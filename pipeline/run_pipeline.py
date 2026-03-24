@@ -21,6 +21,7 @@ from scanner.models import Market
 from pipeline.signals import detect_signals
 from pipeline.publisher import publish_signals
 from tools.compute_accuracy import main as recompute_accuracy
+from tools.git_push_dashboard import push as push_dashboard
 
 logging.basicConfig(
     level=logging.INFO,
@@ -108,6 +109,7 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
             published = publish_signals(signals)
             if published > 0:
                 recompute_accuracy()
+                push_dashboard()
 
     summary = {
         "markets_scanned": len(markets),
