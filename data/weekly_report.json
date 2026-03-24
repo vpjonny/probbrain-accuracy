@@ -1,0 +1,77 @@
+{
+  "week_ending": null,
+  "signals_published": 0,
+  "signals_resolved": 0,
+  "correct": 0,
+  "accuracy_pct": null,
+  "brier_score": null,
+  "current_streak": "0",
+  "by_category": {},
+  "kill_switches_triggered": [],
+  "notable_calls": [],
+  "weekly_financials": [
+    {
+      "week_ending": "2026-03-29",
+      "period": "2026-03-24 to 2026-03-29",
+      "snapshot_date": "2026-03-25",
+      "snapshot_type": "partial_week_projection",
+      "costs": {
+        "claude_api_usd": 8.00,
+        "claude_api_note": "ESTIMATED — Paperclip spentMonthlyCents=0 for all 11 agents (uncapped mode, untracked). Estimate: ~18 heartbeat runs/day across 11 agents at claude-sonnet-4-6 pricing ($3.00/MTok in, $15.00/MTok out), avg 8K input + 1.5K output tokens per run, Research Agent 2x. Actual spend requires Anthropic console access.",
+        "infra_usd": 0.00,
+        "infra_note": "No hosting invoices identified. Domain cost negligible (<$0.04/week annualized). No VPS billing found in config.",
+        "total_usd": 8.00
+      },
+      "revenue": {
+        "dub_affiliate_usd": 0.00,
+        "dub_affiliate_note": "DUB_API_KEY not injected into this context — click/conversion data unavailable. 4 signals published carrying pb-tg and pb-x affiliate links. No confirmed deposits. Referral code: probbrain.",
+        "builders_program_usdc": 0.00,
+        "builders_program_note": "Polymarket Builders Program application submitted (per 2026-03-24 notes). Not yet active. $0 volume rewards accrued.",
+        "subscriptions_usd": 0.00,
+        "subscriptions_note": "0 subscribers (data/subscribers.json is empty). Pro tier not yet launched.",
+        "total_usd": 0.00
+      },
+      "net_usd": -8.00,
+      "signals_published": 4,
+      "by_category": {
+        "geopolitics": { "signals": 2, "cost_est_usd": 1.50 },
+        "sports": { "signals": 1, "cost_est_usd": 0.75 },
+        "crypto": { "signals": 1, "cost_est_usd": 0.75 }
+      },
+      "unit_economics": {
+        "cost_per_signal_usd": 2.00,
+        "revenue_per_signal_usd": 0.00,
+        "note": "All signal categories negative ROI — expected pre-revenue. Cannot flag categories for pause: no revenue data to compare against."
+      },
+      "break_even": {
+        "weekly_break_even_deposits": 1,
+        "monthly_burn_projection_usd": 32.00,
+        "monthly_break_even_deposits": 4,
+        "note": "At $10/deposit referral, 4 Polymarket first deposits/month covers projected burn. Low hurdle at current scale."
+      },
+      "kill_switch_status": {
+        "triggered": false,
+        "monthly_cost_estimate_usd": 32.00,
+        "kill_switch_threshold_usd": 50.00,
+        "headroom_usd": 18.00,
+        "status": "SAFE — estimated monthly burn ~$32, below $50 kill switch threshold",
+        "cost_per_signal_vs_threshold": "SAFE — est. $2.00/signal cost; $0.50 threshold not applied (no revenue data yet to compute cost-vs-revenue ratio)"
+      },
+      "data_sources": {
+        "costs": "Paperclip GET /api/companies/{id}/agents (spentMonthlyCents=0 all agents, uncapped); claude-sonnet-4-6 pricing extrapolation",
+        "revenue": "data/subscribers.json (0 subscribers confirmed); Dub.co API (unavailable — DUB_API_KEY not in heartbeat env); Builders Program (pending onboarding)",
+        "signals": "data/published_signals.json (4 signals: SIG-001 to SIG-004)"
+      },
+      "confidence": "LOW — costs are estimated from model pricing, not measured from Anthropic console. Revenue confirmed $0. Upgrade to MEDIUM when Anthropic + Dub dashboard access is established.",
+      "assumptions": [
+        "claude-sonnet-4-6 pricing: $3.00/MTok input, $15.00/MTok output",
+        "~18 heartbeat runs/day across 11 agents (based on observed lastHeartbeatAt activity)",
+        "Avg 8,000 input + 1,500 output tokens per heartbeat; Research Agent 16,000 + 3,000",
+        "7-day projection from 2-day observed baseline",
+        "No infra costs this week",
+        "No Dub affiliate conversions confirmed"
+      ],
+      "disclaimer": "Estimates based on available data. Not audited."
+    }
+  ]
+}
