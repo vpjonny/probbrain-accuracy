@@ -23,6 +23,43 @@ def _load_json(path: Path, default):
     return default
 
 
+def _build_signal_rows(published: list, outcome_by_market: dict) -> list:
+    """Build the signals array for the dashboard signal table."""
+    rows = []
+    for sig in published:
+        # Skip non-signal entries (e.g. edge threads)
+        if sig.get("type") or not sig.get("signal_number"):
+            continue
+        market_id = str(sig.get("market_id", ""))
+        outcome_data = outcome_by_market.get(market_id)
+        if outcome_data:
+            market_outcome = outcome_data.get("outcome", "").upper()
+            direction = sig.get("direction", "")
+            if "NO_UNDERPRICED" in direction:
+                status = "WIN" if market_outcome == "NO" else "LOSS"
+            elif "YES_UNDERPRICED" in direction:
+                status = "WIN" if market_outcome == "YES" else "LOSS"
+            else:
+                status = "PENDING"
+        else:
+            status = "PENDING"
+        rows.append({
+            "id": sig.get("signal_id") or f"SIG-{sig['signal_number']:03d}",
+            "signal_number": sig["signal_number"],
+            "title": sig.get("question", ""),
+            "category": sig.get("category", "general"),
+            "direction": sig.get("direction", ""),
+            "confidence": sig.get("confidence", ""),
+            "market_price": sig.get("market_yes_price", 0),
+            "our_estimate": sig.get("our_calibrated_estimate", 0),
+            "gap_pct": sig.get("gap_pct", 0),
+            "status": status,
+            "close_date": sig.get("close_date", ""),
+            "published_at": sig.get("actually_posted_at") or sig.get("published_at", ""),
+        })
+    return rows
+
+
 def compute() -> dict:
     published: list = _load_json(PUBLISHED_PATH, [])
     resolved_outcomes: list = _load_json(RESOLVED_PATH, [])
@@ -31,7 +68,7 @@ def compute() -> dict:
     # resolved.json entries should have: market_id, outcome (YES/NO), resolved_at
     outcome_by_market = {r["market_id"]: r for r in resolved_outcomes if "market_id" in r}
 
-    signals_published = len(published)
+    signals_published = sum(1 for s in published if not s.get("type") and s.get("signal_number"))
     signals_resolved = 0
     correct = 0
     brier_sum = 0.0
@@ -140,6 +177,7 @@ def compute() -> dict:
         "by_confidence": by_confidence,
         "kill_switches_active": [],
         "last_resolved_signal": last_resolved,
+        "signals": _build_signal_rows(published, outcome_by_market),
     }
 
 
