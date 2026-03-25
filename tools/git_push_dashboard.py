@@ -1,5 +1,6 @@
 """
-git_push_dashboard.py — commit and push dashboard/accuracy.json to GitHub after each signal.
+git_push_dashboard.py — commit and push dashboard/accuracy.json and data/published_signals.json
+to GitHub after each signal.
 
 Called by the pipeline immediately after recompute_accuracy() so GitHub Pages
 reflects every signal in real time rather than waiting for the 2h cron.
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
 DASHBOARD_ACCURACY = ROOT / "dashboard" / "accuracy.json"
+PUBLISHED_SIGNALS = ROOT / "data" / "published_signals.json"
 
 
 def _run(cmd: list[str], cwd: Path = ROOT) -> tuple[int, str]:
@@ -22,7 +24,7 @@ def _run(cmd: list[str], cwd: Path = ROOT) -> tuple[int, str]:
 
 def push(signal_id: str = "") -> bool:
     """
-    Stage dashboard/accuracy.json, commit, and push to origin/main.
+    Stage dashboard/accuracy.json and data/published_signals.json, commit, and push to origin/main.
 
     Returns True on success, False on failure (non-fatal — pipeline continues).
     """
@@ -30,14 +32,14 @@ def push(signal_id: str = "") -> bool:
         logger.warning("git_push_dashboard: accuracy.json not found, skipping push")
         return False
 
-    # Check if there's anything to commit
-    rc, diff = _run(["git", "diff", "--name-only", "dashboard/accuracy.json"])
+    # Check if there's anything to commit in either tracked file
+    rc, diff = _run(["git", "diff", "--name-only", "dashboard/accuracy.json", "data/published_signals.json"])
     if rc != 0:
         logger.error("git diff failed: %s", diff)
         return False
 
     if not diff.strip():
-        logger.info("git_push_dashboard: no changes in accuracy.json, nothing to push")
+        logger.info("git_push_dashboard: no changes to commit, nothing to push")
         return True
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -47,8 +49,12 @@ def push(signal_id: str = "") -> bool:
     msg_parts.append(f"[{ts}]")
     commit_msg = " ".join(msg_parts) + "\n\nCo-Authored-By: Paperclip <noreply@paperclip.ing>"
 
+    files_to_stage = ["dashboard/accuracy.json"]
+    if PUBLISHED_SIGNALS.exists():
+        files_to_stage.append("data/published_signals.json")
+
     steps = [
-        (["git", "add", "dashboard/accuracy.json"], "stage"),
+        (["git", "add"] + files_to_stage, "stage"),
         (["git", "commit", "-m", commit_msg], "commit"),
         (["git", "push", "origin", "main"], "push"),
     ]
@@ -60,5 +66,5 @@ def push(signal_id: str = "") -> bool:
             return False
         logger.info("git_push_dashboard: %s OK — %s", label, out[:120])
 
-    logger.info("git_push_dashboard: dashboard pushed to GitHub — deploy-pages.yml triggered")
+    logger.info("git_push_dashboard: dashboard + published_signals pushed to GitHub — deploy-pages.yml triggered")
     return True
