@@ -3,89 +3,547 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ProbBrain — Accuracy Dashboard</title>
+  <title>ProbBrain — Signal Accuracy Hub</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; background: #0d0d0d; color: #e8e8e8; margin: 0; padding: 24px; }
-    h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
-    .subtitle { color: #888; font-size: 0.85rem; margin-bottom: 32px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
-    .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; }
-    .card .label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 0.08em; }
-    .card .value { font-size: 1.8rem; font-weight: 700; margin-top: 4px; }
-    .card .value.green { color: #4ade80; }
-    .card .value.yellow { color: #facc15; }
-    .card .value.red { color: #f87171; }
-    .card .value.gray { color: #666; }
-    .disclaimer { font-size: 0.75rem; color: #555; border-top: 1px solid #1e1e1e; padding-top: 16px; margin-top: 32px; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th { text-align: left; padding: 8px 12px; color: #888; font-weight: 500; border-bottom: 1px solid #2a2a2a; }
-    td { padding: 8px 12px; border-bottom: 1px solid #1a1a1a; }
-    .badge-high { background: #7f1d1d; color: #fca5a5; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
-    .badge-medium { background: #713f12; color: #fde68a; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
-    .win { color: #4ade80; }
-    .loss { color: #f87171; }
-    #updated { color: #555; font-size: 0.75rem; margin-bottom: 24px; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --border: #222222;
+      --border2: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #666;
+      --muted2: #444;
+      --green: #22c55e;
+      --green-dim: #14532d;
+      --yellow: #eab308;
+      --yellow-dim: #713f12;
+      --red: #ef4444;
+      --red-dim: #7f1d1d;
+      --blue: #3b82f6;
+      --accent: #6366f1;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 12px; }
+
+    .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+    .logo span { color: var(--accent); }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #0f2010;
+      border: 1px solid #1a4020;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .header-right { display: flex; align-items: center; gap: 8px; }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .social-link:hover { border-color: var(--accent); background: #16172a; }
+    .social-link svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* Main */
+    .main { padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .kpi-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--border2);
+    }
+
+    .kpi-card.accent-green::before { background: var(--green); }
+    .kpi-card.accent-yellow::before { background: var(--yellow); }
+    .kpi-card.accent-red::before { background: var(--red); }
+    .kpi-card.accent-blue::before { background: var(--blue); }
+
+    .kpi-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .kpi-value.green { color: var(--green); }
+    .kpi-value.yellow { color: var(--yellow); }
+    .kpi-value.red { color: var(--red); }
+    .kpi-value.blue { color: var(--blue); }
+    .kpi-value.muted { color: var(--muted); }
+
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trend-up { color: var(--green); }
+    .trend-down { color: var(--red); }
+    .trend-flat { color: var(--muted); }
+
+    /* Signal Table */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 36px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+
+    thead { background: var(--bg2); }
+
+    th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #111; }
+
+    td { padding: 13px 14px; vertical-align: middle; }
+
+    .signal-num { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+
+    .signal-title { font-weight: 500; max-width: 260px; }
+    .signal-cat { font-size: 0.7rem; color: var(--muted); margin-top: 2px; text-transform: capitalize; }
+
+    .dir-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .dir-no { background: var(--red-dim); color: #fca5a5; }
+    .dir-yes { background: var(--green-dim); color: #86efac; }
+
+    .conf-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .conf-high { background: var(--red-dim); color: #fca5a5; }
+    .conf-medium { background: var(--yellow-dim); color: #fde68a; }
+    .conf-low { background: var(--muted2); color: #aaa; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .status-pending { background: #1a1a2e; color: #818cf8; border: 1px solid #312e81; }
+    .status-win { background: var(--green-dim); color: #86efac; border: 1px solid #166534; }
+    .status-loss { background: var(--red-dim); color: #fca5a5; border: 1px solid #991b1b; }
+
+    .prob-col { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .prob-market { color: var(--muted); }
+    .prob-sep { color: var(--muted2); margin: 0 4px; }
+    .prob-ours { font-weight: 600; }
+
+    .gap-pill {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .gap-high { background: #1a0f2e; color: #c084fc; }
+    .gap-medium { background: #1e1a0f; color: #fde68a; }
+    .gap-low { background: #111; color: var(--muted); }
+
+    .close-date { color: var(--muted); font-size: 0.78rem; }
+
+    .empty-row td { color: var(--muted); text-align: center; padding: 32px; }
+
+    /* Category breakdown */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    .cat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .cat-name { font-size: 0.78rem; font-weight: 600; text-transform: capitalize; margin-bottom: 8px; }
+    .cat-stats { display: flex; gap: 12px; }
+    .cat-stat { font-size: 0.72rem; color: var(--muted); }
+    .cat-stat strong { color: var(--text); font-size: 0.9rem; display: block; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #updated { font-size: 0.75rem; color: var(--muted); }
+    .disclaimer { font-size: 0.72rem; color: var(--muted2); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .header { padding: 12px 16px; }
+      .main { padding: 20px 16px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-value { font-size: 1.6rem; }
+      .table-wrap { overflow-x: auto; }
+      table { min-width: 620px; }
+      .footer { flex-direction: column; align-items: flex-start; }
+      .social-link { padding: 5px 9px; font-size: 0.75rem; }
+    }
   </style>
 </head>
 <body>
-  <h1>ProbBrain — Signal Accuracy</h1>
-  <div class="subtitle">Every call logged. Every outcome tracked. No rounding.</div>
-  <div id="updated">Loading...</div>
 
-  <div class="grid" id="stats-grid">
-    <div class="card"><div class="label">Signals Published</div><div class="value gray" id="published">—</div></div>
-    <div class="card"><div class="label">Resolved</div><div class="value gray" id="resolved">—</div></div>
-    <div class="card"><div class="label">Accuracy</div><div class="value gray" id="accuracy">—</div></div>
-    <div class="card"><div class="label">Brier Score</div><div class="value gray" id="brier">—</div></div>
-    <div class="card"><div class="label">Current Streak</div><div class="value gray" id="streak">—</div></div>
-  </div>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">Prob<span>Brain</span></div>
+      <div class="live-badge">
+        <div class="pulse-dot"></div>
+        Live
+      </div>
+    </div>
+    <div class="header-right">
+      <a class="social-link" href="https://dub.sh/pb-tg" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.062 13.67l-2.948-.924c-.643-.204-.657-.643.136-.953l11.51-4.437c.537-.194 1.006.131.802.892z"/></svg>
+        Telegram
+      </a>
+      <a class="social-link" href="https://dub.sh/pb-x" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
+    </div>
+  </header>
 
-  <h2 style="font-size:1rem;color:#888;margin-bottom:12px">By Category</h2>
-  <table id="category-table">
-    <thead><tr><th>Category</th><th>Resolved</th><th>Correct</th><th>Accuracy</th></tr></thead>
-    <tbody id="category-body"><tr><td colspan="4" style="color:#555">No resolved signals yet.</td></tr></tbody>
-  </table>
+  <main class="main">
 
-  <div class="disclaimer">
-    Not financial advice. Prediction markets carry risk. Trade only what you can afford to lose.<br>
-    Accuracy tracked from first signal. All numbers are exact — no rounding up.
-  </div>
+    <div class="section-title">Performance Overview</div>
+    <div class="kpi-grid">
+      <div class="kpi-card accent-blue">
+        <div class="kpi-label">Published</div>
+        <div class="kpi-value blue" id="published">—</div>
+        <div class="kpi-sub">signals total</div>
+      </div>
+      <div class="kpi-card" id="card-resolved">
+        <div class="kpi-label">Resolved</div>
+        <div class="kpi-value muted" id="resolved">—</div>
+        <div class="kpi-sub" id="resolved-sub">of total</div>
+      </div>
+      <div class="kpi-card" id="card-accuracy">
+        <div class="kpi-label">Accuracy</div>
+        <div class="kpi-value muted" id="accuracy">—</div>
+        <div class="kpi-sub" id="accuracy-sub">awaiting resolution</div>
+      </div>
+      <div class="kpi-card" id="card-brier">
+        <div class="kpi-label">Brier Score</div>
+        <div class="kpi-value muted" id="brier">—</div>
+        <div class="kpi-sub">lower = better</div>
+      </div>
+      <div class="kpi-card" id="card-streak">
+        <div class="kpi-label">Streak</div>
+        <div class="kpi-value muted" id="streak">—</div>
+        <div class="kpi-sub" id="streak-sub">no resolved signals</div>
+      </div>
+    </div>
+
+    <div class="section-title">Signal Log</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Market</th>
+            <th>Direction</th>
+            <th>Market vs Ours</th>
+            <th>Gap</th>
+            <th>Confidence</th>
+            <th>Status</th>
+            <th>Closes</th>
+          </tr>
+        </thead>
+        <tbody id="signal-body">
+          <tr class="empty-row"><td colspan="8">Loading signals...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="cat-section" style="display:none">
+      <div class="section-title">By Category</div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <div id="updated">Loading...</div>
+    <div class="disclaimer">Not financial advice. All numbers are exact — no rounding up.</div>
+  </footer>
 
   <script>
+    function dirBadge(dir) {
+      if (dir === 'NO_UNDERPRICED') return '<span class="dir-badge dir-no">&#9660; Bet NO</span>';
+      if (dir === 'YES_UNDERPRICED') return '<span class="dir-badge dir-yes">&#9650; Bet YES</span>';
+      return `<span class="dir-badge">${dir}</span>`;
+    }
+
+    function confBadge(c) {
+      const cls = c === 'HIGH' ? 'conf-high' : c === 'MEDIUM' ? 'conf-medium' : 'conf-low';
+      return `<span class="conf-badge ${cls}">${c}</span>`;
+    }
+
+    function statusBadge(s) {
+      if (s === 'WIN') return '<span class="status-badge status-win">&#10003; WIN</span>';
+      if (s === 'LOSS') return '<span class="status-badge status-loss">&#10007; LOSS</span>';
+      return '<span class="status-badge status-pending">&#9685; PENDING</span>';
+    }
+
+    function gapPill(g) {
+      const cls = g >= 30 ? 'gap-high' : g >= 10 ? 'gap-medium' : 'gap-low';
+      return `<span class="gap-pill ${cls}">${g.toFixed(1)}pp</span>`;
+    }
+
     function loadData() {
       fetch('accuracy.json?t=' + Date.now())
         .then(r => r.json())
         .then(d => {
-          document.getElementById('published').textContent = d.signals_published ?? '0';
-          document.getElementById('resolved').textContent = d.signals_resolved ?? '0';
-
-          const acc = document.getElementById('accuracy');
-          if (d.accuracy_pct != null) {
-            acc.textContent = d.accuracy_pct.toFixed(1) + '%';
-            acc.className = 'value ' + (d.accuracy_pct >= 65 ? 'green' : d.accuracy_pct >= 50 ? 'yellow' : 'red');
-          } else {
-            acc.textContent = '—';
-            acc.className = 'value gray';
-          }
-
-          document.getElementById('brier').textContent = d.brier_score != null ? d.brier_score.toFixed(3) : '—';
-
-          const streak = d.current_streak;
-          document.getElementById('streak').textContent = streak ? (d.streak_type === 'win' ? '+' : '-') + streak : '—';
           document.getElementById('updated').textContent = d.updated_at
-            ? 'Last updated: ' + new Date(d.updated_at).toUTCString() + ' · auto-refreshes every 60s'
+            ? 'Last updated: ' + new Date(d.updated_at).toUTCString() + ' \u00b7 auto-refreshes every 60s'
             : 'No data yet.';
 
-          const body = document.getElementById('category-body');
+          // Published
+          document.getElementById('published').textContent = d.signals_published ?? '0';
+
+          // Resolved
+          document.getElementById('resolved').textContent = d.signals_resolved ?? '0';
+          const pctRes = d.signals_published ? Math.round((d.signals_resolved / d.signals_published) * 100) : 0;
+          document.getElementById('resolved-sub').textContent = pctRes + '% of total';
+
+          // Accuracy
+          const accEl = document.getElementById('accuracy');
+          const accSub = document.getElementById('accuracy-sub');
+          const cardAcc = document.getElementById('card-accuracy');
+          if (d.accuracy_pct != null) {
+            const cls = d.accuracy_pct >= 65 ? 'green' : d.accuracy_pct >= 50 ? 'yellow' : 'red';
+            accEl.textContent = d.accuracy_pct.toFixed(1) + '%';
+            accEl.className = 'kpi-value ' + cls;
+            cardAcc.className = 'kpi-card accent-' + cls;
+            const arrow = d.accuracy_pct >= 65 ? '\u25b2' : d.accuracy_pct >= 50 ? '\u25a4' : '\u25bc';
+            accSub.textContent = arrow + ' vs 50% baseline';
+          } else {
+            accEl.textContent = '—';
+            accEl.className = 'kpi-value muted';
+            cardAcc.className = 'kpi-card';
+            accSub.textContent = 'awaiting resolution';
+          }
+
+          // Brier
+          const brierEl = document.getElementById('brier');
+          const cardBrier = document.getElementById('card-brier');
+          if (d.brier_score != null) {
+            const cls = d.brier_score <= 0.2 ? 'green' : d.brier_score <= 0.33 ? 'yellow' : 'red';
+            brierEl.textContent = d.brier_score.toFixed(3);
+            brierEl.className = 'kpi-value ' + cls;
+            cardBrier.className = 'kpi-card accent-' + cls;
+          } else {
+            brierEl.textContent = '—';
+            brierEl.className = 'kpi-value muted';
+            cardBrier.className = 'kpi-card';
+          }
+
+          // Streak
+          const streakEl = document.getElementById('streak');
+          const streakSub = document.getElementById('streak-sub');
+          const cardStreak = document.getElementById('card-streak');
+          if (d.current_streak) {
+            const isWin = d.streak_type === 'win';
+            streakEl.textContent = (isWin ? '+' : '-') + d.current_streak;
+            streakEl.className = 'kpi-value ' + (isWin ? 'green' : 'red');
+            cardStreak.className = 'kpi-card accent-' + (isWin ? 'green' : 'red');
+            streakSub.textContent = isWin ? 'win streak' : 'loss streak';
+          } else {
+            streakEl.textContent = '—';
+            streakEl.className = 'kpi-value muted';
+            cardStreak.className = 'kpi-card';
+            streakSub.textContent = 'no resolved signals';
+          }
+
+          // Signal table
+          const signals = d.signals || [];
+          const tbody = document.getElementById('signal-body');
+          if (!signals.length) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No signals published yet.</td></tr>';
+          } else {
+            tbody.innerHTML = signals.map(s => {
+              const mkt = Math.round(s.market_price * 100) + '%';
+              const ours = Math.round(s.our_estimate * 100) + '%';
+              return `<tr>
+                <td><span class="signal-num">#${s.signal_number}</span></td>
+                <td>
+                  <div class="signal-title">${s.title}</div>
+                  <div class="signal-cat">${s.category}</div>
+                </td>
+                <td>${dirBadge(s.direction)}</td>
+                <td><span class="prob-col"><span class="prob-market">${mkt}</span><span class="prob-sep">/</span><span class="prob-ours">${ours}</span></span></td>
+                <td>${gapPill(s.gap_pct)}</td>
+                <td>${confBadge(s.confidence)}</td>
+                <td>${statusBadge(s.status)}</td>
+                <td><span class="close-date">${s.close_date || '—'}</span></td>
+              </tr>`;
+            }).join('');
+          }
+
+          // Category breakdown
           const cats = d.by_category || {};
+          const catSection = document.getElementById('cat-section');
           if (Object.keys(cats).length) {
-            body.innerHTML = Object.entries(cats).map(([cat, s]) =>
-              `<tr><td>${cat}</td><td>${s.resolved}</td><td>${s.correct}</td><td>${s.accuracy_pct != null ? s.accuracy_pct.toFixed(1)+'%' : '—'}</td></tr>`
-            ).join('');
+            catSection.style.display = '';
+            document.getElementById('cat-grid').innerHTML = Object.entries(cats).map(([cat, s]) => `
+              <div class="cat-card">
+                <div class="cat-name">${cat}</div>
+                <div class="cat-stats">
+                  <div class="cat-stat"><strong>${s.resolved}</strong>resolved</div>
+                  <div class="cat-stat"><strong>${s.correct}</strong>correct</div>
+                  <div class="cat-stat"><strong>${s.accuracy_pct != null ? s.accuracy_pct.toFixed(0) + '%' : '—'}</strong>accuracy</div>
+                </div>
+              </div>`).join('');
+          } else {
+            catSection.style.display = 'none';
           }
         })
         .catch(() => {
-          document.getElementById('updated').textContent = 'Dashboard not yet initialized.';
+          document.getElementById('updated').textContent = 'Dashboard data unavailable.';
         });
     }
 
