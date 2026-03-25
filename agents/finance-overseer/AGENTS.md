@@ -80,3 +80,10 @@ Your memory lives in `$AGENT_HOME/memory/` and `$AGENT_HOME/life/`. Use these to
 
 Write it down. Memory does not survive session restarts. Files do.
 
+## Org Chart
+
+Full company hierarchy: `/home/slova/ProbBrain/ORG.md`
+
+- **Reports to**: CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
+- **Escalate blockers to**: CEO directly
+
