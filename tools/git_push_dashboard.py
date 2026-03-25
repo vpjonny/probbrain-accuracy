@@ -56,7 +56,7 @@ def push(signal_id: str = "") -> bool:
     steps = [
         (["git", "add"] + files_to_stage, "stage"),
         (["git", "commit", "-m", commit_msg], "commit"),
-        (["git", "push", "origin", "main"], "push"),
+        (["git", "push", "origin", "main"], "push origin"),
     ]
 
     for cmd, label in steps:
@@ -66,5 +66,59 @@ def push(signal_id: str = "") -> bool:
             return False
         logger.info("git_push_dashboard: %s OK — %s", label, out[:120])
 
+    # Also sync accuracy.json to probbrain-accuracy (the public-facing dashboard URL).
+    # That repo serves files from its root, so we push accuracy.json there directly.
+    _sync_accuracy_repo(commit_msg)
+
     logger.info("git_push_dashboard: dashboard + published_signals pushed to GitHub — deploy-pages.yml triggered")
     return True
+
+
+def _sync_accuracy_repo(commit_msg: str) -> None:
+    """
+    Push updated accuracy.json to the probbrain-accuracy repo root.
+    That repo's GitHub Pages serves from its root, so accuracy.json at root
+    is what vpjonny.github.io/probbrain-accuracy/ fetches.
+    Non-fatal — logs warnings on failure.
+    """
+    # Ensure the remote is configured
+    rc, remotes = _run(["git", "remote"])
+    if "accuracy" not in remotes.split():
+        _run(["git", "remote", "add", "accuracy", "https://github.com/vpjonny/probbrain-accuracy.git"])
+
+    # Fetch the current accuracy/main
+    rc, out = _run(["git", "fetch", "accuracy", "main"])
+    if rc != 0:
+        logger.warning("git_push_dashboard: accuracy fetch failed: %s", out[:120])
+        return
+
+    # Check out accuracy/main in a temporary worktree
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmppath = Path(tmpdir)
+        rc, out = _run(["git", "worktree", "add", str(tmppath), "accuracy/main"])
+        if rc != 0:
+            logger.warning("git_push_dashboard: accuracy worktree failed: %s", out[:120])
+            return
+        try:
+            import shutil
+            shutil.copy(str(DASHBOARD_ACCURACY), str(tmppath / "accuracy.json"))
+            rc, out = _run(["git", "add", "accuracy.json"], cwd=tmppath)
+            if rc != 0:
+                logger.warning("git_push_dashboard: accuracy add failed: %s", out)
+                return
+            rc, diff = _run(["git", "diff", "--cached", "--name-only"], cwd=tmppath)
+            if not diff.strip():
+                logger.info("git_push_dashboard: accuracy repo already up to date, skip")
+                return
+            rc, out = _run(["git", "commit", "-m", commit_msg], cwd=tmppath)
+            if rc != 0:
+                logger.warning("git_push_dashboard: accuracy commit failed: %s", out)
+                return
+            rc, out = _run(["git", "push", "accuracy", "HEAD:main"], cwd=tmppath)
+            if rc != 0:
+                logger.warning("git_push_dashboard: accuracy push failed: %s", out[:120])
+            else:
+                logger.info("git_push_dashboard: accuracy repo synced OK")
+        finally:
+            _run(["git", "worktree", "remove", "--force", str(tmppath)])
