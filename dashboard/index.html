@@ -202,6 +202,8 @@
     tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #111; }
+    tbody tr[data-href] { cursor: pointer; }
+    tbody tr[data-href]:hover { background: #161622; }
 
     td { padding: 13px 14px; vertical-align: middle; }
 
@@ -508,7 +510,10 @@
             tbody.innerHTML = signals.map(s => {
               const mkt = Math.round(s.market_price * 100) + '%';
               const ours = Math.round(s.our_estimate * 100) + '%';
-              return `<tr>
+              const href = s.polymarket_slug
+                ? 'https://polymarket.com/event/' + s.polymarket_slug + '?via=0x-slova'
+                : '';
+              return `<tr${href ? ' data-href="' + href + '"' : ''}>
                 <td><span class="signal-num">#${s.signal_number}</span></td>
                 <td>
                   <div class="signal-title">${s.title}</div>
@@ -522,6 +527,9 @@
                 <td><span class="close-date">${s.close_date || '—'}</span></td>
               </tr>`;
             }).join('');
+            tbody.querySelectorAll('tr[data-href]').forEach(row => {
+              row.addEventListener('click', () => window.open(row.dataset.href, '_blank'));
+            });
           }
 
           // Category breakdown

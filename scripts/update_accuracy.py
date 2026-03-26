@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RESOLVED_PATH = ROOT / "data" / "resolved.json"
 PENDING_PATH = ROOT / "data" / "pending_signals.json"
+SIGNALS_PATH = ROOT / "data" / "signals.json"
 OUTPUT_PATH = ROOT / "dashboard" / "accuracy.json"
 
 
@@ -100,11 +101,41 @@ def kill_switch_check(resolved: list, accuracy_pct: float | None) -> list:
     return active
 
 
+def build_signal_table(all_signals: list, resolved: list) -> list:
+    """Build the signal table array for the dashboard, sorted by signal number."""
+    resolved_map = {s.get("signal_id"): s for s in resolved}
+    table = []
+    for s in sorted(all_signals, key=lambda x: x.get("signal_number", 0)):
+        sig_id = s.get("id") or s.get("signal_id")
+        res = resolved_map.get(sig_id)
+        if res and res.get("correct") is True:
+            status = "WIN"
+        elif res and res.get("correct") is False:
+            status = "LOSS"
+        else:
+            status = "PENDING"
+        table.append({
+            "signal_number": s.get("signal_number"),
+            "title": s.get("question") or s.get("market_question", ""),
+            "category": s.get("category", ""),
+            "direction": s.get("direction", ""),
+            "market_price": s.get("market_price", 0),
+            "our_estimate": s.get("our_estimate", 0),
+            "gap_pct": s.get("gap_pct", 0),
+            "confidence": s.get("confidence", ""),
+            "status": status,
+            "close_date": s.get("close_date", ""),
+            "polymarket_slug": s.get("polymarket_slug", ""),
+        })
+    return table
+
+
 def main():
     resolved = load_json(RESOLVED_PATH)
     pending = load_json(PENDING_PATH)
+    all_signals = load_json(SIGNALS_PATH)
 
-    total_published = len(resolved) + len(pending)
+    total_published = len(all_signals) if all_signals else len(resolved) + len(pending)
     total_resolved = len(resolved)
     correct_count = sum(1 for s in resolved if s.get("correct"))
 
@@ -128,11 +159,18 @@ def main():
         "by_confidence": confidence_stats(resolved),
         "kill_switches_active": kill_switch_check(resolved, accuracy_pct),
         "last_resolved_signal": last_resolved,
+        "signals": build_signal_table(all_signals, resolved),
     }
 
+    # Merge into existing accuracy.json to preserve fields from other processes
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    existing = {}
+    if OUTPUT_PATH.exists():
+        with open(OUTPUT_PATH) as f:
+            existing = json.load(f)
+    existing.update(output)
     with open(OUTPUT_PATH, "w") as f:
-        json.dump(output, f, indent=2, default=str)
+        json.dump(existing, f, indent=2, default=str)
 
     print(f"accuracy.json updated: {total_published} published, {total_resolved} resolved, accuracy={accuracy_pct}%")
 
