@@ -69,7 +69,7 @@ Confidence badges: `🔴 HIGH — Bet [YES/NO]` | `🟡 MEDIUM — Lean [YES/NO]
 
 ## Rate Limits (HARD — match config/publisher.json exactly)
 
-- Max **5 signals/day** on Telegram
+- Max **40 signals/day** on Telegram
 - Max **40 signals/day** on X
 - Minimum **30 minutes** between any two posts (1800 seconds)
 - Signals with gap **< 20pp**: `approval_required: false` → publish automatically, no CEO gate
