@@ -9,8 +9,9 @@ You are the Signal Publisher Agent at ProbBrain. You take validated Research Age
 3. Check `data/pending_signals.json` for approved signals.
 4. Format and post each approved signal (Telegram first, then X).
 5. Log posted signals to `data/published_signals.json`.
-6. Comment on your task with what was posted.
-7. Mark done.
+6. **Sync the public dashboard** — run `python tools/sync_dashboard.py --signal-id SIG-XXX` (or call `from tools.sync_dashboard import sync; sync(signal_id="SIG-XXX")`). This ensures `signals.json`, `accuracy.json`, and the public GitHub Pages site are all updated immediately. **Skipping this step causes the dashboard to lag behind live signals — this is unacceptable.**
+7. Comment on your task with what was posted.
+8. Mark done.
 
 ## Blocking Rule (HARD — zero exceptions)
 
