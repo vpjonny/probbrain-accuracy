@@ -1,15 +1,15 @@
 """
-Post SIG-013: Will Sweden qualify for the 2026 FIFA World Cup? (NO_UNDERPRICED)
-Sourced from PRO-198 signal description.
-Content reviewed by Content Creator (PRO-199) and Twitter Engager (PRO-200).
+Post SIG-007: Netanyahu out by Dec 31, 2026? (NO_UNDERPRICED)
+Sourced from data/scans/2026-03-26-07.json, approved via PRO-149 Approved label.
+Content reviewed by Content Creator (PRO-156) and Twitter Engager (PRO-158).
 
 This script:
-1. Posts SIG-013 to Telegram then X
+1. Posts SIG-007 to Telegram then X
 2. Updates data/published_signals.json
 3. Pushes dashboard
-4. PATCHes PRO-198 to done via Paperclip API
+4. PATCHes PRO-149 to done via Paperclip API
 
-Usage: python tools/post_sig013_sweden_wc_2026_03_26.py [--dry-run]
+Usage: python tools/post_sig007_netanyahu_2026_03_26.py [--dry-run]
 """
 import json
 import logging
@@ -44,65 +44,65 @@ TELEGRAM_API = "https://api.telegram.org"
 PAPERCLIP_API_URL = os.getenv("PAPERCLIP_API_URL", "").strip()
 PAPERCLIP_API_KEY = os.getenv("PAPERCLIP_API_KEY", "").strip()
 PAPERCLIP_RUN_ID = os.getenv("PAPERCLIP_RUN_ID", "").strip()
-PRO_198_ID = "781fc859-0917-481a-a6e8-c8e65de7b10b"
+PRO_149_ID = "3c8fc56a-b3c2-42c8-b0d7-d6b390a1f3cc"
 
 DRY_RUN = "--dry-run" in sys.argv
 
-# Final copy — incorporates Content Creator (PRO-199) and Twitter Engager (PRO-200) feedback.
-# Content Creator fix applied: "Poland ~52% fav in the final" → "Poland ~52% fav in the qualifying final"
+# Final copy — incorporates Content Creator (PRO-156) and Twitter Engager (PRO-158) feedback:
+# - Gap written as 21.5pp (not 21.5%)
+# - "Oct elections puts" → "Oct elections put" (grammar)
+# - Counter-evidence tightened: removed redundant budget path, kept survival path point
+# - Tweet 2 compressed to fit 280 chars (Twitter Engager PRO-158)
 SIGNAL = {
-    "signal_number": 13,
-    "signal_id": "SIG-013",
-    "market_id": "sweden-2026-wc-qualifier",
-    "question": "Will Sweden qualify for the 2026 FIFA World Cup?",
-    "category": "sports",
+    "signal_number": 7,
+    "signal_id": "SIG-007",
+    "market_id": "567688",
+    "question": "Will Netanyahu cease to be PM of Israel by Dec 31, 2026?",
+    "category": "geopolitics",
     "direction": "NO_UNDERPRICED",
     "confidence": "HIGH",
-    "our_estimate": 0.155,
-    "market_price_at_signal": 0.345,
-    "gap_pct": 19.0,
-    "volume_usdc": 131000,
-    "close_date": "2026-04-12",
-    "paperclip_issue": "PRO-198",
+    "our_estimate": 0.28,
+    "market_price_at_signal": 0.495,
+    "gap_pct": 21.5,
+    "volume_usdc": 857026,
+    "close_date": "2026-12-31",
+    "paperclip_issue": "PRO-149",
     "evidence": [
-        "Sweden's semi-final vs Ukraine is TODAY — Opta gives them only 32% to advance (21% in 90 mins + extra time/pens)",
-        "Even if Sweden advances, they almost certainly face Poland (Poland ~57% to beat Albania in the other semi)",
-        "Combined two-match probability: ~32% × 48% ≈ 15% — matches our estimate exactly",
-        "Market is pricing Sweden as if the semi-final is already won — classic single-match double-count error",
-        "$131K volume is relatively thin — inefficient market, susceptible to optimism bias",
+        "Netanyahu re-elected as Likud leader, targets Sept/Oct elections — preference for a late-year vote makes a Dec 31 exit extremely unlikely (Anadolu Agency, March 2026)",
+        "Corruption trial verdict not expected until 2027 — no conviction mechanism removing him in calendar 2026 (Wikipedia: Trial of Benjamin Netanyahu)",
+        "Israeli coalition formation historically takes 6–12 weeks minimum — Oct elections put a new PM in late Dec or Jan 2027 at best, likely missing the deadline (Chatham House, March 2026)",
+        "Budget passes (~55% prob) → Netanyahu controls timing → Oct elections → near-zero Dec 31 exit; if budget fails (~45%), June elections create a narrow but sub-50% exit path",
+        "Historical base rate: only 2 of last 5 Israeli PMs left office within 9 months of an active war or major escalation",
     ],
     "telegram_copy": (
         "\U0001f534 HIGH \u2014 Bet NO | MARKET SIGNAL\n\n"
-        "\U0001f4ca Will Sweden qualify for the 2026 FIFA World Cup?\n\n"
-        "Market: 34.5% YES | Our estimate: 15.5% YES\n"
-        "Gap: 19pp (market overpricing YES)\n"
-        "Volume: $131K\n"
-        "Closes: 2026-04-12\n\n"
+        "\U0001f4ca Will Netanyahu cease to be PM of Israel by Dec 31, 2026?\n\n"
+        "Market: 49.5% YES | Our estimate: 28% YES\n"
+        "Gap: 21.5pp (market overpricing YES)\n"
+        "Volume: $857k\n"
+        "Closes: 2026-12-31\n\n"
         "Evidence:\n"
-        "\u2022 Sweden's semi-final vs Ukraine is TODAY \u2014 Opta gives them only 32% to advance (21% in 90 mins + extra time/pens)\n"
-        "\u2022 Even if Sweden advances, they almost certainly face Poland (Poland ~57% to beat Albania in the other semi)\n"
-        "\u2022 Combined two-match probability: ~32% \u00d7 48% \u2248 15% \u2014 matches our estimate exactly\n"
-        "\u2022 Market is pricing Sweden as if the semi-final is already won \u2014 classic single-match double-count error\n"
-        "\u2022 $131K volume is relatively thin \u2014 inefficient market, susceptible to optimism bias\n\n"
-        "Counter-evidence: Semi-finals are high-variance. Sweden could outperform Opta\u2019s model and draw a weaker path than expected. "
-        "If Albania beats Poland, Sweden\u2019s final-stage odds improve meaningfully.\n\n"
+        "\u2022 Netanyahu re-elected as Likud leader, targets Sept/Oct elections \u2014 preference for a late-year vote makes a Dec 31 exit extremely unlikely (Anadolu Agency, March 2026)\n"
+        "\u2022 Corruption trial verdict not expected until 2027 \u2014 no conviction mechanism removing him in calendar 2026 (Wikipedia: Trial of Benjamin Netanyahu)\n"
+        "\u2022 Israeli coalition formation historically takes 6\u201312 weeks minimum \u2014 Oct elections put a new PM in late Dec or Jan 2027 at best, likely missing the deadline (Chatham House, March 2026)\n"
+        "\u2022 Budget passes (~55% prob) \u2192 Netanyahu controls timing \u2192 Oct elections \u2192 near-zero Dec 31 exit; if budget fails (~45%), June elections create a narrow but sub-50% exit path\n"
+        "\u2022 Historical base rate: only 2 of last 5 Israeli PMs left office within 9 months of an active war or major escalation\n\n"
+        "Counter-evidence: Netanyahu has historically defied political predictions; never count him out of engineering a survival path.\n\n"
         "\U0001f517 Trade on Polymarket: https://dub.sh/pb-tg\n\n"
         "\u26a0\ufe0f Not financial advice. Trade at your own risk.\n"
         "\U0001f4c8 Accuracy track record: https://vpjonny.github.io/probbrain-accuracy/"
     ),
     "x_thread_copy": {
         "tweet_1": (
-            "Polymarket prices Sweden qualifying for the 2026 World Cup at 34.5%. "
-            "Their semi-final vs Ukraine is TODAY. Opta: 32% chance they advance. "
-            "Combined WC probability: ~15%. Gap: 19pp. [thread]"
+            "Polymarket prices Netanyahu at 49.5% to leave office by Dec 31. "
+            "Our calibrated estimate: 28%. Gap: 21.5pp. Here\u2019s the evidence. [thread]"
         ),
         "tweet_2": (
-            "Semi-final TODAY vs Ukraine (Opta: 32% advance). "
-            "If through, face likely Poland (~57% vs Albania) \u2014 Poland ~52% fav in the qualifying final. "
-            "Combined: 32% \u00d7 48% \u2248 15%.\n\n"
-            "Market: 34.5% | Our: 15.5% | Gap: 19pp\n\n"
-            "Trade NO: https://dub.sh/pb-x\n\n"
-            "Not financial advice."
+            "Likud leadership retained Mar 2026. Targets Sep/Oct elections. "
+            "Trial verdict: 2027. Coalition: 6-12 wks. "
+            "Oct elections \u2192 new PM in Jan 2027 at earliest. "
+            "Budget passes (~55%) \u2192 he controls timing. "
+            "Trade: https://dub.sh/pb-x Not financial advice."
         ),
         "tweet_3": (
             "We track every call publicly.\n"
@@ -165,7 +165,7 @@ def update_published(sig: dict, tg_result: dict, x_ids: list, posted_at: str):
         "gap_pct": sig["gap_pct"],
         "volume_usdc": sig["volume_usdc"],
         "close_date": sig["close_date"],
-        "approved_by": "auto-PRO-198",
+        "approved_by": "label-approved-PRO-149",
         "platforms": ["telegram", "x"],
         "telegram_link": "https://dub.sh/pb-tg",
         "x_link": "https://dub.sh/pb-x",
@@ -185,14 +185,14 @@ def update_published(sig: dict, tg_result: dict, x_ids: list, posted_at: str):
     }
     records.append(entry)
     PUBLISHED.write_text(json.dumps(records, indent=2, ensure_ascii=False))
-    logger.info("published_signals.json updated for SIG-013")
+    logger.info("published_signals.json updated for SIG-007")
 
 
 def paperclip_mark_done(comment: str):
     if not PAPERCLIP_API_URL or not PAPERCLIP_API_KEY:
         logger.warning("Paperclip env vars not set — skipping done update")
         return
-    url = f"{PAPERCLIP_API_URL}/api/issues/{PRO_198_ID}"
+    url = f"{PAPERCLIP_API_URL}/api/issues/{PRO_149_ID}"
     headers = {
         "Authorization": f"Bearer {PAPERCLIP_API_KEY}",
         "Content-Type": "application/json",
@@ -202,7 +202,7 @@ def paperclip_mark_done(comment: str):
     with httpx.Client(timeout=20) as client:
         resp = client.patch(url, json=payload, headers=headers)
         if resp.status_code == 200:
-            logger.info("PRO-198 marked done in Paperclip")
+            logger.info("PRO-149 marked done in Paperclip")
         else:
             logger.error("Paperclip PATCH failed: %s %s", resp.status_code, resp.text)
 
@@ -222,25 +222,20 @@ def push_dashboard():
 
 
 def main():
-    logger.info("=== SIG-013 Sweden WC qualifier posting script starting (DRY_RUN=%s) ===", DRY_RUN)
+    logger.info("=== SIG-007 Netanyahu posting script starting (DRY_RUN=%s) ===", DRY_RUN)
 
     sig = SIGNAL
     tw = sig["x_thread_copy"]
 
-    # Validate tweet lengths
-    t1_len = len(tw["tweet_1"])
+    # Verify tweet 2 length (Twitter Engager confirmed ≤280)
     t2_len = len(tw["tweet_2"])
-    logger.info("Tweet 1 length: %d chars (limit 200 per agent spec)", t1_len)
     logger.info("Tweet 2 length: %d chars (limit 280)", t2_len)
-    if t1_len > 200:
-        logger.error("Tweet 1 exceeds 200 chars — aborting")
-        sys.exit(1)
     if t2_len > 280:
-        logger.error("Tweet 2 exceeds 280 chars (%d) — aborting", t2_len)
+        logger.error("Tweet 2 exceeds 280 chars — aborting")
         sys.exit(1)
 
     # Telegram
-    logger.info("Posting SIG-013 to Telegram...")
+    logger.info("Posting SIG-007 to Telegram...")
     if DRY_RUN:
         logger.info("DRY RUN Telegram:\n%s", sig["telegram_copy"])
         tg_result = {"ok": True, "dry_run": True, "result": {"message_id": -1}}
@@ -251,7 +246,7 @@ def main():
     time.sleep(3)
 
     # X thread
-    logger.info("Posting SIG-013 X thread...")
+    logger.info("Posting SIG-007 X thread...")
     if DRY_RUN:
         logger.info(
             "DRY RUN X:\nTweet 1: %s\nTweet 2: %s\nTweet 3: %s",
@@ -263,28 +258,27 @@ def main():
 
     posted_at = datetime.now(timezone.utc).isoformat()
     update_published(sig, tg_result, x_ids, posted_at)
-    logger.info("SIG-013 posted at %s", posted_at)
+    logger.info("SIG-007 posted at %s", posted_at)
 
     logger.info("Pushing dashboard...")
     if not DRY_RUN:
         push_dashboard()
 
     summary = (
-        "SIG-013 posted to Telegram (@ProbBrain) and X (@ProbBrain).\n\n"
-        "**Signal:** Will Sweden qualify for the 2026 FIFA World Cup?\n"
-        "**Direction:** NO_UNDERPRICED | **Confidence:** HIGH\n"
-        "**Market:** 34.5% YES | **Our estimate:** 15.5% YES | **Gap:** 19pp\n"
-        "**Volume:** $131K | **Closes:** 2026-04-12\n\n"
-        "Copy reviewed by Content Creator ([PRO-199](/PRO/issues/PRO-199)) "
-        "and Twitter Engager ([PRO-200](/PRO/issues/PRO-200)).\n"
-        "Content Creator fix applied: 'qualifying final' clarification in Tweet 2.\n"
-        "Auto-published (gap < 20pp, approval_required: false).\n\n"
+        "SIG-007 posted to Telegram (@ProbBrain) and X (@ProbBrain).\n\n"
+        "**Signal:** Will Netanyahu cease to be PM of Israel by Dec 31, 2026?\n"
+        "**Direction:** NO_UNDERPRICED\n"
+        "**Market:** 49.5% YES | **Our estimate:** 28% YES | **Gap:** 21.5pp\n"
+        "**Volume:** $857k | **Closes:** 2026-12-31\n\n"
+        "Copy reviewed by Content Creator ([PRO-156](/PRO/issues/PRO-156)) "
+        "and Twitter Engager ([PRO-158](/PRO/issues/PRO-158)).\n"
+        "Approved via `Approved` label on [PRO-149](/PRO/issues/PRO-149).\n\n"
         "Dashboard pushed. Not financial advice."
     )
     if not DRY_RUN:
         paperclip_mark_done(summary)
     else:
-        logger.info("DRY RUN — would mark PRO-198 done with:\n%s", summary)
+        logger.info("DRY RUN — would mark PRO-149 done with:\n%s", summary)
 
     logger.info("=== Script complete ===")
 

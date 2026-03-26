@@ -74,7 +74,10 @@ SIGNAL = {
             "Not financial advice."
         ),
         "tweet_3": (
-            "We track every call publicly \u2192 https://vpjonny.github.io/probbrain-accuracy/"
+            "We track every call publicly.\n"
+            "Accuracy dashboard: https://vpjonny.github.io/probbrain-accuracy/\n\n"
+            "Join us on Telegram: https://t.me/ProbBrain\n"
+            "Follow @ProbBrain for more signals."
         ),
     },
 }

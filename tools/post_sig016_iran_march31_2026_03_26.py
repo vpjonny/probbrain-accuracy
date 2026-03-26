@@ -80,7 +80,12 @@ SIGNAL = {
             "Market: 25.5% | Our: 13% | Gap: 12.5pp\n\n"
             "Trade NO: https://dub.sh/pb-x Not financial advice."
         ),
-        "tweet_3": "We track every call publicly \u2192 https://vpjonny.github.io/probbrain-accuracy/",
+        "tweet_3": (
+            "We track every call publicly.\n"
+            "Accuracy dashboard: https://vpjonny.github.io/probbrain-accuracy/\n\n"
+            "Join us on Telegram: https://t.me/ProbBrain\n"
+            "Follow @ProbBrain for more signals."
+        ),
     },
 }
 

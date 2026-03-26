@@ -7,7 +7,7 @@ Requires all four credentials in .env:
 Thread format (3 tweets):
   Tweet 1 — core insight + probability gap (<200 chars, no hashtags)
   Tweet 2 — evidence bullets + affiliate link + disclaimer
-  Tweet 3 — accuracy dashboard link
+  Tweet 3 — accuracy dashboard + Telegram join + Follow @ProbBrain
 """
 import logging
 import os
@@ -21,6 +21,14 @@ logger = logging.getLogger(__name__)
 DUB_LINK_X = os.getenv("DUB_LINK_TWITTER", "https://dub.sh/pb-x")
 DASHBOARD_URL = "https://vpjonny.github.io/probbrain-accuracy/"
 TELEGRAM_INVITE_URL = os.getenv("DUB_LINK_TELEGRAM_CHANNEL", "https://dub.sh/pb-tg")
+
+# Standard tweet_3 closing copy — all signal threads MUST use this.
+TWEET3_STANDARD = (
+    f"We track every call publicly.\n"
+    f"Accuracy dashboard: {DASHBOARD_URL}\n\n"
+    f"Join us on Telegram: {TELEGRAM_INVITE_URL}\n"
+    f"Follow @ProbBrain for more signals."
+)
 
 
 def _client() -> tweepy.Client:
@@ -97,7 +105,8 @@ def build_thread(
     tweet3 = (
         f"We track every call publicly.\n"
         f"Accuracy record: {DASHBOARD_URL}\n\n"
-        f"Join us on Telegram: {TELEGRAM_INVITE_URL}"
+        f"Join us on Telegram: {TELEGRAM_INVITE_URL}\n"
+        f"Follow @ProbBrain for more signals."
     )
 
     return XThreadContent(tweet1=tweet1, tweet2=tweet2, tweet3=tweet3)
