@@ -14,7 +14,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PUBLISHED_PATH = ROOT / "data" / "published_signals.json"
 RESOLVED_PATH = ROOT / "data" / "resolved.json"
+SLUG_PATH = ROOT / "data" / "polymarket_slugs.json"
 OUTPUT_PATH = ROOT / "dashboard" / "accuracy.json"
+
+# Fields in accuracy.json that are manually curated (e.g. by CEO heartbeat)
+# and should be preserved across compute_accuracy.py regenerations.
+_CURATED_KEYS = [
+    "live_price_snapshot", "kill_switch_checks", "kill_switches_active",
+    "upcoming_resolutions", "notable_price_movements", "signals_count_note",
+    "resolution_watch", "by_horizon",
+]
 
 
 def _load_json(path: Path, default):
@@ -23,7 +32,21 @@ def _load_json(path: Path, default):
     return default
 
 
-def _build_signal_rows(published: list, outcome_by_market: dict) -> list:
+def _load_slug_map() -> dict:
+    """Load polymarket slug mapping from data/polymarket_slugs.json,
+    falling back to slugs already present in the current accuracy.json."""
+    slug_map: dict = _load_json(SLUG_PATH, {})
+    # Also pull slugs from existing accuracy.json signals as fallback
+    existing = _load_json(OUTPUT_PATH, {})
+    for sig in existing.get("signals", []):
+        num = str(sig.get("signal_number", ""))
+        slug = sig.get("polymarket_slug", "")
+        if slug and num not in slug_map:
+            slug_map[num] = slug
+    return slug_map
+
+
+def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict) -> list:
     """Build the signals array for the dashboard signal table."""
     rows = []
     for sig in published:
@@ -43,7 +66,7 @@ def _build_signal_rows(published: list, outcome_by_market: dict) -> list:
                 status = "PENDING"
         else:
             status = "PENDING"
-        rows.append({
+        row = {
             "id": sig.get("signal_id") or f"SIG-{sig['signal_number']:03d}",
             "signal_number": sig["signal_number"],
             "title": sig.get("question", ""),
@@ -56,13 +79,21 @@ def _build_signal_rows(published: list, outcome_by_market: dict) -> list:
             "status": status,
             "close_date": sig.get("close_date", ""),
             "published_at": sig.get("actually_posted_at") or sig.get("published_at", ""),
-        })
+        }
+        slug = slug_map.get(str(sig["signal_number"]), "")
+        if slug:
+            row["polymarket_slug"] = slug
+        rows.append(row)
     return rows
 
 
 def compute() -> dict:
     published: list = _load_json(PUBLISHED_PATH, [])
     resolved_outcomes: list = _load_json(RESOLVED_PATH, [])
+    slug_map = _load_slug_map()
+
+    # Load existing accuracy.json to preserve manually curated fields
+    existing_accuracy = _load_json(OUTPUT_PATH, {})
 
     # Build a lookup of resolved outcomes keyed by market_id
     # resolved.json entries should have: market_id, outcome (YES/NO), resolved_at
@@ -164,7 +195,7 @@ def compute() -> dict:
         if conf_data["resolved"] > 0:
             conf_data["accuracy_pct"] = round(conf_data["correct"] / conf_data["resolved"] * 100, 1)
 
-    return {
+    result = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "signals_published": signals_published,
         "signals_resolved": signals_resolved,
@@ -175,10 +206,17 @@ def compute() -> dict:
         "streak_type": streak_type,
         "by_category": by_category,
         "by_confidence": by_confidence,
-        "kill_switches_active": [],
+        "kill_switches_active": existing_accuracy.get("kill_switches_active", []),
         "last_resolved_signal": last_resolved,
-        "signals": _build_signal_rows(published, outcome_by_market),
+        "signals": _build_signal_rows(published, outcome_by_market, slug_map),
     }
+
+    # Preserve manually curated fields from the existing accuracy.json
+    for key in _CURATED_KEYS:
+        if key in existing_accuracy and key not in result:
+            result[key] = existing_accuracy[key]
+
+    return result
 
 
 def main():
