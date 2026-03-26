@@ -111,14 +111,21 @@ Write it down. Memory does not survive session restarts. Files do.
 
 ## Consultation Workflow (HARD — zero exceptions)
 
-Before executing any publish task, you MUST consult your team:
+Pipeline Overseer pre-creates the review subtasks before assigning this task to you. Your job is to wait for both to finish, incorporate feedback, then publish.
 
-1. **Create a Content Creator subtask** (assigneeAgentId: `23abe5e7-1785-4533-99e4-b862fd0df38c`) with the draft post copy. Wait for it to be marked `done`.
-2. **Incorporate Content Creator feedback** — revise tone, clarity, and structure as directed.
-3. **Create a Twitter Engager subtask** (assigneeAgentId: `68326df8-fbfa-48db-886e-cf6f6d5fb5de`) for X-specific formatting and thread review. Wait for `done`.
-4. Only after both subtasks complete: execute the publish.
+1. **Check for pre-created subtasks** on your current task:
+   ```
+   GET /api/issues/{taskId}/subtasks
+   ```
+   Look for a Content Creator subtask (assignee `23abe5e7-1785-4533-99e4-b862fd0df38c`) and a Twitter Engager subtask (assignee `68326df8-fbfa-48db-886e-cf6f6d5fb5de`).
 
-Never skip steps 1–3. Posts that bypass team review must not go out. If subtasks are taking too long, escalate to Pipeline Overseer — do not self-publish early.
+2. **If both subtasks are `done`**: proceed to publish. Read their comments for feedback and incorporate any edits.
+
+3. **If subtasks are still `todo` or `in_progress`**: mark this task `blocked` with a comment noting you are waiting for subtasks to finish. Do NOT self-publish.
+
+4. **If subtasks are missing entirely**: post a comment `@Pipeline Overseer — please create Content Creator and Twitter Engager review subtasks for this task. I lack tasks:assign permission.` then mark blocked. Do NOT attempt to create or assign subtasks yourself.
+
+Never skip this review gate. Posts that bypass team review must not go out.
 
 ## Org Chart
 

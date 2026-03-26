@@ -63,18 +63,47 @@ Read `data/scans/` for the most recently modified scan file. Parse it:
 
 - If `signals` array has entries with `confidence: HIGH` or `confidence: MEDIUM`:
   - Check if Signal Publisher already has an open task for this `scan_timestamp`
-  - If not, create a publish task:
+  - If not, create a publish task AND immediately create both review subtasks:
 
+**3a — Create Signal Publisher task:**
 ```json
 POST /api/companies/{companyId}/issues
 {
-  "title": "Publish signals from [scan_timestamp] — consult Content Creator for post drafts first",
-  "description": "Signal summary:\n[paste top 3 signals with question, gap_pct, direction, confidence]\n\nWorkflow: 1) Draft posts with Content Creator subtask 2) Incorporate feedback 3) Execute publish",
+  "title": "Publish signals from [scan_timestamp] — awaiting Content Creator + Twitter Engager review",
+  "description": "Signal summary:\n[paste top 3 signals with question, gap_pct, direction, confidence]\n\nReview subtasks will be pre-created for you. Wait for both to complete before publishing.",
   "assigneeAgentId": "1664c38b-a21d-4c73-9507-0467c9d88c1e",
   "goalId": "e2d373a8-364e-4a22-8d34-086ced3a0caf",
   "status": "todo"
 }
 ```
+
+**3b — Immediately create Content Creator review subtask** (use the new Signal Publisher task ID as `parentId`):
+```json
+POST /api/companies/{companyId}/issues
+{
+  "title": "Content review: [scan_timestamp] — check tone/clarity of draft copy",
+  "description": "[include draft Telegram + X copy from scan data]",
+  "assigneeAgentId": "23abe5e7-1785-4533-99e4-b862fd0df38c",
+  "goalId": "e2d373a8-364e-4a22-8d34-086ced3a0caf",
+  "parentId": "[signal-publisher-task-id]",
+  "status": "todo"
+}
+```
+
+**3c — Immediately create Twitter Engager review subtask** (same `parentId`):
+```json
+POST /api/companies/{companyId}/issues
+{
+  "title": "X thread review: [scan_timestamp] — check X format and thread structure",
+  "description": "[include draft X thread from scan data]",
+  "assigneeAgentId": "68326df8-fbfa-48db-886e-cf6f6d5fb5de",
+  "goalId": "e2d373a8-364e-4a22-8d34-086ced3a0caf",
+  "parentId": "[signal-publisher-task-id]",
+  "status": "todo"
+}
+```
+
+Signal Publisher will wait for both subtasks to reach `done` before posting. This design means **Signal Publisher never needs `tasks:assign` permission** — Pipeline Overseer handles all subtask delegation.
 
 ### Step 4 — Monitor Active Pipeline Tasks
 
@@ -85,7 +114,7 @@ GET /api/companies/{companyId}/issues?assigneeAgentId=1664c38b-a21d-4c73-9507-04
 ```
 
 For each `in_progress` task:
-- Fetch its subtasks. Signal Publisher is required to have **both** a Content Creator subtask AND a Twitter Engager subtask before executing. If either is missing, post a comment reminding Signal Publisher to create the missing subtask.
+- Fetch its subtasks. If Content Creator OR Twitter Engager subtask is missing (e.g., due to a gap in earlier pipeline runs), create the missing subtask now (you have `tasks:assign`).
 - If the task has been `blocked` for more than 2 heartbeat cycles (~1 hour), escalate: PATCH the task with a comment and assign to CEO.
 
 ### Step 5 — Dedup Guard
