@@ -50,6 +50,7 @@ Counter-evidence: [One sentence acknowledging the other side]
 
 ⚠️ Not financial advice. Trade at your own risk.
 📈 Accuracy track record: [DASHBOARD_URL]
+🐦 Follow us on X: https://x.com/ProbBrain
 ```
 
 Confidence badges: `🔴 HIGH — Bet [YES/NO]` | `🟡 MEDIUM — Lean [YES/NO]`
@@ -60,7 +61,7 @@ Confidence badges: `🔴 HIGH — Bet [YES/NO]` | `🟡 MEDIUM — Lean [YES/NO]
 
 **Tweet 2 (first reply):** Evidence bullets + Polymarket affiliate link + "Not financial advice."
 
-**Tweet 3 (second reply):** "We track every call publicly → [DASHBOARD_URL]"
+**Tweet 3 (second reply):** "We track every call publicly → [DASHBOARD_URL]" + "Get signals on Telegram: https://t.me/ProbBrain" + "Follow @ProbBrain for more."
 
 ## Signal Confidence Rules (HARD)
 
