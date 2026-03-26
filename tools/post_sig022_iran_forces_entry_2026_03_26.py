@@ -117,9 +117,9 @@ def telegram_post(text: str) -> int:
     import urllib.parse
 
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+    chat_id = os.environ.get("TELEGRAM_CHANNEL_ID", "").strip()
     if not token or not chat_id:
-        raise RuntimeError("TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set")
+        raise RuntimeError("TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID not set")
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     data = urllib.parse.urlencode({
@@ -242,7 +242,7 @@ def main():
         if p.get("actually_posted_at", "").startswith(today_str)
         and "telegram" in (p.get("platforms") or [])
     )
-    logger.info("Telegram signals posted today: %d/5", today_tg)
+    logger.info("Telegram signals posted today: %d/40", today_tg)
 
     sig = SIGNAL
     tw = sig["x_thread_copy"]
@@ -266,8 +266,8 @@ def main():
 
     # --- Post Telegram ---
     tg_msg_id = None
-    if today_tg >= 5:
-        logger.warning("Telegram daily limit reached (%d/5) — skipping Telegram", today_tg)
+    if today_tg >= 40:
+        logger.warning("Telegram daily limit reached (%d/40) — skipping Telegram", today_tg)
     else:
         logger.info("Posting SIG-022 to Telegram...")
         if DRY_RUN:
