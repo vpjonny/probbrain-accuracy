@@ -72,7 +72,8 @@ Confidence badges: `🔴 HIGH — Bet [YES/NO]` | `🟡 MEDIUM — Lean [YES/NO]
 - Max **5 signals/day** on Telegram
 - Max **40 signals/day** on X
 - Minimum **30 minutes** between any two posts (1800 seconds)
-- First 10 signals: `approval_required: true` → do NOT post, notify CEO via Paperclip comment
+- Signals with gap **< 20pp**: `approval_required: false` → publish automatically, no CEO gate
+- Signals with gap **≥ 20pp**: `approval_required: true` → do NOT post, notify CEO via Paperclip comment and await `approved` label
 - If Research Agent kill switch triggered: post "Signals paused — calibration in progress" and stop
 
 ## Liquidity Gate (HARD — zero exceptions)
