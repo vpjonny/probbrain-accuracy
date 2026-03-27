@@ -276,6 +276,82 @@
 
     .empty-row td { color: var(--muted); text-align: center; padding: 32px; }
 
+    /* Search bar */
+    .table-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 8px 14px;
+      flex: 1;
+      max-width: 400px;
+      transition: border-color 0.15s;
+    }
+
+    .search-box:focus-within { border-color: var(--accent); }
+
+    .search-box svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+
+    .search-box input {
+      border: none;
+      background: none;
+      color: var(--text);
+      font-size: 0.84rem;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .search-box input::placeholder { color: var(--muted2); }
+
+    .page-info { font-size: 0.75rem; color: var(--muted); }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      background: var(--bg2);
+    }
+
+    .page-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-family: inherit;
+    }
+
+    .page-btn:hover:not(:disabled) { border-color: var(--accent); background: #16172a; }
+    .page-btn:disabled { opacity: 0.3; cursor: default; }
+    .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+
+    .page-ellipsis { color: var(--muted2); font-size: 0.78rem; padding: 0 4px; }
+
     /* Category breakdown */
     .cat-grid {
       display: grid;
@@ -381,6 +457,13 @@
     </div>
 
     <div class="section-title">Signal Log</div>
+    <div class="table-controls">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="signal-search" placeholder="Search signals by market, category, direction..." autocomplete="off">
+      </div>
+      <div class="page-info" id="page-info"></div>
+    </div>
     <div class="table-wrap">
       <table>
         <thead>
@@ -399,6 +482,7 @@
           <tr class="empty-row"><td colspan="8">Loading signals...</td></tr>
         </tbody>
       </table>
+      <div class="pagination" id="pagination" style="display:none"></div>
     </div>
 
     <div id="cat-section" style="display:none">
@@ -501,36 +585,11 @@
             streakSub.textContent = 'no resolved signals';
           }
 
-          // Signal table
-          const signals = d.signals || [];
-          const tbody = document.getElementById('signal-body');
-          if (!signals.length) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No signals published yet.</td></tr>';
-          } else {
-            tbody.innerHTML = signals.map(s => {
-              const mkt = Math.round(s.market_price * 100) + '%';
-              const ours = Math.round(s.our_estimate * 100) + '%';
-              const href = s.polymarket_slug
-                ? 'https://polymarket.com/event/' + s.polymarket_slug + '?via=0x-slova'
-                : '';
-              return `<tr${href ? ' data-href="' + href + '"' : ''}>
-                <td><span class="signal-num">#${s.signal_number}</span></td>
-                <td>
-                  <div class="signal-title">${s.title}</div>
-                  <div class="signal-cat">${s.category}</div>
-                </td>
-                <td>${dirBadge(s.direction)}</td>
-                <td><span class="prob-col"><span class="prob-market">${mkt}</span><span class="prob-sep">/</span><span class="prob-ours">${ours}</span></span></td>
-                <td>${gapPill(s.gap_pct)}</td>
-                <td>${confBadge(s.confidence)}</td>
-                <td>${statusBadge(s.status)}</td>
-                <td><span class="close-date">${s.close_date || '—'}</span></td>
-              </tr>`;
-            }).join('');
-            tbody.querySelectorAll('tr[data-href]').forEach(row => {
-              row.addEventListener('click', () => window.open(row.dataset.href, '_blank'));
-            });
-          }
+          // Signal table — store globally for pagination/search
+          window._allSignals = d.signals || [];
+          window._searchQuery = document.getElementById('signal-search').value;
+          if (!window._currentPage) window._currentPage = 1;
+          renderSignalTable();
 
           // Category breakdown
           const cats = d.by_category || {};
@@ -554,6 +613,124 @@
           document.getElementById('updated').textContent = 'Dashboard data unavailable.';
         });
     }
+
+    const PAGE_SIZE = 25;
+
+    function getFilteredSignals() {
+      const q = (window._searchQuery || '').toLowerCase().trim();
+      if (!q) return window._allSignals || [];
+      return (window._allSignals || []).filter(s =>
+        (s.title || '').toLowerCase().includes(q) ||
+        (s.category || '').toLowerCase().includes(q) ||
+        (s.direction || '').toLowerCase().includes(q) ||
+        (s.status || '').toLowerCase().includes(q) ||
+        (s.confidence || '').toLowerCase().includes(q) ||
+        ('#' + s.signal_number).includes(q)
+      );
+    }
+
+    function renderSignalRow(s) {
+      const mkt = Math.round(s.market_price * 100) + '%';
+      const ours = Math.round(s.our_estimate * 100) + '%';
+      const href = s.polymarket_slug
+        ? 'https://polymarket.com/event/' + s.polymarket_slug + '?via=0x-slova'
+        : '';
+      return `<tr${href ? ' data-href="' + href + '"' : ''}>
+        <td><span class="signal-num">#${s.signal_number}</span></td>
+        <td>
+          <div class="signal-title">${s.title}</div>
+          <div class="signal-cat">${s.category}</div>
+        </td>
+        <td>${dirBadge(s.direction)}</td>
+        <td><span class="prob-col"><span class="prob-market">${mkt}</span><span class="prob-sep">/</span><span class="prob-ours">${ours}</span></span></td>
+        <td>${gapPill(s.gap_pct)}</td>
+        <td>${confBadge(s.confidence)}</td>
+        <td>${statusBadge(s.status)}</td>
+        <td><span class="close-date">${s.close_date || '—'}</span></td>
+      </tr>`;
+    }
+
+    function buildPageButtons(totalPages, current) {
+      const btns = [];
+      const add = (label, page, disabled, active) => {
+        if (active) btns.push(`<button class="page-btn active" disabled>${label}</button>`);
+        else if (disabled) btns.push(`<button class="page-btn" disabled>${label}</button>`);
+        else btns.push(`<button class="page-btn" data-page="${page}">${label}</button>`);
+      };
+
+      add('‹', current - 1, current === 1, false);
+
+      // Show pages with ellipsis
+      const range = [];
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+          range.push(i);
+        } else if (range[range.length - 1] !== '...') {
+          range.push('...');
+        }
+      }
+
+      range.forEach(p => {
+        if (p === '...') btns.push('<span class="page-ellipsis">…</span>');
+        else add(String(p), p, false, p === current);
+      });
+
+      add('›', current + 1, current === totalPages, false);
+      return btns.join('');
+    }
+
+    function renderSignalTable() {
+      const filtered = getFilteredSignals();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      const page = Math.min(window._currentPage || 1, totalPages);
+      window._currentPage = page;
+
+      const start = (page - 1) * PAGE_SIZE;
+      const pageSignals = filtered.slice(start, start + PAGE_SIZE);
+
+      const tbody = document.getElementById('signal-body');
+      const pagination = document.getElementById('pagination');
+      const pageInfo = document.getElementById('page-info');
+
+      if (!filtered.length) {
+        const msg = window._searchQuery ? 'No signals match your search.' : 'No signals published yet.';
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="8">${msg}</td></tr>`;
+        pagination.style.display = 'none';
+        pageInfo.textContent = '';
+        return;
+      }
+
+      tbody.innerHTML = pageSignals.map(renderSignalRow).join('');
+      tbody.querySelectorAll('tr[data-href]').forEach(row => {
+        row.addEventListener('click', () => window.open(row.dataset.href, '_blank'));
+      });
+
+      // Page info
+      const end = Math.min(start + PAGE_SIZE, filtered.length);
+      const suffix = window._searchQuery ? ` (filtered from ${(window._allSignals || []).length})` : '';
+      pageInfo.textContent = `${start + 1}–${end} of ${filtered.length}${suffix}`;
+
+      // Pagination controls
+      if (totalPages > 1) {
+        pagination.style.display = '';
+        pagination.innerHTML = buildPageButtons(totalPages, page);
+        pagination.querySelectorAll('.page-btn[data-page]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            window._currentPage = parseInt(btn.dataset.page);
+            renderSignalTable();
+          });
+        });
+      } else {
+        pagination.style.display = 'none';
+      }
+    }
+
+    // Search handler
+    document.getElementById('signal-search').addEventListener('input', function () {
+      window._searchQuery = this.value;
+      window._currentPage = 1;
+      renderSignalTable();
+    });
 
     loadData();
     setInterval(loadData, 60000);
