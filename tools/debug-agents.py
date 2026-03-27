@@ -27,6 +27,10 @@ API_KEY = os.environ.get("PAPERCLIP_API_KEY", "")
 COMPANY_ID = os.environ.get("PAPERCLIP_COMPANY_ID", "")
 JSON_MODE = "--json" in sys.argv
 VERBOSE = "--verbose" in sys.argv or "-v" in sys.argv
+AGENT_FILTER = None
+for i, arg in enumerate(sys.argv):
+    if arg == "--agent" and i + 1 < len(sys.argv):
+        AGENT_FILTER = sys.argv[i + 1].lower()
 
 if not API_KEY or not COMPANY_ID:
     print("ERROR: PAPERCLIP_API_KEY and PAPERCLIP_COMPANY_ID must be set.")
@@ -220,6 +224,141 @@ def print_blockers_section(snapshot):
         print()
 
 
+def print_config_health(snapshot):
+    """Validate agent adapter and runtime configs."""
+    section("CONFIG HEALTH")
+    required_adapter = ["cwd", "model", "instructionsFilePath"]
+    agents = snapshot.get("agents", [])
+    all_ok = True
+    for agent in agents:
+        name = agent.get("name", "?")
+        ac = agent.get("adapterConfig") or {}
+        rc = agent.get("runtimeConfig") or {}
+        status = agent.get("status", "?")
+        issues = []
+
+        # Check adapter config
+        if not ac:
+            issues.append(c("adapterConfig is EMPTY", RED))
+        else:
+            for key in required_adapter:
+                if not ac.get(key):
+                    issues.append(c(f"missing adapterConfig.{key}", RED))
+            # Check instructions file exists on disk
+            inst_path = ac.get("instructionsFilePath")
+            if inst_path:
+                full_path = inst_path if os.path.isabs(inst_path) else os.path.join(ac.get("cwd", ""), inst_path)
+                if not os.path.exists(full_path):
+                    issues.append(c(f"instructions file not found: {full_path}", RED))
+
+        # Check runtime config
+        hb = rc.get("heartbeat", {})
+        if not hb.get("enabled"):
+            issues.append(c("heartbeat disabled", YELLOW))
+
+        # Check agent status
+        if status == "error":
+            issues.append(c("agent status is ERROR", RED))
+        elif status == "paused":
+            issues.append(c("agent is PAUSED", YELLOW))
+            pr = agent.get("pauseReason")
+            if pr:
+                issues.append(c(f"  reason: {pr}", YELLOW))
+
+        if issues:
+            all_ok = False
+            print(f"  {c(name, BOLD)} — {c('ISSUES FOUND', RED)}")
+            for iss in issues:
+                print(f"    {c('!', RED)} {iss}")
+            print()
+        else:
+            print(f"  {c(name, BOLD)} — {c('OK', GREEN)}")
+
+    if all_ok:
+        print(f"\n  {c('All agent configs look healthy.', GREEN)}")
+    print()
+
+
+def print_agent_deep_debug(snapshot, agent_tasks, agent_name):
+    """Deep debug a single agent by name."""
+    section(f"DEEP DEBUG: {agent_name}")
+    agents = snapshot.get("agents", [])
+    agent = None
+    for a in agents:
+        if a.get("name", "").lower() == agent_name.lower() or a.get("urlKey", "").lower() == agent_name.lower():
+            agent = a
+            break
+    if not agent:
+        print(c(f"  Agent '{agent_name}' not found.", RED))
+        return
+
+    aid = agent["id"]
+    name = agent["name"]
+
+    # Basic info
+    print(f"  {c('Name:', GRAY)} {c(name, BOLD)}")
+    print(f"  {c('ID:', GRAY)} {aid}")
+    print(f"  {c('Status:', GRAY)} {c(agent.get('status','?'), GREEN if agent.get('status')=='running' else RED)}")
+    print(f"  {c('Role:', GRAY)} {agent.get('role','?')}")
+    print(f"  {c('Last heartbeat:', GRAY)} {ago(agent.get('lastHeartbeatAt'))}")
+    print()
+
+    # Adapter config
+    ac = agent.get("adapterConfig") or {}
+    print(f"  {c('adapterConfig:', BOLD)}")
+    for k, v in ac.items():
+        val_str = str(v)[:80]
+        print(f"    {c(k, CYAN)}: {val_str}")
+    print()
+
+    # Runtime config
+    rc = agent.get("runtimeConfig") or {}
+    print(f"  {c('runtimeConfig:', BOLD)}")
+    print(f"    {json.dumps(rc, indent=6)}")
+    print()
+
+    # Tasks
+    tasks = agent_tasks.get(aid, [])
+    print(f"  {c('Active tasks:', BOLD)} {len(tasks)}")
+    for t in tasks:
+        ts = t.get("status", "?")
+        ts_color = RED if ts == "blocked" else (CYAN if ts == "in_progress" else GRAY)
+        print(f"    [{c(ts, ts_color)}] {c(t.get('identifier','?'), MAGENTA)} {t.get('title','?')[:55]}")
+        last_comment = snapshot["last_comments"].get(t["id"])
+        if last_comment:
+            body = last_comment.get("body", "").replace("\n", " ")[:120]
+            print(f"      {c('last msg:', GRAY)} {body}")
+    if not tasks:
+        print(f"    {c('(none)', GRAY)}")
+    print()
+
+    # Instructions file check
+    inst_path = ac.get("instructionsFilePath")
+    if inst_path:
+        full_path = inst_path if os.path.isabs(inst_path) else os.path.join(ac.get("cwd", ""), inst_path)
+        exists = os.path.exists(full_path)
+        print(f"  {c('Instructions file:', BOLD)} {full_path}")
+        print(f"    {c('exists:', GRAY)} {c('YES', GREEN) if exists else c('NO', RED)}")
+        if exists:
+            size = os.path.getsize(full_path)
+            print(f"    {c('size:', GRAY)} {size} bytes")
+    print()
+
+    # Memory dir check
+    cwd = ac.get("cwd", "")
+    agent_key = name.lower().replace(" ", "-")
+    mem_dirs = [
+        os.path.join(cwd, f"agents/{agent_key}/memory"),
+        os.path.join(cwd, f"agents/{agent_key}/life"),
+    ]
+    print(f"  {c('Memory/state dirs:', BOLD)}")
+    for d in mem_dirs:
+        exists = os.path.isdir(d)
+        file_count = len(os.listdir(d)) if exists else 0
+        print(f"    {d} — {c('exists', GREEN) if exists else c('missing', GRAY)} ({file_count} files)")
+    print()
+
+
 def print_stale_section(snapshot):
     stale_issues = []
     for issue in snapshot["active_issues"]:
@@ -316,11 +455,17 @@ def main():
         print(json.dumps(snapshot, indent=2, default=str))
         return
 
+    if AGENT_FILTER:
+        print_agent_deep_debug(snapshot, agent_tasks, AGENT_FILTER)
+        return
+
     section("DASHBOARD")
     print_dashboard_section(snapshot)
     print()
 
     print_agents_section(snapshot, agent_tasks)
+
+    print_config_health(snapshot)
 
     section("BLOCKERS")
     print_blockers_section(snapshot)
@@ -336,7 +481,7 @@ def main():
     hr()
     print(
         c(
-            f"  Tip: run with --verbose for activity log, --json for raw data.",
+            f"  Tip: --verbose for activity, --json for raw, --agent <name> for deep debug.",
             GRAY,
         )
     )
