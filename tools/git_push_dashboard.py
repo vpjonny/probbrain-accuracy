@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent
 DASHBOARD_ACCURACY = ROOT / "dashboard" / "accuracy.json"
+DASHBOARD_INDEX = ROOT / "dashboard" / "index.html"
 PUBLISHED_SIGNALS = ROOT / "data" / "published_signals.json"
 
 
@@ -103,7 +104,9 @@ def _sync_accuracy_repo(commit_msg: str) -> None:
         try:
             import shutil
             shutil.copy(str(DASHBOARD_ACCURACY), str(tmppath / "accuracy.json"))
-            rc, out = _run(["git", "add", "accuracy.json"], cwd=tmppath)
+            if DASHBOARD_INDEX.exists():
+                shutil.copy(str(DASHBOARD_INDEX), str(tmppath / "index.html"))
+            rc, out = _run(["git", "add", "accuracy.json", "index.html"], cwd=tmppath)
             if rc != 0:
                 logger.warning("git_push_dashboard: accuracy add failed: %s", out)
                 return
