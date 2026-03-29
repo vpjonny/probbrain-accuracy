@@ -3,10 +3,15 @@
 
 import os
 import json
+import sys
 from datetime import datetime
 from pathlib import Path
 import httpx
 import tweepy
+
+# Add tools to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from polymarket_screenshot import generate_and_upload_market_card
 
 # Load .env file
 env_file = Path('/home/slova/ProbBrain/.env')
@@ -127,7 +132,9 @@ tweet_3 = f"""We track every call publicly: {DASHBOARD_URL}
 
 Get signals on Telegram: https://t.me/ProbBrain
 
-Follow @ProbBrain for more calibrated estimates 📊"""
+Follow @ProbBrain for more calibrated estimates 📊
+
+#Ukraine #Geopolitics"""
 
 client = tweepy.Client(
     consumer_key=X_CONSUMER_KEY,
@@ -138,9 +145,26 @@ client = tweepy.Client(
 )
 
 try:
-    r1 = client.create_tweet(text=tweet_1)
+    # Generate and upload market card
+    print("🖼️ Generating market card screenshot...")
+    media_id = generate_and_upload_market_card(
+        market_question=SIGNAL["question"],
+        market_price_yes=SIGNAL["market_yes"],
+        our_estimate=SIGNAL["our_estimate_yes"],
+        gap_pct=SIGNAL["gap_pct"],
+        confidence=SIGNAL["confidence"],
+        twitter_client=client,
+        volume_usdc=1957715.7953240108
+    )
+
+    if media_id:
+        r1 = client.create_tweet(text=tweet_1, media_ids=[media_id])
+        print(f"✅ Tweet 1 posted with market card: {r1.data['id']}")
+    else:
+        r1 = client.create_tweet(text=tweet_1)
+        print(f"✅ Tweet 1 posted without screenshot: {r1.data['id']}")
+
     tweet_1_id = r1.data["id"]
-    print(f"✅ Tweet 1 posted: {tweet_1_id}")
 
     r2 = client.create_tweet(text=tweet_2, in_reply_to_tweet_id=tweet_1_id)
     tweet_2_id = r2.data["id"]
