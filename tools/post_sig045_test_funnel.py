@@ -135,14 +135,14 @@ Trade on Polymarket: {DUB_TWITTER}"""
 
     time.sleep(1)  # Rate limit safety
 
-    # Tweet 3: Dashboard + Telegram + follow + hashtags
+    # Tweet 3: Dashboard + Telegram + follow + hashtags (always 2)
     tweet_3 = f"""We track every call publicly:
 {DASHBOARD_URL}
 
 Get signals on Telegram: https://t.me/ProbBrain
 Follow @ProbBrain for more.
 
-#Markets"""
+#Markets #Prediction"""
 
     r3 = client.create_tweet(text=tweet_3, in_reply_to_tweet_id=tweet_2_id)
     tweet_3_id = r3.data["id"]
