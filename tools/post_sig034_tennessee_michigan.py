@@ -1,206 +1,196 @@
 #!/usr/bin/env python3
 """
-Post SIG-034 (Tennessee Volunteers vs. Michigan Wolverines) to Telegram and X.
-WARNING: Market closes 2026-03-29T16:00 (may already be closed).
+Post SIG-034: Tennessee Volunteers vs. Michigan Wolverines
+Elite Eight college basketball signal
 """
 
 import os
 import json
+from datetime import datetime
 import httpx
 import tweepy
-from datetime import datetime
-from dotenv import load_dotenv
-
-# Load .env file
-load_dotenv("/home/slova/ProbBrain/.env")
-
-# Load credentials
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
-X_CONSUMER_KEY = os.getenv("X_CONSUMER_KEY")
-X_CONSUMER_SECRET = os.getenv("X_CONSUMER_SECRET")
-X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN")
-X_ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET")
-
-# Affiliate and dashboard links
-AFFILIATE_TG = "https://dub.sh/pb-tg"
-AFFILIATE_X = "https://dub.sh/pb-x"
-DASHBOARD_URL = "https://vpjonny.github.io/probbrain-accuracy/"
 
 # Signal data
 SIGNAL = {
     "signal_id": "SIG-034",
-    "market": "Tennessee Volunteers vs. Michigan Wolverines",
+    "market_question": "Tennessee Volunteers vs. Michigan Wolverines (Elite Eight)",
     "market_price_yes": 0.225,
-    "our_estimate": 0.26,
+    "our_estimate_yes": 0.26,
     "gap_pct": 3.5,
     "confidence": "MEDIUM",
-    "volume_usdc": 2442108.520329002,
-    "close_date": "2026-03-29",
-    "market_id": "1753593",
+    "volume_usd": 2442108.52,
+    "closes": "2026-03-29T16:00:00Z",
     "polymarket_slug": "cbb-tenn-mich-2026-03-29",
 }
 
-EVIDENCE = [
-    "Michigan: 34-3 (1-seed, #3 ranked), Tennessee: 25-11 (6-seed, #23-25 ranked)",
-    "Tournament dominance: Michigan won by +21, +23, +13 in prior games",
-    "Michigan 7.5-point favorite (implies ~25-26% for Tennessee)",
-    "Expert predictions all favor Michigan by 10+ points",
-    "Michigan 7-5 all-time, 4 straight recent wins vs Tennessee",
-]
+# Config
+AFFILIATE_LINK_TELEGRAM = "https://dub.sh/pb-tg"
+AFFILIATE_LINK_X = "https://dub.sh/pb-x"
+DASHBOARD_URL = "https://vpjonny.github.io/probbrain-accuracy/"
+TELEGRAM_JOIN_LINK = "https://t.me/ProbBrain"
 
-COUNTER_EVIDENCE = "Tennessee's experience in tournament play and double-digit seeding upsets in March Madness history provide non-zero probability, though Michigan's dominant run and ranking advantage strongly favor the higher seed."
+# Telegram message
+TELEGRAM_MESSAGE = """🟡 MARKET SIGNAL
 
-# ============================================================================
-# TELEGRAM MESSAGE
-# ============================================================================
+📊 Tennessee Volunteers vs. Michigan Wolverines (Elite Eight)
 
-telegram_message = f"""🟡 MEDIUM — Lean YES
+Market: 22.5% YES | Our estimate: 26% YES
 
-📊 Tennessee Volunteers vs. Michigan Wolverines
+Gap: 3.5% (market underpricing YES)
 
-Market: {SIGNAL['market_price_yes']*100:.1f}% YES | Our estimate: {SIGNAL['our_estimate']*100:.1f}% YES
+Volume: $2.4M
 
-Gap: {SIGNAL['gap_pct']:.1f}pp (market underpricing YES)
-
-Volume: ${SIGNAL['volume_usdc']/1e6:.1f}M
-
-Closes: {SIGNAL['close_date']}
+Closes: 2026-03-29
 
 Evidence:
 
-• {EVIDENCE[0]}
+• Michigan #1 seed, 34-3 overall record, #3 ranked
+• Tournament dominance: +21, +23, +13 point margins in recent wins
+• Tennessee #6 seed, 25-11 overall, Cinderella story
+• Betting line: Michigan -7.5 (implies ~25-26% for Tennessee)
+• Expert predictions all favor Michigan by 10+ points
 
-• {EVIDENCE[1]}
+Counter-evidence: Elite Eight basketball is inherently volatile; Tennessee's tournament success demonstrates they can compete with top seeds.
 
-• {EVIDENCE[2]}
-
-• {EVIDENCE[3]}
-
-• {EVIDENCE[4]}
-
-Counter-evidence: {COUNTER_EVIDENCE}
-
-🔗 Trade on Polymarket: {AFFILIATE_TG}
+🔗 Trade on Polymarket: {affiliate_link}
 
 ⚠️ Not financial advice. Trade at your own risk.
 
-📈 Accuracy track record: {DASHBOARD_URL}
+📈 Accuracy track record: {dashboard_url}
 
 🐦 Follow us on X: https://x.com/ProbBrain
-"""
-
-# ============================================================================
-# X THREAD
-# ============================================================================
-
-tweet_1 = f"Michigan (1-seed, 34-3) vs Tennessee (6-seed, 25-11). Market says {SIGNAL['market_price_yes']*100:.1f}% for Tennessee, but 7.5-point favorites typically carry ~25-26% underdog probability. Gap: {SIGNAL['gap_pct']:.1f}pp."
-
-tweet_2 = f"""Evidence:
-• Michigan: 34-3 record, #3 ranked, dominant tournament run
-• Tennessee: 25-11 record, #23-25 ranked
-• Michigan: +21, +23, +13 wins in previous tournament games
-• 7-5 all-time, 4 straight wins vs Tennessee
-
-{AFFILIATE_X}
-
-⚠️ Not financial advice. Trade at your own risk."""
-
-tweet_3 = f"""We track every call publicly → {DASHBOARD_URL}
-
-Get signals on Telegram: https://t.me/ProbBrain
-
-Follow @ProbBrain for more."""
-
-# ============================================================================
-# POST TO TELEGRAM
-# ============================================================================
-
-print("[1/4] Posting to Telegram...")
-url_tg = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-payload_tg = {
-    "chat_id": CHANNEL_ID,
-    "text": telegram_message,
-    "parse_mode": "Markdown"
-}
-resp_tg = httpx.post(url_tg, json=payload_tg, timeout=30)
-resp_tg.raise_for_status()
-tg_message_id = resp_tg.json()["result"]["message_id"]
-print(f"✓ Telegram message posted (ID: {tg_message_id})")
-
-# ============================================================================
-# POST TO X
-# ============================================================================
-
-print("[2/4] Posting to X...")
-client = tweepy.Client(
-    consumer_key=X_CONSUMER_KEY,
-    consumer_secret=X_CONSUMER_SECRET,
-    access_token=X_ACCESS_TOKEN,
-    access_token_secret=X_ACCESS_TOKEN_SECRET,
+""".format(
+    affiliate_link=AFFILIATE_LINK_TELEGRAM,
+    dashboard_url=DASHBOARD_URL,
 )
 
-r1 = client.create_tweet(text=tweet_1)
-tweet_1_id = r1.data["id"]
-print(f"✓ Tweet 1 posted (ID: {tweet_1_id})")
+# X thread
+X_TWEET_1 = "Tennessee trading at 22.5% vs. Michigan in Elite Eight — our estimate: 26%. Michigan's dominance (#1 seed, +21, +23, +13 margins) suggests Tennessee is slightly underpriced. 3.5pp gap."
 
-r2 = client.create_tweet(text=tweet_2, in_reply_to_tweet_id=tweet_1_id)
-tweet_2_id = r2.data["id"]
-print(f"✓ Tweet 2 posted (ID: {tweet_2_id})")
+X_TWEET_2 = """Evidence:
+• Michigan: 34-3 record, #3 ranked, 7.5-point favorite
+• Tennessee: 25-11, Cinderella story
+• Betting consensus ~25-26% for Tennessee vs. Polymarket 22.5%
+• Expert predictions all favor Michigan
 
-r3 = client.create_tweet(text=tweet_3, in_reply_to_tweet_id=tweet_2_id)
-tweet_3_id = r3.data["id"]
-print(f"✓ Tweet 3 posted (ID: {tweet_3_id})")
+Trade: {affiliate_link}
+⚠️ Not financial advice.""".format(
+    affiliate_link=AFFILIATE_LINK_X
+)
 
-# ============================================================================
-# LOG TO published_signals.json
-# ============================================================================
+X_TWEET_3 = """We track every call publicly: {dashboard_url}
 
-print("[3/4] Logging to published_signals.json...")
+Get signals on Telegram: {telegram_link}
 
-# Read existing published signals
-published_file = "/home/slova/ProbBrain/data/published_signals.json"
-with open(published_file, "r") as f:
-    published = json.load(f)
+Follow @ProbBrain for more.""".format(
+    dashboard_url=DASHBOARD_URL,
+    telegram_link=TELEGRAM_JOIN_LINK,
+)
 
-# Add new entry
-entry = {
-    "signal_id": SIGNAL["signal_id"],
-    "market_id": SIGNAL["market_id"],
-    "market_question": SIGNAL["market"],
-    "market_price_yes": SIGNAL["market_price_yes"],
-    "our_estimate": SIGNAL["our_estimate"],
-    "gap_pct": SIGNAL["gap_pct"],
-    "confidence": SIGNAL["confidence"],
-    "volume_usdc": SIGNAL["volume_usdc"],
-    "close_date": SIGNAL["close_date"],
-    "polymarket_slug": SIGNAL["polymarket_slug"],
-    "published_at": datetime.utcnow().isoformat() + "Z",
-    "telegram_message_id": str(tg_message_id),
-    "x_tweet_ids": [str(tweet_1_id), str(tweet_2_id), str(tweet_3_id)],
-    "evidence": EVIDENCE,
-    "counter_evidence": COUNTER_EVIDENCE,
-    "direction": "YES_UNDERPRICED",
-    "approval_required": False,
-    "paperclip_issue": "PRO-383",
-}
 
-published.append(entry)
+def post_telegram():
+    """Post to Telegram"""
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    channel_id = os.getenv("TELEGRAM_CHANNEL_ID")
 
-# Write back
-with open(published_file, "w") as f:
-    json.dump(published, f, indent=2)
+    if not bot_token or not channel_id:
+        print("❌ Telegram credentials missing")
+        return None
 
-print(f"✓ Logged to published_signals.json")
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {
+        "chat_id": channel_id,
+        "text": TELEGRAM_MESSAGE,
+        "parse_mode": "Markdown",
+    }
 
-# ============================================================================
-# SYNC DASHBOARD
-# ============================================================================
+    try:
+        resp = httpx.post(url, json=payload, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        message_id = data["result"]["message_id"]
+        print(f"✅ Telegram posted (message ID: {message_id})")
+        return message_id
+    except Exception as e:
+        print(f"❌ Telegram failed: {e}")
+        return None
 
-print("[4/4] Syncing dashboard...")
-os.system("cd /home/slova/ProbBrain && python3 tools/sync_dashboard.py --signal-id SIG-034")
-print("✓ Dashboard synced")
 
-print("\n✅ All done! SIG-034 published.")
-print(f"   Telegram: message_id={tg_message_id}")
-print(f"   X: tweets {tweet_1_id} → {tweet_2_id} → {tweet_3_id}")
+def post_x():
+    """Post X thread"""
+    client = tweepy.Client(
+        consumer_key=os.getenv("X_CONSUMER_KEY"),
+        consumer_secret=os.getenv("X_CONSUMER_SECRET"),
+        access_token=os.getenv("X_ACCESS_TOKEN"),
+        access_token_secret=os.getenv("X_ACCESS_TOKEN_SECRET"),
+    )
+
+    try:
+        # Tweet 1
+        r1 = client.create_tweet(text=X_TWEET_1)
+        tweet_1_id = r1.data["id"]
+        print(f"✅ X Tweet 1 posted (ID: {tweet_1_id})")
+
+        # Tweet 2
+        r2 = client.create_tweet(text=X_TWEET_2, in_reply_to_tweet_id=tweet_1_id)
+        tweet_2_id = r2.data["id"]
+        print(f"✅ X Tweet 2 posted (ID: {tweet_2_id})")
+
+        # Tweet 3
+        r3 = client.create_tweet(text=X_TWEET_3, in_reply_to_tweet_id=tweet_2_id)
+        tweet_3_id = r3.data["id"]
+        print(f"✅ X Tweet 3 posted (ID: {tweet_3_id})")
+
+        return [tweet_1_id, tweet_2_id, tweet_3_id]
+    except Exception as e:
+        print(f"❌ X failed: {e}")
+        return None
+
+
+def main():
+    print(f"Publishing SIG-034...")
+    print()
+
+    # Post to Telegram
+    telegram_message_id = post_telegram()
+    print()
+
+    # Post to X
+    x_tweet_ids = post_x()
+    print()
+
+    # Log to published_signals.json
+    if telegram_message_id or x_tweet_ids:
+        published_entry = {
+            "signal_id": "SIG-034",
+            "published_at": datetime.utcnow().isoformat() + "Z",
+            "platforms": [],
+            "telegram_message_id": telegram_message_id,
+            "x_tweet_ids": x_tweet_ids,
+        }
+
+        if telegram_message_id:
+            published_entry["platforms"].append("telegram")
+        if x_tweet_ids:
+            published_entry["platforms"].append("x")
+
+        # Read existing
+        try:
+            with open("/home/slova/ProbBrain/data/published_signals.json") as f:
+                published = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            published = []
+
+        # Append
+        published.append(published_entry)
+
+        # Write back
+        with open("/home/slova/ProbBrain/data/published_signals.json", "w") as f:
+            json.dump(published, f, indent=2)
+
+        print(f"✅ Logged to published_signals.json")
+        print(f"\nPosted to: {', '.join(published_entry['platforms'])}")
+
+
+if __name__ == "__main__":
+    main()
