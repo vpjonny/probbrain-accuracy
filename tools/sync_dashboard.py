@@ -60,6 +60,8 @@ def _sync_signals_json() -> int:
         if sn in existing_nums or sid in existing_ids:
             continue
 
+        market_price = ps.get("market_yes_price") or ps.get("market_price_at_signal") or ps.get("market_price", 0)
+        our_est = ps.get("our_calibrated_estimate") or ps.get("our_estimate") or ps.get("our_estimate_yes", 0)
         entry = {
             "signal_number": sn,
             "signal_id": sid,
@@ -68,8 +70,11 @@ def _sync_signals_json() -> int:
             "category": ps.get("category", "general"),
             "direction": ps.get("direction", ""),
             "confidence": ps.get("confidence", ""),
-            "market_yes_price": ps.get("market_yes_price") or ps.get("market_price", 0),
-            "our_calibrated_estimate": ps.get("our_calibrated_estimate") or ps.get("our_estimate") or ps.get("our_estimate_yes", 0),
+            "market_price": market_price,
+            "market_price_at_signal": market_price,
+            "our_estimate": our_est,
+            "our_calibrated_estimate": our_est,
+            "market_yes_price": market_price,
             "gap_pct": ps.get("gap_pct") or ps.get("gap_pp", 0),
             "volume_usdc": ps.get("volume_usdc", 0),
             "close_date": ps.get("close_date") or ps.get("closes", ""),
@@ -93,10 +98,24 @@ def sync(signal_id: str = "") -> bool:
     sys.path.insert(0, str(ROOT))
     from tools.compute_accuracy import main as recompute_accuracy
     from tools.git_push_dashboard import push as push_dashboard
+    from tools.validate_signals import backfill, validate
 
     # Step 1: Sync signals.json
     added = _sync_signals_json()
     logger.info("sync_dashboard: %d new signals added to signals.json", added)
+
+    # Step 1b: Backfill any missing price fields
+    fixed = backfill()
+    if fixed:
+        logger.info("sync_dashboard: backfilled %d signal(s) with missing price data", fixed)
+
+    # Step 1c: Validate — warn but don't block
+    signals = json.loads(SIGNALS_PATH.read_text()) if SIGNALS_PATH.exists() else []
+    issues = validate(signals)
+    if issues:
+        for issue in issues:
+            logger.warning("sync_dashboard: validation issue — %s: %s (%s)",
+                           issue["signal_id"], issue["field"], issue["issue"])
 
     # Step 2: Recompute accuracy
     result = recompute_accuracy()
