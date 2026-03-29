@@ -199,6 +199,23 @@
       white-space: nowrap;
     }
 
+    th[data-sort] {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
+    }
+
+    th[data-sort]:hover { color: var(--text); }
+
+    th[data-sort]::after {
+      content: ' \2195';
+      opacity: 0.3;
+      font-size: 0.8em;
+    }
+
+    th[data-sort].sort-asc::after { content: ' \2191'; opacity: 1; color: var(--accent); }
+    th[data-sort].sort-desc::after { content: ' \2193'; opacity: 1; color: var(--accent); }
+
     tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #111; }
@@ -468,14 +485,14 @@
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Market</th>
-            <th>Direction</th>
-            <th>Market vs Ours</th>
-            <th>Gap</th>
-            <th>Confidence</th>
-            <th>Status</th>
-            <th>Closes</th>
+            <th data-sort="number">#</th>
+            <th data-sort="market">Market</th>
+            <th data-sort="direction">Direction</th>
+            <th data-sort="market_price">Market vs Ours</th>
+            <th data-sort="gap">Gap</th>
+            <th data-sort="confidence">Confidence</th>
+            <th data-sort="status">Status</th>
+            <th data-sort="close_date">Closes</th>
           </tr>
         </thead>
         <tbody id="signal-body">
@@ -620,17 +637,45 @@
 
     const PAGE_SIZE = 25;
 
+    // Sort state
+    window._sortCol = null;
+    window._sortDir = null; // 'asc' or 'desc'
+
+    const CONF_ORDER = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+    const STATUS_ORDER = { WIN: 3, LOSS: 2, PENDING: 1 };
+
+    function compareSignals(a, b, col) {
+      switch (col) {
+        case 'number': return a.signal_number - b.signal_number;
+        case 'market': return (a.title || '').localeCompare(b.title || '');
+        case 'direction': return (a.direction || '').localeCompare(b.direction || '');
+        case 'market_price': return (a.market_price || 0) - (b.market_price || 0);
+        case 'gap': return (a.gap_pct || 0) - (b.gap_pct || 0);
+        case 'confidence': return (CONF_ORDER[a.confidence] || 0) - (CONF_ORDER[b.confidence] || 0);
+        case 'status': return (STATUS_ORDER[a.status] || 0) - (STATUS_ORDER[b.status] || 0);
+        case 'close_date': return (a.close_date || '').localeCompare(b.close_date || '');
+        default: return 0;
+      }
+    }
+
     function getFilteredSignals() {
       const q = (window._searchQuery || '').toLowerCase().trim();
-      if (!q) return window._allSignals || [];
-      return (window._allSignals || []).filter(s =>
-        (s.title || '').toLowerCase().includes(q) ||
-        (s.category || '').toLowerCase().includes(q) ||
-        (s.direction || '').toLowerCase().includes(q) ||
-        (s.status || '').toLowerCase().includes(q) ||
-        (s.confidence || '').toLowerCase().includes(q) ||
-        ('#' + s.signal_number).includes(q)
-      );
+      let signals = window._allSignals || [];
+      if (q) {
+        signals = signals.filter(s =>
+          (s.title || '').toLowerCase().includes(q) ||
+          (s.category || '').toLowerCase().includes(q) ||
+          (s.direction || '').toLowerCase().includes(q) ||
+          (s.status || '').toLowerCase().includes(q) ||
+          (s.confidence || '').toLowerCase().includes(q) ||
+          ('#' + s.signal_number).includes(q)
+        );
+      }
+      if (window._sortCol) {
+        const dir = window._sortDir === 'asc' ? 1 : -1;
+        signals = signals.slice().sort((a, b) => dir * compareSignals(a, b, window._sortCol));
+      }
+      return signals;
     }
 
     function renderSignalRow(s) {
@@ -734,6 +779,28 @@
       window._searchQuery = this.value;
       window._currentPage = 1;
       renderSignalTable();
+    });
+
+    // Sort handler
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', function () {
+        const col = this.dataset.sort;
+        if (window._sortCol === col) {
+          // Cycle: desc → asc → none
+          if (window._sortDir === 'desc') { window._sortDir = 'asc'; }
+          else { window._sortCol = null; window._sortDir = null; }
+        } else {
+          window._sortCol = col;
+          window._sortDir = 'desc';
+        }
+        // Update header classes
+        document.querySelectorAll('th[data-sort]').forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+        if (window._sortCol) {
+          this.classList.add(window._sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+        }
+        window._currentPage = 1;
+        renderSignalTable();
+      });
     });
 
     loadData();
