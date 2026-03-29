@@ -72,6 +72,7 @@ Follow this order strictly:
 - Never reply to toxic, political flame wars, or low-quality bait.
 - Never make unsubstantiated claims.
 - If unsure about context or risk → escalate to CEO instead of posting.
+- **403 reply restrictions**: If you receive a `403 Forbidden` when attempting to reply, auto-cancel the task immediately with a comment noting the 403. Do NOT block or escalate — just cancel and move on.
 - Always disclose indirectly that you're data-driven ("According to our tracking…", "Our latest signal shows…").
 - If a reply could be seen as overly promotional, get CEO approval first.
 
