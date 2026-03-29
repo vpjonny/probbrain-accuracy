@@ -26,32 +26,53 @@ SIGNALS_PATH = ROOT / "data" / "signals.json"
 PUBLISHED_PATH = ROOT / "data" / "published_signals.json"
 
 
+def _extract_signal_number(ps: dict) -> int | None:
+    """Extract signal_number from a published signal entry, falling back to signal_id parsing."""
+    sn = ps.get("signal_number")
+    if sn is not None:
+        return int(sn)
+    sid = ps.get("signal_id", "")
+    if sid.startswith("SIG-"):
+        try:
+            return int(sid.split("-", 1)[1])
+        except (ValueError, IndexError):
+            pass
+    return None
+
+
 def _sync_signals_json() -> int:
     """Ensure every published signal exists in signals.json. Returns count of added entries."""
     published = json.loads(PUBLISHED_PATH.read_text()) if PUBLISHED_PATH.exists() else []
     signals = json.loads(SIGNALS_PATH.read_text()) if SIGNALS_PATH.exists() else []
 
     existing_nums = {s["signal_number"] for s in signals}
+    existing_ids = {s.get("signal_id") for s in signals}
     added = 0
 
     for ps in published:
-        sn = ps.get("signal_number")
-        if sn is None or sn in existing_nums:
+        # Skip non-signal entries (e.g. edge threads)
+        if ps.get("type") in ("edge_thread",):
+            continue
+        sn = _extract_signal_number(ps)
+        if sn is None:
+            continue
+        sid = ps.get("signal_id", f"SIG-{sn:03d}")
+        if sn in existing_nums or sid in existing_ids:
             continue
 
         entry = {
             "signal_number": sn,
-            "signal_id": ps.get("signal_id", f"SIG-{sn:03d}"),
+            "signal_id": sid,
             "market_id": ps.get("market_id", ""),
-            "question": ps.get("question", ""),
+            "question": ps.get("question") or ps.get("market_question", ""),
             "category": ps.get("category", "general"),
             "direction": ps.get("direction", ""),
             "confidence": ps.get("confidence", ""),
-            "market_yes_price": ps.get("market_yes_price", 0),
-            "our_calibrated_estimate": ps.get("our_calibrated_estimate", 0),
-            "gap_pct": ps.get("gap_pct", 0),
+            "market_yes_price": ps.get("market_yes_price") or ps.get("market_price", 0),
+            "our_calibrated_estimate": ps.get("our_calibrated_estimate") or ps.get("our_estimate") or ps.get("our_estimate_yes", 0),
+            "gap_pct": ps.get("gap_pct") or ps.get("gap_pp", 0),
             "volume_usdc": ps.get("volume_usdc", 0),
-            "close_date": ps.get("close_date", ""),
+            "close_date": ps.get("close_date") or ps.get("closes", ""),
             "evidence": ps.get("evidence", []),
             "published_at": ps.get("actually_posted_at") or ps.get("telegram_posted_at") or ps.get("published_at", ""),
         }

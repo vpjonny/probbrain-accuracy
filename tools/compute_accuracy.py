@@ -11,6 +11,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tools.sync_dashboard import _extract_signal_number
+
 ROOT = Path(__file__).resolve().parent.parent
 PUBLISHED_PATH = ROOT / "data" / "published_signals.json"
 RESOLVED_PATH = ROOT / "data" / "resolved.json"
@@ -51,7 +53,10 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
     rows = []
     for sig in published:
         # Skip non-signal entries (e.g. edge threads)
-        if sig.get("type") or not sig.get("signal_number"):
+        if sig.get("type"):
+            continue
+        sn = _extract_signal_number(sig)
+        if sn is None:
             continue
         market_id = str(sig.get("market_id", ""))
         outcome_data = outcome_by_market.get(market_id)
@@ -67,9 +72,9 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
         else:
             status = "PENDING"
         row = {
-            "id": sig.get("signal_id") or f"SIG-{sig['signal_number']:03d}",
-            "signal_number": sig["signal_number"],
-            "title": sig.get("question", ""),
+            "id": sig.get("signal_id") or f"SIG-{sn:03d}",
+            "signal_number": sn,
+            "title": sig.get("question") or sig.get("market_question", ""),
             "category": sig.get("category", "general"),
             "direction": sig.get("direction", ""),
             "confidence": sig.get("confidence", ""),
@@ -80,7 +85,7 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
             "close_date": sig.get("close_date", ""),
             "published_at": sig.get("actually_posted_at") or sig.get("published_at", ""),
         }
-        slug = slug_map.get(str(sig["signal_number"]), "")
+        slug = slug_map.get(str(sn), "")
         if slug:
             row["polymarket_slug"] = slug
         rows.append(row)
@@ -99,7 +104,7 @@ def compute() -> dict:
     # resolved.json entries should have: market_id, outcome (YES/NO), resolved_at
     outcome_by_market = {r["market_id"]: r for r in resolved_outcomes if "market_id" in r}
 
-    signals_published = sum(1 for s in published if not s.get("type") and s.get("signal_number"))
+    signals_published = sum(1 for s in published if not s.get("type") and _extract_signal_number(s) is not None)
     signals_resolved = 0
     correct = 0
     brier_sum = 0.0
