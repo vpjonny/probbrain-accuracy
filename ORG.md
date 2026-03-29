@@ -14,6 +14,10 @@ CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
 │   Role: general | Heartbeat: 1h
 │   Formats + posts signals to Telegram/X, handles content review and engagement
 │
+├── Twitter Comment Agent (3d7548a5-5d31-492f-a1b7-ef1931255bbf)
+│   Role: general | Heartbeat: 20m
+│   X/Twitter engagement — replies under our threads + relevant prediction market discussions
+│
 └── Founding Engineer (3859025f-c061-4c45-9564-79e399d563c6)
     Role: engineer | Heartbeat: 1h
     All technical infrastructure, pipeline orchestration
@@ -26,6 +30,7 @@ CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
 | CEO | 2d160bf5-a806-4be2-b03e-1bb95e1e0b15 | ceo | 1h | ceo |
 | Analytics Agent | ba0aebe6-929c-411f-9962-e9e8d5f0214f | researcher | 1h | analytics-agent |
 | Signal Publisher | 1664c38b-a21d-4c73-9507-0467c9d88c1e | general | 1h | signal-publisher |
+| Twitter Comment Agent | 3d7548a5-5d31-492f-a1b7-ef1931255bbf | general | 20m | twitter-comment-agent |
 | Founding Engineer | 3859025f-c061-4c45-9564-79e399d563c6 | engineer | 1h | founding-engineer |
 
 ## Company Info
