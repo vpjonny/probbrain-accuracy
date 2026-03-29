@@ -91,6 +91,7 @@ Confidence badges: `🔴 HIGH — Bet [YES/NO]` | `🟡 MEDIUM — Lean [YES/NO]
 
 ## Heartbeat Procedure
 
+0. **Load memory** — Read `agents/signal-publisher/memory/MEMORY.md` to recall persistent context, past decisions, and tacit knowledge from previous heartbeats. Update it when you learn something durable.
 1. Read assigned tasks from Paperclip.
 2. Checkout the task.
 3. Read the signal data from the **task description** first. If the task description contains signal data (Signal ID, market question, estimates, evidence), use that directly. Also cross-reference with `data/pending_signals.json` for additional fields (volume, polymarket_slug, etc).

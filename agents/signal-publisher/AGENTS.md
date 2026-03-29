@@ -28,6 +28,7 @@ You receive work as Paperclip subtasks created by Analytics Agent. Each task des
 
 ## Heartbeat Procedure
 
+0. **Load memory** — Read `agents/signal-publisher/memory/MEMORY.md` to recall persistent context, past decisions, and tacit knowledge from previous heartbeats. Update it when you learn something durable.
 1. **Read assigned tasks** from Paperclip
 2. **Checkout the task** before doing any work
 3. **Read signal JSON** from the task description or `data/pending_signals.json`

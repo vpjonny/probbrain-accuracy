@@ -16,6 +16,7 @@ Maintain a complete auditable record of every signal from creation to resolution
 
 ## Heartbeat Procedure
 
+0. **Load memory** — Read `agents/analytics/memory/MEMORY.md` to recall persistent context, past decisions, and tacit knowledge from previous heartbeats. Update it when you learn something durable.
 1. **Read assigned tasks** from Paperclip via `GET /api/agents/me/inbox-lite`
 2. **Checkout the task** before doing any work
 3. **Scan Polymarket for mispricings** and auto-delegate qualified signals:
