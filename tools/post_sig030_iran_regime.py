@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Post SIG-032 (Trump out as President before 2027) to Telegram and X.
+Post SIG-030 (Iranian regime fall by June 30) to Telegram and X.
 """
 
 import os
@@ -28,28 +28,28 @@ DASHBOARD_URL = "https://vpjonny.github.io/probbrain-accuracy/"
 
 # Signal data
 SIGNAL = {
-    "signal_id": "SIG-032",
-    "market": "Trump out as President before 2027?",
-    "market_price_yes": 0.175,
-    "our_estimate": 0.02,
-    "gap_pct": 15.5,
+    "signal_id": "SIG-030",
+    "market": "Will the Iranian regime fall by June 30?",
+    "market_price_yes": 0.195,
+    "our_estimate": 0.075,
+    "gap_pct": 12.0,
     "confidence": "MEDIUM",
-    "volume_usdc": 5220972.42,
-    "close_date": "2026-12-31",
-    "market_id": "666861",
-    "polymarket_slug": "trump-out-as-president-before-2027",
+    "volume_usdc": 22254903.092957396,
+    "close_date": "2026-06-30",
+    "market_id": "958443",
+    "polymarket_slug": "will-the-iranian-regime-fall-by-june-30",
 }
 
 EVIDENCE = [
-    "Trump is 79 years old; modern medical care has eliminated most in-office deaths (0 of 19 presidents since 1950)",
-    "Republican Senate controls Congress; impeachment conviction politically impossible (requires 2/3 majority)",
-    "No resignation catalysts evident; Trump actively governing Operation Epic Fury (Iran conflict)",
-    "Assassination risk very low in modern era (~0.1% baseline across full term)",
-    "Age-adjusted mortality for 79-year-old male over 9 months: ~1-2%",
-    "Historical comparison: Only 4 presidents have left office due to death/assassination/resignation (1841-1974); none since 1974",
+    "Iran in active military conflict with Israel (Operation Epic Fury, Feb 28 start)",
+    "Iran fired 300+ ballistic missiles at central Israel; Israel struck IRGC targets in Isfahan",
+    "Regime remains operational; Khamenei and IRGC leadership directing operations",
+    "No major popular uprising or internal military coup in progress; IRGC controls security apparatus",
+    "Modern regime collapses: ~5% base rate over 6-month windows; Iran-specific: 0 collapses since 1979",
+    "Even escalated conflict rarely triggers regime collapse within 3 months (typically takes years)",
 ]
 
-COUNTER_EVIDENCE = "Despite elevated rhetoric around Iran escalation and political conflict, the combination of modern security infrastructure, low base rates for presidential exits, and GOP Senate control makes removal extremely unlikely within the 9-month window."
+COUNTER_EVIDENCE = "Despite active military escalation and operational strikes exchanged, regime collapse historically requires either internal military coup, widespread popular uprising, or complete military defeat—none evident in current conflict dynamics. 40+ years of regime survival through multiple crises (Iraq war, sanctions, internal dissent) suggests resilience."
 
 # ============================================================================
 # TELEGRAM MESSAGE
@@ -57,7 +57,7 @@ COUNTER_EVIDENCE = "Despite elevated rhetoric around Iran escalation and politic
 
 telegram_message = f"""🟡 MEDIUM — Lean NO
 
-📊 Trump out as President before 2027?
+📊 Will the Iranian regime fall by June 30?
 
 Market: {SIGNAL['market_price_yes']*100:.1f}% YES | Our estimate: {SIGNAL['our_estimate']*100:.1f}% YES
 
@@ -68,11 +68,17 @@ Volume: ${SIGNAL['volume_usdc']/1e6:.1f}M
 Closes: {SIGNAL['close_date']}
 
 Evidence:
+
 • {EVIDENCE[0]}
+
 • {EVIDENCE[1]}
+
 • {EVIDENCE[2]}
+
 • {EVIDENCE[3]}
+
 • {EVIDENCE[4]}
+
 • {EVIDENCE[5]}
 
 Counter-evidence: {COUNTER_EVIDENCE}
@@ -90,13 +96,14 @@ Counter-evidence: {COUNTER_EVIDENCE}
 # X THREAD
 # ============================================================================
 
-tweet_1 = f"Market: Trump out by 2026-12-31 at {SIGNAL['market_price_yes']*100:.1f}% YES. Our estimate: {SIGNAL['our_estimate']*100:.1f}%. Gap: {SIGNAL['gap_pct']:.1f}pp. Most plausible exits (death, assassination, impeachment) have near-zero probability."
+tweet_1 = f"Market: Iranian regime collapse by 2026-06-30 at {SIGNAL['market_price_yes']*100:.1f}% YES. Our estimate: {SIGNAL['our_estimate']*100:.1f}%. Gap: {SIGNAL['gap_pct']:.1f}pp. Base rate for regime collapse over 6 months is ~5%; current escalation raises it to 7.5%. Iran has survived 40+ years and multiple crises."
 
 tweet_2 = f"""Evidence:
-• Trump is 79; modern medical care has eliminated in-office deaths (0 of 19 since 1950)
-• GOP Senate controls Congress—impeachment impossible
-• No resignation catalysts; Trump actively governing
-• Assassination risk ~0.1%; age-adjusted mortality over 9 months: ~1-2%
+• Iran in active military conflict with Israel (Operation Epic Fury)
+• Fired 300+ ballistic missiles; Israel struck IRGC targets
+• Regime remains operational; Khamenei and IRGC directing ops
+• No major uprising or military coup in progress
+• Historical base rate: 0 regime collapses in Iran since 1979
 
 {AFFILIATE_X}
 
@@ -178,7 +185,7 @@ entry = {
     "counter_evidence": COUNTER_EVIDENCE,
     "direction": "NO_UNDERPRICED",
     "approval_required": False,
-    "paperclip_issue": "PRO-371",
+    "paperclip_issue": "PRO-383",
 }
 
 published.append(entry)
@@ -194,9 +201,9 @@ print(f"✓ Logged to published_signals.json")
 # ============================================================================
 
 print("[4/4] Syncing dashboard...")
-os.system("cd /home/slova/ProbBrain && python3 tools/sync_dashboard.py --signal-id SIG-032")
+os.system("cd /home/slova/ProbBrain && python3 tools/sync_dashboard.py --signal-id SIG-030")
 print("✓ Dashboard synced")
 
-print("\n✅ All done! SIG-032 published.")
+print("\n✅ All done! SIG-030 published.")
 print(f"   Telegram: message_id={tg_message_id}")
 print(f"   X: tweets {tweet_1_id} → {tweet_2_id} → {tweet_3_id}")

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Post SIG-032 (Trump out as President before 2027) to Telegram and X.
+Post SIG-034 (Tennessee Volunteers vs. Michigan Wolverines) to Telegram and X.
+WARNING: Market closes 2026-03-29T16:00 (may already be closed).
 """
 
 import os
@@ -28,52 +29,55 @@ DASHBOARD_URL = "https://vpjonny.github.io/probbrain-accuracy/"
 
 # Signal data
 SIGNAL = {
-    "signal_id": "SIG-032",
-    "market": "Trump out as President before 2027?",
-    "market_price_yes": 0.175,
-    "our_estimate": 0.02,
-    "gap_pct": 15.5,
+    "signal_id": "SIG-034",
+    "market": "Tennessee Volunteers vs. Michigan Wolverines",
+    "market_price_yes": 0.225,
+    "our_estimate": 0.26,
+    "gap_pct": 3.5,
     "confidence": "MEDIUM",
-    "volume_usdc": 5220972.42,
-    "close_date": "2026-12-31",
-    "market_id": "666861",
-    "polymarket_slug": "trump-out-as-president-before-2027",
+    "volume_usdc": 2442108.520329002,
+    "close_date": "2026-03-29",
+    "market_id": "1753593",
+    "polymarket_slug": "cbb-tenn-mich-2026-03-29",
 }
 
 EVIDENCE = [
-    "Trump is 79 years old; modern medical care has eliminated most in-office deaths (0 of 19 presidents since 1950)",
-    "Republican Senate controls Congress; impeachment conviction politically impossible (requires 2/3 majority)",
-    "No resignation catalysts evident; Trump actively governing Operation Epic Fury (Iran conflict)",
-    "Assassination risk very low in modern era (~0.1% baseline across full term)",
-    "Age-adjusted mortality for 79-year-old male over 9 months: ~1-2%",
-    "Historical comparison: Only 4 presidents have left office due to death/assassination/resignation (1841-1974); none since 1974",
+    "Michigan: 34-3 (1-seed, #3 ranked), Tennessee: 25-11 (6-seed, #23-25 ranked)",
+    "Tournament dominance: Michigan won by +21, +23, +13 in prior games",
+    "Michigan 7.5-point favorite (implies ~25-26% for Tennessee)",
+    "Expert predictions all favor Michigan by 10+ points",
+    "Michigan 7-5 all-time, 4 straight recent wins vs Tennessee",
 ]
 
-COUNTER_EVIDENCE = "Despite elevated rhetoric around Iran escalation and political conflict, the combination of modern security infrastructure, low base rates for presidential exits, and GOP Senate control makes removal extremely unlikely within the 9-month window."
+COUNTER_EVIDENCE = "Tennessee's experience in tournament play and double-digit seeding upsets in March Madness history provide non-zero probability, though Michigan's dominant run and ranking advantage strongly favor the higher seed."
 
 # ============================================================================
 # TELEGRAM MESSAGE
 # ============================================================================
 
-telegram_message = f"""🟡 MEDIUM — Lean NO
+telegram_message = f"""🟡 MEDIUM — Lean YES
 
-📊 Trump out as President before 2027?
+📊 Tennessee Volunteers vs. Michigan Wolverines
 
 Market: {SIGNAL['market_price_yes']*100:.1f}% YES | Our estimate: {SIGNAL['our_estimate']*100:.1f}% YES
 
-Gap: {SIGNAL['gap_pct']:.1f}pp (market overpricing YES)
+Gap: {SIGNAL['gap_pct']:.1f}pp (market underpricing YES)
 
 Volume: ${SIGNAL['volume_usdc']/1e6:.1f}M
 
 Closes: {SIGNAL['close_date']}
 
 Evidence:
+
 • {EVIDENCE[0]}
+
 • {EVIDENCE[1]}
+
 • {EVIDENCE[2]}
+
 • {EVIDENCE[3]}
+
 • {EVIDENCE[4]}
-• {EVIDENCE[5]}
 
 Counter-evidence: {COUNTER_EVIDENCE}
 
@@ -90,13 +94,13 @@ Counter-evidence: {COUNTER_EVIDENCE}
 # X THREAD
 # ============================================================================
 
-tweet_1 = f"Market: Trump out by 2026-12-31 at {SIGNAL['market_price_yes']*100:.1f}% YES. Our estimate: {SIGNAL['our_estimate']*100:.1f}%. Gap: {SIGNAL['gap_pct']:.1f}pp. Most plausible exits (death, assassination, impeachment) have near-zero probability."
+tweet_1 = f"Michigan (1-seed, 34-3) vs Tennessee (6-seed, 25-11). Market says {SIGNAL['market_price_yes']*100:.1f}% for Tennessee, but 7.5-point favorites typically carry ~25-26% underdog probability. Gap: {SIGNAL['gap_pct']:.1f}pp."
 
 tweet_2 = f"""Evidence:
-• Trump is 79; modern medical care has eliminated in-office deaths (0 of 19 since 1950)
-• GOP Senate controls Congress—impeachment impossible
-• No resignation catalysts; Trump actively governing
-• Assassination risk ~0.1%; age-adjusted mortality over 9 months: ~1-2%
+• Michigan: 34-3 record, #3 ranked, dominant tournament run
+• Tennessee: 25-11 record, #23-25 ranked
+• Michigan: +21, +23, +13 wins in previous tournament games
+• 7-5 all-time, 4 straight wins vs Tennessee
 
 {AFFILIATE_X}
 
@@ -176,9 +180,9 @@ entry = {
     "x_tweet_ids": [str(tweet_1_id), str(tweet_2_id), str(tweet_3_id)],
     "evidence": EVIDENCE,
     "counter_evidence": COUNTER_EVIDENCE,
-    "direction": "NO_UNDERPRICED",
+    "direction": "YES_UNDERPRICED",
     "approval_required": False,
-    "paperclip_issue": "PRO-371",
+    "paperclip_issue": "PRO-383",
 }
 
 published.append(entry)
@@ -194,9 +198,9 @@ print(f"✓ Logged to published_signals.json")
 # ============================================================================
 
 print("[4/4] Syncing dashboard...")
-os.system("cd /home/slova/ProbBrain && python3 tools/sync_dashboard.py --signal-id SIG-032")
+os.system("cd /home/slova/ProbBrain && python3 tools/sync_dashboard.py --signal-id SIG-034")
 print("✓ Dashboard synced")
 
-print("\n✅ All done! SIG-032 published.")
+print("\n✅ All done! SIG-034 published.")
 print(f"   Telegram: message_id={tg_message_id}")
 print(f"   X: tweets {tweet_1_id} → {tweet_2_id} → {tweet_3_id}")
