@@ -6,9 +6,11 @@ Flow:
   1. fetch_markets()       — Polymarket Gamma API → filtered Market list
   2. save_snapshot()       — timestamped JSON snapshot in data/
   3. detect_signals()      — filter to notable markets
-  4. approval gate         — if approval_required (publisher.json threshold not met),
-                             write to data/pending_signals.json and stop
-  5. publish_signals()     — send approved signals to Telegram channel
+  4. global approval gate  — if count threshold not met (publisher.json),
+                             stage all to pending_signals.json and stop
+  5. per-signal gate       — signals with approval_required: true in signals.json
+                             are staged to pending_signals.json; rest proceed
+  6. publish_signals()     — send approved signals to Telegram channel
 """
 import json
 import logging
@@ -32,6 +34,7 @@ logger = logging.getLogger(__name__)
 PUBLISHER_CONFIG_PATH = Path("config/publisher.json")
 PENDING_SIGNALS_PATH = Path("data/pending_signals.json")
 PUBLISHED_SIGNALS_PATH = Path("data/published_signals.json")
+SIGNALS_PATH = Path("data/signals.json")
 
 
 def _load_publisher_config() -> dict:
@@ -53,10 +56,25 @@ def _approval_required() -> bool:
     return len(published) < threshold
 
 
+def _signals_requiring_approval() -> set:
+    """Return set of market IDs that have approval_required: true in signals.json."""
+    if not SIGNALS_PATH.exists():
+        return set()
+    signals = json.loads(SIGNALS_PATH.read_text())
+    return {s.get("market_id") for s in signals if s.get("approval_required")}
+
+
 def _stage_signals(signals: List[Market]) -> None:
-    """Write detected signals to pending_signals.json awaiting approval."""
-    pending = [m.to_dict() for m in signals]
-    PENDING_SIGNALS_PATH.write_text(json.dumps(pending, indent=2))
+    """Append detected signals to pending_signals.json awaiting approval."""
+    if PENDING_SIGNALS_PATH.exists():
+        existing = json.loads(PENDING_SIGNALS_PATH.read_text())
+    else:
+        existing = []
+    existing_ids = {s.get("id") or s.get("market_id") for s in existing}
+    for m in signals:
+        if m.id not in existing_ids:
+            existing.append(m.to_dict())
+    PENDING_SIGNALS_PATH.write_text(json.dumps(existing, indent=2))
     logger.info("Staged %d signal(s) → %s", len(signals), PENDING_SIGNALS_PATH)
 
 
@@ -99,7 +117,21 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
         logger.info("Pipeline staged (approval required): %s", summary)
         return summary
 
-    # 4. Publish (or dry-run log)
+    # 4. Per-signal approval gate — split out signals with approval_required: true
+    if signals and not force_publish and not dry_run:
+        blocked_ids = _signals_requiring_approval()
+        if blocked_ids:
+            needs_approval = [s for s in signals if s.id in blocked_ids]
+            signals = [s for s in signals if s.id not in blocked_ids]
+            if needs_approval:
+                _stage_signals(needs_approval)
+                logger.info(
+                    "Held %d signal(s) for per-signal approval: %s",
+                    len(needs_approval),
+                    [s.id for s in needs_approval],
+                )
+
+    # 5. Publish (or dry-run log)
     published = 0
     if signals:
         if dry_run:
@@ -117,7 +149,6 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
         "signals_published": published,
         "snapshot": str(snapshot_path),
         "dry_run": dry_run,
-        "approval_required": False,
     }
     logger.info("Pipeline complete: %s", summary)
     return summary
