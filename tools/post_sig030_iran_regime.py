@@ -4,11 +4,16 @@ Post SIG-030 (Iranian regime fall by June 30) to Telegram and X.
 """
 
 import os
+import sys
 import json
 import httpx
 import tweepy
 from datetime import datetime
 from dotenv import load_dotenv
+
+# Add tools to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from polymarket_screenshot import generate_and_upload_market_card
 
 # Load .env file
 load_dotenv("/home/slova/ProbBrain/.env")
@@ -113,7 +118,9 @@ tweet_3 = f"""We track every call publicly → {DASHBOARD_URL}
 
 Get signals on Telegram: https://t.me/ProbBrain
 
-Follow @ProbBrain for more."""
+Follow @ProbBrain for more.
+
+#Iran #MiddleEast"""
 
 # ============================================================================
 # POST TO TELEGRAM
@@ -143,9 +150,25 @@ client = tweepy.Client(
     access_token_secret=X_ACCESS_TOKEN_SECRET,
 )
 
-r1 = client.create_tweet(text=tweet_1)
+# Generate and upload market card
+print("🖼️ Generating market card screenshot...")
+media_id = generate_and_upload_market_card(
+    market_question=SIGNAL["market"],
+    market_price_yes=SIGNAL["market_price_yes"],
+    our_estimate=SIGNAL["our_estimate"],
+    gap_pct=SIGNAL["gap_pct"],
+    confidence=SIGNAL["confidence"],
+    twitter_client=client,
+    volume_usdc=SIGNAL["volume_usdc"]
+)
+
+if media_id:
+    r1 = client.create_tweet(text=tweet_1, media_ids=[media_id])
+    print(f"✓ Tweet 1 posted with market card (ID: {r1.data['id']})")
+else:
+    r1 = client.create_tweet(text=tweet_1)
+    print(f"✓ Tweet 1 posted without screenshot (ID: {r1.data['id']})")
 tweet_1_id = r1.data["id"]
-print(f"✓ Tweet 1 posted (ID: {tweet_1_id})")
 
 r2 = client.create_tweet(text=tweet_2, in_reply_to_tweet_id=tweet_1_id)
 tweet_2_id = r2.data["id"]

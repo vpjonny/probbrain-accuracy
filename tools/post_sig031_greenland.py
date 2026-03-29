@@ -9,6 +9,10 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+# Add tools to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from polymarket_screenshot import generate_and_upload_market_card
+
 # Load .env file
 env_file = Path(__file__).parent.parent / ".env"
 if env_file.exists():
@@ -97,7 +101,9 @@ X_TWEET_3 = f"""We track every call publicly: {SIGNAL['dashboard_url']}
 
 Get signals on Telegram: https://t.me/ProbBrain
 
-Follow @ProbBrain for more market calls."""
+Follow @ProbBrain for more market calls.
+
+#Geopolitics #US"""
 
 def post_telegram():
     """Post to Telegram"""
@@ -114,7 +120,7 @@ def post_telegram():
     return msg_id
 
 def post_x():
-    """Post X thread using tweepy"""
+    """Post X thread using tweepy with market card"""
     try:
         import tweepy
     except ImportError:
@@ -128,10 +134,26 @@ def post_x():
         access_token_secret=CONFIG["x_access_token_secret"],
     )
 
+    # Generate and upload market card
+    print("🖼️ Generating market card screenshot...")
+    media_id = generate_and_upload_market_card(
+        market_question=SIGNAL["market_question"],
+        market_price_yes=SIGNAL["market_price_yes"] / 100.0,
+        our_estimate=SIGNAL["our_estimate_yes"] / 100.0,
+        gap_pct=SIGNAL["gap_pp"],
+        confidence=SIGNAL["confidence"],
+        twitter_client=client,
+        volume_usdc=SIGNAL["volume_millions"] * 1_000_000
+    )
+
     # Post thread
-    r1 = client.create_tweet(text=X_TWEET_1)
+    if media_id:
+        r1 = client.create_tweet(text=X_TWEET_1, media_ids=[media_id])
+        print(f"✓ X tweet 1 posted with market card: {r1.data['id']}")
+    else:
+        r1 = client.create_tweet(text=X_TWEET_1)
+        print(f"✓ X tweet 1 posted without screenshot: {r1.data['id']}")
     tweet_1_id = r1.data["id"]
-    print(f"✓ X tweet 1 posted: {tweet_1_id}")
 
     r2 = client.create_tweet(text=X_TWEET_2, in_reply_to_tweet_id=tweet_1_id)
     tweet_2_id = r2.data["id"]

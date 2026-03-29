@@ -9,6 +9,10 @@ import httpx
 import tweepy
 from dotenv import load_dotenv
 
+# Add tools to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from polymarket_screenshot import generate_and_upload_market_card
+
 # Load .env file
 load_dotenv("/home/slova/ProbBrain/.env")
 
@@ -98,12 +102,14 @@ def build_x_thread():
 Not financial advice. Trade at your own risk.
 {TELEGRAM_AFFILIATE}"""
 
-    # Tweet 3: Dashboard + follow
+    # Tweet 3: Dashboard + follow + hashtags
     tweet_3 = f"""We track every call publicly → {DASHBOARD_URL}
 
 Get signals on Telegram: https://t.me/ProbBrain
 
-Follow @ProbBrain for more."""
+Follow @ProbBrain for more.
+
+#Politics #Elections"""
 
     return tweet_1, tweet_2, tweet_3
 
@@ -133,7 +139,7 @@ def post_to_telegram(message):
         return None
 
 def post_to_x(tweet_1, tweet_2, tweet_3):
-    """Post thread to X/Twitter."""
+    """Post thread to X/Twitter with market card screenshot."""
     if not all([X_CONSUMER_KEY, X_CONSUMER_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET]):
         print("⚠️ X credentials not set; skipping X")
         return None, None, None
@@ -145,15 +151,31 @@ def post_to_x(tweet_1, tweet_2, tweet_3):
         access_token_secret=X_ACCESS_TOKEN_SECRET,
     )
 
+    # Generate and upload market card
+    print("🖼️ Generating market card screenshot...")
+    media_id = generate_and_upload_market_card(
+        market_question=MARKET_QUESTION,
+        market_price_yes=MARKET_PRICE / 100.0,
+        our_estimate=OUR_ESTIMATE / 100.0,
+        gap_pct=GAP,
+        confidence=CONFIDENCE,
+        twitter_client=client,
+        volume_usdc=VOLUME
+    )
+
     # Post thread
-    r1 = client.create_tweet(text=tweet_1)
-    print(f"✓ X Tweet 1 posted (id: {r1.data['id']})")
+    if media_id:
+        r1 = client.create_tweet(text=tweet_1, media_ids=[media_id])
+        print(f"✓ X Tweet 1 posted with market card (id: {r1.data['id']})")
+    else:
+        r1 = client.create_tweet(text=tweet_1)
+        print(f"✓ X Tweet 1 posted without screenshot (id: {r1.data['id']})")
 
     r2 = client.create_tweet(text=tweet_2, in_reply_to_tweet_id=r1.data["id"])
     print(f"✓ X Tweet 2 posted (id: {r2.data['id']})")
 
     r3 = client.create_tweet(text=tweet_3, in_reply_to_tweet_id=r2.data["id"])
-    print(f"✓ X Tweet 3 posted (id: {r3.data['id']})")
+    print(f"✓ X Tweet 3 posted with hashtags (id: {r3.data['id']})")
 
     return r1.data["id"], r2.data["id"], r3.data["id"]
 
