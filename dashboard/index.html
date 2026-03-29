@@ -428,6 +428,14 @@
 
     .visit-counter svg { width: 13px; height: 13px; flex-shrink: 0; }
     .visit-count { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+    .visit-label { color: var(--muted); }
+
+    @keyframes countPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .visit-counter.loaded { animation: countPop 0.3s ease; }
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -535,9 +543,10 @@
 
   </main>
 
-  <div class="visit-counter" title="Total page visits">
+  <div class="visit-counter" id="visit-counter" title="Total page visits">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
     <span class="visit-count" id="visit-count">—</span>
+    <span class="visit-label">visits</span>
   </div>
 
   <footer class="footer">
@@ -841,6 +850,7 @@
         .then(d => {
           if (d && d.count != null) {
             document.getElementById('visit-count').textContent = d.count.toLocaleString();
+            document.getElementById('visit-counter').classList.add('loaded');
           }
         })
         .catch(() => {});
