@@ -36,8 +36,21 @@ def _load_json(path: Path, default):
 
 def _load_slug_map() -> dict:
     """Load polymarket slug mapping from data/polymarket_slugs.json,
-    falling back to slugs already present in the current accuracy.json."""
+    falling back to slugs in signals.json and existing accuracy.json."""
     slug_map: dict = _load_json(SLUG_PATH, {})
+    # Pull slugs from signals.json
+    signals_path = ROOT / "data" / "signals.json"
+    for sig in _load_json(signals_path, []):
+        num = str(sig.get("signal_number", ""))
+        slug = sig.get("polymarket_slug", "")
+        if slug and num not in slug_map:
+            slug_map[num] = slug
+    # Pull slugs from published_signals.json
+    for sig in _load_json(PUBLISHED_PATH, []):
+        sn = _extract_signal_number(sig)
+        slug = sig.get("polymarket_slug", "")
+        if sn and slug and str(sn) not in slug_map:
+            slug_map[str(sn)] = slug
     # Also pull slugs from existing accuracy.json signals as fallback
     existing = _load_json(OUTPUT_PATH, {})
     for sig in existing.get("signals", []):
