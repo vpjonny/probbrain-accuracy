@@ -213,7 +213,11 @@ def compute() -> dict:
         "by_confidence": by_confidence,
         "kill_switches_active": existing_accuracy.get("kill_switches_active", []),
         "last_resolved_signal": last_resolved,
-        "signals": _build_signal_rows(published, outcome_by_market, slug_map),
+        "signals": sorted(
+            _build_signal_rows(published, outcome_by_market, slug_map),
+            key=lambda s: s.get("published_at") or "",
+            reverse=True,
+        ),
     }
 
     # Preserve manually curated fields from the existing accuracy.json

@@ -585,8 +585,12 @@
             streakSub.textContent = 'no resolved signals';
           }
 
-          // Signal table — store globally for pagination/search
-          window._allSignals = d.signals || [];
+          // Signal table — store globally for pagination/search (newest first)
+          window._allSignals = (d.signals || []).slice().sort((a, b) => {
+            const da = a.published_at || '';
+            const db = b.published_at || '';
+            return da < db ? 1 : da > db ? -1 : b.signal_number - a.signal_number;
+          });
           window._searchQuery = document.getElementById('signal-search').value;
           if (!window._currentPage) window._currentPage = 1;
           renderSignalTable();
