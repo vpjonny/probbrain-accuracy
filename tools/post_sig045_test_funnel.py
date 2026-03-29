@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Publish SIG-045 (test funnel validation) to Telegram and X."""
+"""Publish SIG-045 (test funnel validation) to Telegram and X with market card screenshot."""
 import os
 import httpx
 import json
 from datetime import datetime
 import time
 from dotenv import load_dotenv
+import sys
+
+# Add tools to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from polymarket_screenshot import generate_and_upload_market_card
 
 # Load .env
 load_dotenv()
@@ -91,12 +96,28 @@ try:
         wait_on_rate_limit=True,
     )
 
-    # Tweet 1: Core insight
+    # Generate market card screenshot
+    print("[X] Generating market card screenshot...")
+    media_id = generate_and_upload_market_card(
+        market_question=MARKET_QUESTION,
+        market_price_yes=MARKET_PRICE,
+        our_estimate=OUR_ESTIMATE,
+        gap_pct=GAP_PCT,
+        confidence=CONFIDENCE,
+        twitter_client=client,
+        volume_usdc=VOLUME,
+    )
+
+    # Tweet 1: Core insight with market card
     tweet_1 = f"{MARKET_QUESTION}\n\nMarket: 35% YES | Our: 15% YES\nGap: 20pp (overpricing YES)"
 
-    r1 = client.create_tweet(text=tweet_1)
+    if media_id:
+        r1 = client.create_tweet(text=tweet_1, media_ids=[media_id])
+        print(f"✓ Tweet 1 posted with market card (id: {r1.data['id']})")
+    else:
+        r1 = client.create_tweet(text=tweet_1)
+        print(f"✓ Tweet 1 posted without screenshot (id: {r1.data['id']})")
     tweet_1_id = r1.data["id"]
-    print(f"✓ Tweet 1 posted (id: {tweet_1_id})")
 
     time.sleep(1)  # Rate limit safety
 
@@ -114,12 +135,14 @@ Trade on Polymarket: {DUB_TWITTER}"""
 
     time.sleep(1)  # Rate limit safety
 
-    # Tweet 3: Dashboard + Telegram + follow
+    # Tweet 3: Dashboard + Telegram + follow + hashtags
     tweet_3 = f"""We track every call publicly:
 {DASHBOARD_URL}
 
 Get signals on Telegram: https://t.me/ProbBrain
-Follow @ProbBrain for more."""
+Follow @ProbBrain for more.
+
+#Markets"""
 
     r3 = client.create_tweet(text=tweet_3, in_reply_to_tweet_id=tweet_2_id)
     tweet_3_id = r3.data["id"]
@@ -156,6 +179,8 @@ signal_entry = {
     "counter_evidence": "Market pricing reflects some interest despite test nature.",
     "telegram_message_id": telegram_msg_id,
     "x_tweet_ids": x_tweet_ids,
+    "x_has_market_card": media_id is not None,
+    "x_thread_includes_hashtags": True,
     "published_at": datetime.utcnow().isoformat() + "Z",
     "signal_number": 45,
 }
