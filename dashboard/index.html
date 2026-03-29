@@ -403,6 +403,32 @@
     #updated { font-size: 0.75rem; color: var(--muted); }
     .disclaimer { font-size: 0.72rem; color: var(--muted2); }
 
+    /* Visit Counter */
+    .visit-counter {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      z-index: 100;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .visit-counter:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .visit-counter svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .visit-count { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+
     /* Responsive */
     @media (max-width: 900px) {
       .kpi-grid { grid-template-columns: repeat(3, 1fr); }
@@ -508,6 +534,11 @@
     </div>
 
   </main>
+
+  <div class="visit-counter" title="Total page visits">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span class="visit-count" id="visit-count">—</span>
+  </div>
 
   <footer class="footer">
     <div id="updated">Loading...</div>
@@ -802,6 +833,18 @@
         renderSignalTable();
       });
     });
+
+    // Visit counter — uses counterapi.dev (free, no signup)
+    (function() {
+      fetch('https://api.counterapi.dev/v1/probbrain-dashboard/visits/up')
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.count != null) {
+            document.getElementById('visit-count').textContent = d.count.toLocaleString();
+          }
+        })
+        .catch(() => {});
+    })();
 
     loadData();
     setInterval(loadData, 60000);
