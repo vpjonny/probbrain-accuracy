@@ -89,6 +89,8 @@ def _sync_signals_json() -> int:
 
 def sync(signal_id: str = "") -> bool:
     """Full sync: signals.json → compute accuracy → push to both repos."""
+    # Add parent dir to path for imports when running as script
+    sys.path.insert(0, str(ROOT))
     from tools.compute_accuracy import main as recompute_accuracy
     from tools.git_push_dashboard import push as push_dashboard
 
