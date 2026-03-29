@@ -45,7 +45,7 @@ def _sync_signals_json() -> int:
     published = json.loads(PUBLISHED_PATH.read_text()) if PUBLISHED_PATH.exists() else []
     signals = json.loads(SIGNALS_PATH.read_text()) if SIGNALS_PATH.exists() else []
 
-    existing_nums = {s["signal_number"] for s in signals}
+    existing_nums = {s["signal_number"] for s in signals if "signal_number" in s}
     existing_ids = {s.get("signal_id") for s in signals}
     added = 0
 
