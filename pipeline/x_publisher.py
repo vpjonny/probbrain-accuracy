@@ -11,6 +11,7 @@ Thread format (3 tweets):
 """
 import logging
 import os
+import time
 from dataclasses import dataclass
 from typing import Optional
 
@@ -130,11 +131,13 @@ def post_thread(thread: XThreadContent, dry_run: bool = False) -> Optional[list[
         t1_id = r1.data["id"]
         ids.append(t1_id)
         logger.info("Posted tweet 1 (id=%s)", t1_id)
+        time.sleep(2)
 
         r2 = client.create_tweet(text=thread.tweet2, in_reply_to_tweet_id=t1_id)
         t2_id = r2.data["id"]
         ids.append(t2_id)
         logger.info("Posted tweet 2 (id=%s)", t2_id)
+        time.sleep(2)
 
         r3 = client.create_tweet(text=thread.tweet3, in_reply_to_tweet_id=t2_id)
         t3_id = r3.data["id"]

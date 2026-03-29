@@ -4,6 +4,7 @@ Sends one message per signal to TELEGRAM_CHANNEL_ID.
 """
 import logging
 import os
+import time
 from typing import List
 
 import httpx
@@ -12,6 +13,10 @@ from scanner.models import Market
 from bot.templates import format_signal
 
 logger = logging.getLogger(__name__)
+
+# Hard-coded gap between posting successive signals (seconds).
+# 30 minutes minimum between posts to avoid flooding channels.
+MIN_GAP_BETWEEN_POSTS_SEC = 1800
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID", "")    # e.g. @ProbBrain or -100xxxxxxxxxx
@@ -50,6 +55,14 @@ def publish_signals(markets: List[Market], channel_id: str = "", dub_link: str =
     sent = 0
     for market in markets:
         try:
+            # Enforce gap between successive posts
+            if sent > 0:
+                logger.info(
+                    "Waiting %d seconds before next signal post...",
+                    MIN_GAP_BETWEEN_POSTS_SEC,
+                )
+                time.sleep(MIN_GAP_BETWEEN_POSTS_SEC)
+
             text = format_signal(
                 question=market.question,
                 yes_pct=market.implied_probability,
