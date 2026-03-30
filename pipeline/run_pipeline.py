@@ -131,6 +131,21 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
                     [s.id for s in needs_approval],
                 )
 
+    # 4b. Dedup — remove signals already in published_signals.json
+    if signals and not dry_run:
+        already_published = set()
+        if PUBLISHED_SIGNALS_PATH.exists():
+            try:
+                pub = json.loads(PUBLISHED_SIGNALS_PATH.read_text())
+                already_published = {str(s.get("market_id", "")) for s in pub if s.get("market_id")}
+            except (json.JSONDecodeError, KeyError):
+                pass
+        before = len(signals)
+        signals = [s for s in signals if str(s.id) not in already_published]
+        skipped = before - len(signals)
+        if skipped:
+            logger.info("DEDUP: filtered out %d already-published signal(s)", skipped)
+
     # 5. Publish (or dry-run log)
     published = 0
     if signals:
