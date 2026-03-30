@@ -69,16 +69,92 @@ def _load_published_questions() -> Set[str]:
         return set()
 
 
+def _extract_core_theme(question: str) -> str:
+    """
+    Extract core betting theme from a question.
+    Removes conditional qualifiers like 'before GTA VI', specific dates, etc.
+    Examples:
+      'Russia-Ukraine ceasefire before GTA VI?' → 'russia ukraine ceasefire'
+      'Trump out as President before 2027?' → 'trump out as president'
+      'Will China invade Taiwan before GTA VI?' → 'china invade taiwan'
+    """
+    theme = question.lower()
+
+    # Remove common meme/date conditionals (in order of specificity)
+    qualifiers = [
+        # GTA VI variants
+        'before gta vi', 'before gta6', 'before gtavi', ' gta vi', ' gta6', ' gtavi',
+        # Specific dates
+        ' by end of 2026', ' by march 31', ' by april 15', ' by june 2026', ' by july 2026',
+        ' by march 31 2026', ' by april 30 2026',
+        # Years
+        ' 2026', ' 2027', ' 2025',
+        # Temporal qualifiers
+        ' before ', ' by ', ' by?',
+    ]
+
+    for qualifier in qualifiers:
+        theme = theme.replace(qualifier, ' ').strip()
+
+    # Remove punctuation (but keep spaces)
+    theme = ''.join(c if c.isalnum() or c.isspace() else ' ' for c in theme)
+
+    # Normalize whitespace
+    theme = ' '.join(theme.split())
+
+    return theme
+
+
+def _load_published_themes() -> set:
+    """Load set of core themes from already-published signals."""
+    published_file = Path(__file__).parent.parent / "data" / "published_signals.json"
+    if not published_file.exists():
+        return set()
+
+    try:
+        with open(published_file, "r") as f:
+            data = json.load(f)
+
+        themes = set()
+        if isinstance(data, list):
+            for signal in data:
+                if "question" in signal:
+                    theme = _extract_core_theme(signal["question"])
+                    if theme:
+                        themes.add(theme)
+
+        return themes
+    except (json.JSONDecodeError, IOError):
+        return set()
+
+
 def filter_duplicates(markets: List[Market]) -> List[Market]:
-    """Remove markets that duplicate already-published signals."""
+    """
+    Remove markets that duplicate or near-duplicate already-published signals.
+
+    Two-pass filtering:
+    1. Exact question match (fast check)
+    2. Semantic theme match (catches GTA VI variants, date variants, etc.)
+    """
     published_questions = _load_published_questions()
-    if not published_questions:
+    published_themes = _load_published_themes()
+
+    if not published_questions and not published_themes:
         return markets
 
     filtered = []
     for m in markets:
-        normalized = _normalize_question(m.question)
-        if normalized not in published_questions:
-            filtered.append(m)
+        normalized_q = _normalize_question(m.question)
+        theme = _extract_core_theme(m.question)
+
+        # Reject if exact question match
+        if normalized_q in published_questions:
+            continue
+
+        # Reject if semantic theme match (catches meme variants like "before GTA VI")
+        if theme in published_themes:
+            continue
+
+        filtered.append(m)
 
     return filtered
