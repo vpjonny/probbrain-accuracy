@@ -123,7 +123,12 @@ def post_thread(thread: XThreadContent, dry_run: bool = False) -> Optional[list[
                     thread.tweet1, thread.tweet2, thread.tweet3)
         return None
 
-    client = _client()
+    try:
+        client = _client()
+    except RuntimeError as exc:
+        logger.warning("X posting skipped (missing credentials): %s", exc)
+        return None
+
     ids = []
 
     try:

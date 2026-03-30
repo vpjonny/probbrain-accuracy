@@ -11,17 +11,19 @@ Flow:
   5. per-signal gate       — signals with approval_required: true in signals.json
                              are staged to pending_signals.json; rest proceed
   6. publish_signals()     — send approved signals to Telegram channel
+  7. post_x_threads()      — build and post threads for published signals
 """
 import json
 import logging
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from scanner.polymarket import fetch_markets, save_snapshot
 from scanner.models import Market
 from pipeline.signals import detect_signals
 from pipeline.publisher import publish_signals
+from pipeline import x_publisher
 from tools.compute_accuracy import main as recompute_accuracy
 from tools.git_push_dashboard import push as push_dashboard
 
@@ -76,6 +78,86 @@ def _stage_signals(signals: List[Market]) -> None:
             existing.append(m.to_dict())
     PENDING_SIGNALS_PATH.write_text(json.dumps(existing, indent=2))
     logger.info("Staged %d signal(s) → %s", len(signals), PENDING_SIGNALS_PATH)
+
+
+def _lookup_signal_by_market_id(market_id: str) -> Optional[dict]:
+    """Look up a signal by market_id from signals.json."""
+    if not SIGNALS_PATH.exists():
+        return None
+    try:
+        signals = json.loads(SIGNALS_PATH.read_text())
+        for s in signals:
+            if str(s.get("market_id", "")) == str(market_id):
+                return s
+    except (json.JSONDecodeError, KeyError):
+        logger.warning("Could not parse %s for signal lookup", SIGNALS_PATH)
+    return None
+
+
+def _post_x_thread_for_signal(signal_data: dict, market: Market, dry_run: bool = False) -> Optional[list[str]]:
+    """Build and post an X thread for a signal. Returns list of tweet IDs or None on failure."""
+    try:
+        thread = x_publisher.build_thread(
+            question=signal_data.get("question") or market.question,
+            market_yes_pct=signal_data.get("market_price", market.yes_price) * 100,
+            our_estimate_pct=signal_data.get("our_calibrated_estimate", 0) * 100,
+            gap_pct=signal_data.get("gap_pct", 0),
+            direction=signal_data.get("direction", ""),
+            confidence=signal_data.get("confidence", "MEDIUM"),
+            evidence=signal_data.get("evidence", []),
+            close_date=signal_data.get("close_date", market.close_date.isoformat() if market.close_date else ""),
+            volume_usdc=market.volume_usd,
+        )
+        tweet_ids = x_publisher.post_thread(thread, dry_run=dry_run)
+        if tweet_ids:
+            logger.info("Posted X thread for signal SIG-%s (3 tweets, ids=%s)",
+                        signal_data.get("signal_number"), tweet_ids)
+        return tweet_ids
+    except Exception as exc:
+        logger.error("Failed to post X thread for market %s: %s", market.id, exc)
+        return None
+
+
+def _update_published_signals_with_x_threads(published_market_ids: List[str], markets_by_id: dict) -> None:
+    """
+    Update published_signals.json to include X tweet IDs for newly published signals.
+    Looks up each published market in signals.json and posts X thread.
+    """
+    if not published_market_ids:
+        return
+
+    if not PUBLISHED_SIGNALS_PATH.exists():
+        logger.warning("published_signals.json not found; skipping X thread posting")
+        return
+
+    published_signals = json.loads(PUBLISHED_SIGNALS_PATH.read_text())
+
+    for entry in published_signals:
+        market_id = str(entry.get("market_id", ""))
+        if market_id not in published_market_ids:
+            continue
+        # Skip if already has X tweet IDs
+        if entry.get("x_tweet_ids"):
+            logger.info("Market %s already has X tweets posted; skipping", market_id)
+            continue
+
+        signal_data = _lookup_signal_by_market_id(market_id)
+        market = markets_by_id.get(market_id)
+        if not signal_data or not market:
+            logger.warning("Could not find signal or market data for market_id %s; skipping X thread", market_id)
+            continue
+
+        tweet_ids = _post_x_thread_for_signal(signal_data, market)
+        if tweet_ids:
+            entry["x_tweet_ids"] = {
+                "tweet_1": tweet_ids[0],
+                "tweet_2": tweet_ids[1],
+                "tweet_3": tweet_ids[2],
+            }
+
+    # Write updated published_signals.json
+    PUBLISHED_SIGNALS_PATH.write_text(json.dumps(published_signals, indent=2))
+    logger.info("Updated published_signals.json with X thread IDs")
 
 
 def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False) -> dict:
@@ -148,6 +230,7 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
 
     # 5. Publish (or dry-run log)
     published = 0
+    published_market_ids = []
     if signals:
         if dry_run:
             for s in signals:
@@ -155,8 +238,15 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
         else:
             published = publish_signals(signals)
             if published > 0:
+                # Track which markets were published for X thread posting
+                published_market_ids = [str(s.id) for s in signals]
                 recompute_accuracy()
                 push_dashboard()
+
+    # 6. Post X threads for published signals (after Telegram)
+    if published_market_ids and not dry_run:
+        markets_by_id = {str(m.id): m for m in markets}
+        _update_published_signals_with_x_threads(published_market_ids, markets_by_id)
 
     summary = {
         "markets_scanned": len(markets),
