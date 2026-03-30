@@ -11,11 +11,12 @@ Flow:
   5. per-signal gate       — signals with approval_required: true in signals.json
                              are staged to pending_signals.json; rest proceed
   6. publish_signals()     — send approved signals to Telegram channel
-  7. post_x_threads()      — build and post threads for published signals
+  7. post_x_threads()      — build and post threads for published signals (respecting X rate limits)
 """
 import json
 import logging
 import sys
+from datetime import date
 from pathlib import Path
 from typing import List, Optional
 
@@ -118,10 +119,39 @@ def _post_x_thread_for_signal(signal_data: dict, market: Market, dry_run: bool =
         return None
 
 
+def _get_today_x_threads_count() -> int:
+    """Count X threads posted today (signals with x_tweet_ids)."""
+    today = date.today().isoformat()
+    if not PUBLISHED_SIGNALS_PATH.exists():
+        return 0
+    try:
+        signals = json.loads(PUBLISHED_SIGNALS_PATH.read_text())
+        count = 0
+        for s in signals:
+            if s.get("x_tweet_ids") and s.get("published_at", "").startswith(today):
+                count += 1
+        return count
+    except (json.JSONDecodeError, KeyError):
+        logger.warning("Could not parse %s to count today's X threads", PUBLISHED_SIGNALS_PATH)
+        return 0
+
+
+def _get_config_max_x_per_day() -> int:
+    """Get max_signals_per_day_twitter from config."""
+    if PUBLISHER_CONFIG_PATH.exists():
+        try:
+            config = json.loads(PUBLISHER_CONFIG_PATH.read_text())
+            return config.get("max_signals_per_day_twitter", 40)
+        except (json.JSONDecodeError, KeyError):
+            pass
+    return 40
+
+
 def _update_published_signals_with_x_threads(published_market_ids: List[str], markets_by_id: dict) -> None:
     """
     Update published_signals.json to include X tweet IDs for newly published signals.
     Looks up each published market in signals.json and posts X thread.
+    Respects max_signals_per_day_twitter rate limit.
     """
     if not published_market_ids:
         return
@@ -130,9 +160,22 @@ def _update_published_signals_with_x_threads(published_market_ids: List[str], ma
         logger.warning("published_signals.json not found; skipping X thread posting")
         return
 
+    max_x_daily = _get_config_max_x_per_day()
+    today_x_count = _get_today_x_threads_count()
+    remaining_x_today = max(0, max_x_daily - today_x_count)
+
+    if remaining_x_today == 0:
+        logger.warning("Daily X limit reached (%d/%d); skipping X thread posting", today_x_count, max_x_daily)
+        return
+
     published_signals = json.loads(PUBLISHED_SIGNALS_PATH.read_text())
+    x_posted = 0
 
     for entry in published_signals:
+        if x_posted >= remaining_x_today:
+            logger.info("Hit daily X limit (%d/%d); stopping", x_posted + today_x_count, max_x_daily)
+            break
+
         market_id = str(entry.get("market_id", ""))
         if market_id not in published_market_ids:
             continue
@@ -154,10 +197,11 @@ def _update_published_signals_with_x_threads(published_market_ids: List[str], ma
                 "tweet_2": tweet_ids[1],
                 "tweet_3": tweet_ids[2],
             }
+            x_posted += 1
 
     # Write updated published_signals.json
     PUBLISHED_SIGNALS_PATH.write_text(json.dumps(published_signals, indent=2))
-    logger.info("Updated published_signals.json with X thread IDs")
+    logger.info("Updated published_signals.json with X thread IDs (daily: %d/%d)", x_posted + today_x_count, max_x_daily)
 
 
 def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False) -> dict:

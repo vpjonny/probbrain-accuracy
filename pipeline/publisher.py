@@ -3,12 +3,13 @@ Publisher: push signals to Telegram channel with deduplication.
 Sends one message per signal to TELEGRAM_CHANNEL_ID.
 Checks published_signals.json before posting to prevent duplicates.
 Persists successfully published signals back to published_signals.json.
+Respects rate limits from config/publisher.json.
 """
 import json
 import logging
 import os
 import time
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 from typing import List, Optional
 
@@ -19,10 +20,6 @@ from bot.templates import format_signal
 
 logger = logging.getLogger(__name__)
 
-# Hard-coded gap between posting successive signals (seconds).
-# 30 minutes minimum between posts to avoid flooding channels.
-MIN_GAP_BETWEEN_POSTS_SEC = 1800
-
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID", "")    # e.g. @ProbBrain or -100xxxxxxxxxx
 DUB_LINK_TELEGRAM = os.getenv("DUB_LINK_TELEGRAM", "https://polymarket.com")
@@ -30,6 +27,47 @@ DUB_LINK_TELEGRAM = os.getenv("DUB_LINK_TELEGRAM", "https://polymarket.com")
 TELEGRAM_API = "https://api.telegram.org"
 
 PUBLISHED_SIGNALS_PATH = Path("data/published_signals.json")
+PUBLISHER_CONFIG_PATH = Path("config/publisher.json")
+
+# Default rate limits (loaded from config)
+MIN_GAP_BETWEEN_POSTS_SEC = 1800
+MAX_SIGNALS_PER_DAY_TELEGRAM = 40
+
+
+def _load_publisher_config() -> dict:
+    """Load rate limit config from config/publisher.json."""
+    if not PUBLISHER_CONFIG_PATH.exists():
+        logger.warning("config/publisher.json not found; using defaults")
+        return {}
+    try:
+        return json.loads(PUBLISHER_CONFIG_PATH.read_text())
+    except (json.JSONDecodeError, KeyError) as exc:
+        logger.warning("Could not parse %s: %s; using defaults", PUBLISHER_CONFIG_PATH, exc)
+        return {}
+
+
+def _get_config_value(key: str, default):
+    """Get a config value with fallback to default."""
+    config = _load_publisher_config()
+    return config.get(key, default)
+
+
+def _get_today_published_count() -> int:
+    """Count signals published today in Telegram."""
+    today = date.today().isoformat()
+    if not PUBLISHED_SIGNALS_PATH.exists():
+        return 0
+    try:
+        signals = json.loads(PUBLISHED_SIGNALS_PATH.read_text())
+        count = 0
+        for s in signals:
+            published_at = s.get("published_at", "")
+            if published_at.startswith(today):
+                count += 1
+        return count
+    except (json.JSONDecodeError, KeyError):
+        logger.warning("Could not parse %s to count today's signals", PUBLISHED_SIGNALS_PATH)
+        return 0
 
 
 def _load_published_market_ids() -> set:
@@ -115,6 +153,7 @@ def publish_signals(markets: List[Market], channel_id: str = "", dub_link: str =
     """
     Send each market as a formatted signal to the Telegram channel.
     Skips markets already in published_signals.json (dedup guard).
+    Respects rate limits from config/publisher.json.
     Returns number of messages sent.
     """
     channel = channel_id or CHANNEL_ID
@@ -125,11 +164,27 @@ def publish_signals(markets: List[Market], channel_id: str = "", dub_link: str =
     if not channel:
         raise RuntimeError("TELEGRAM_CHANNEL_ID is not set")
 
+    # Load config with fallbacks
+    min_gap = _get_config_value("min_gap_between_posts_sec", MIN_GAP_BETWEEN_POSTS_SEC)
+    max_daily = _get_config_value("max_signals_per_day_telegram", MAX_SIGNALS_PER_DAY_TELEGRAM)
+
+    # Check daily rate limit
+    today_published = _get_today_published_count()
+    if today_published >= max_daily:
+        logger.warning("Daily Telegram limit reached (%d/%d); skipping publish", today_published, max_daily)
+        return 0
+    remaining_today = max_daily - today_published
+
     # Dedup: skip already-published markets
     published_ids = _load_published_market_ids()
 
     sent = 0
     for market in markets:
+        # Check if we've hit daily limit
+        if sent >= remaining_today:
+            logger.info("Hit daily Telegram limit (%d/%d); stopping", sent + today_published, max_daily)
+            break
+
         if str(market.id) in published_ids:
             logger.info("DEDUP: skipping market %s (%s) — already published", market.id, market.question[:40])
             continue
@@ -139,9 +194,9 @@ def publish_signals(markets: List[Market], channel_id: str = "", dub_link: str =
             if sent > 0:
                 logger.info(
                     "Waiting %d seconds before next signal post...",
-                    MIN_GAP_BETWEEN_POSTS_SEC,
+                    min_gap,
                 )
-                time.sleep(MIN_GAP_BETWEEN_POSTS_SEC)
+                time.sleep(min_gap)
 
             text = format_signal(
                 question=market.question,
@@ -170,5 +225,5 @@ def publish_signals(markets: List[Market], channel_id: str = "", dub_link: str =
         except Exception as exc:
             logger.error("Failed to publish signal for %s: %s", market.id, exc)
 
-    logger.info("Published %d/%d signals to %s", sent, len(markets), channel)
+    logger.info("Published %d/%d signals to %s (daily: %d/%d)", sent, len(markets), channel, sent + today_published, max_daily)
     return sent
