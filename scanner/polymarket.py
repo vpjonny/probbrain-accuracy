@@ -11,7 +11,7 @@ from typing import List, Optional
 
 import httpx
 
-from .filters import apply_filters
+from .filters import apply_filters, filter_duplicates
 from .models import Market
 
 logger = logging.getLogger(__name__)
@@ -161,7 +161,10 @@ def fetch_markets(limit: int = 500, filtered: bool = True) -> List[Market]:
 
     if filtered:
         markets = apply_filters(markets)
-        logger.info("Markets after filtering: %d", len(markets))
+        logger.info("Markets after liquidity filtering: %d", len(markets))
+
+        markets = filter_duplicates(markets)
+        logger.info("Markets after dedup filtering: %d", len(markets))
 
     return markets
 
