@@ -258,6 +258,7 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
                 )
 
     # 4b. Dedup — remove signals already in published_signals.json
+    skipped_dedup = 0
     if signals and not dry_run:
         already_published = set()
         if PUBLISHED_SIGNALS_PATH.exists():
@@ -268,13 +269,14 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
                 pass
         before = len(signals)
         signals = [s for s in signals if str(s.id) not in already_published]
-        skipped = before - len(signals)
-        if skipped:
-            logger.info("DEDUP: filtered out %d already-published signal(s)", skipped)
+        skipped_dedup = before - len(signals)
+        if skipped_dedup:
+            logger.info("DEDUP: filtered out %d already-published signal(s)", skipped_dedup)
 
     # 5. Publish (or dry-run log)
     published = 0
     published_market_ids = []
+    published_signal_ids = []
     if signals:
         if dry_run:
             for s in signals:
@@ -284,6 +286,13 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
             if published > 0:
                 # Track which markets were published for X thread posting
                 published_market_ids = [str(s.id) for s in signals]
+                # Lookup signal numbers from signals.json
+                for market_id in published_market_ids:
+                    signal = _lookup_signal_by_market_id(market_id)
+                    if signal:
+                        sig_num = signal.get("signal_number") or signal.get("id")
+                        if sig_num:
+                            published_signal_ids.append(str(sig_num))
                 recompute_accuracy()
                 push_dashboard()
 
@@ -295,7 +304,10 @@ def run(dry_run: bool = False, max_signals: int = 5, force_publish: bool = False
     summary = {
         "markets_scanned": len(markets),
         "signals_detected": len(signals),
+        "signals_deduped": skipped_dedup,
         "signals_published": published,
+        "published_market_ids": published_market_ids,
+        "published_signal_ids": published_signal_ids,
         "snapshot": str(snapshot_path),
         "dry_run": dry_run,
     }
