@@ -59,8 +59,10 @@ def _load_published_questions() -> Set[str]:
         published_questions = set()
         if isinstance(data, list):
             for signal in data:
-                if "question" in signal:
-                    normalized = _normalize_question(signal["question"])
+                # Check both "question" (full format) and "market_question" (abbreviated format)
+                question = signal.get("question") or signal.get("market_question")
+                if question:
+                    normalized = _normalize_question(question)
                     if normalized:
                         published_questions.add(normalized)
 
@@ -118,8 +120,10 @@ def _load_published_themes() -> set:
         themes = set()
         if isinstance(data, list):
             for signal in data:
-                if "question" in signal:
-                    theme = _extract_core_theme(signal["question"])
+                # Check both "question" (full format) and "market_question" (abbreviated format)
+                question = signal.get("question") or signal.get("market_question")
+                if question:
+                    theme = _extract_core_theme(question)
                     if theme:
                         themes.add(theme)
 
