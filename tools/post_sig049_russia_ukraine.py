@@ -6,6 +6,7 @@ CEO-approved signal with 33.5pp gap
 - 2 hashtags at the end of the final tweet
 """
 
+import argparse
 import os
 import sys
 import json
@@ -16,6 +17,7 @@ import tweepy
 # Add tools dir to path for local imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from polymarket_screenshot import generate_and_upload_market_card
+from posting_utils import should_post_to_platform
 
 # Load config and env
 config = json.load(open("/home/slova/ProbBrain/config/publisher.json"))
@@ -233,6 +235,10 @@ def sync_dashboard() -> None:
         print(f"  ⚠ Dashboard sync skipped: {e}")
 
 def main():
+    parser = argparse.ArgumentParser(description=f"Publish {SIGNAL_ID}")
+    parser.add_argument("--force", action="store_true", help="Force re-post even if already published (override dedup)")
+    args = parser.parse_args()
+
     print(f"\n{'='*60}")
     print(f"{SIGNAL_ID} Publishing Script")
     print(f"{'='*60}\n")
@@ -245,58 +251,88 @@ def main():
         print(f"\n✗ Rate limit check failed. Do not post.")
         sys.exit(1)
 
-    # Generate market card and upload to Twitter
-    print(f"\n[Market Card] Generating and uploading screenshot...")
-    twitter_client = tweepy.Client(
-        consumer_key=X_CONSUMER_KEY,
-        consumer_secret=X_CONSUMER_SECRET,
-        access_token=X_ACCESS_TOKEN,
-        access_token_secret=X_ACCESS_TOKEN_SECRET,
-    )
+    # Dedup checks
+    skip_telegram = False
+    skip_x = False
+    if not args.force:
+        if not should_post_to_platform(SIGNAL_ID, "telegram", published_path):
+            print(f"[Dedup] SKIP Telegram — {SIGNAL_ID} already posted to Telegram. Use --force to override.")
+            skip_telegram = True
+        if not should_post_to_platform(SIGNAL_ID, "x", published_path):
+            print(f"[Dedup] SKIP X — {SIGNAL_ID} already posted to X. Use --force to override.")
+            skip_x = True
+        if skip_telegram and skip_x:
+            print(f"\n[Dedup] {SIGNAL_ID} already published to all platforms. Nothing to do.")
+            sys.exit(0)
+    else:
+        print(f"[Dedup] --force flag set, skipping dedup checks.")
 
-    try:
-        media_id = generate_and_upload_market_card(
-            market_question=MARKET_QUESTION,
-            market_price_yes=MARKET_PRICE_YES,
-            our_estimate=OUR_ESTIMATE_YES,
-            gap_pct=GAP_PP,
-            confidence=CONFIDENCE,
-            twitter_client=twitter_client,
-            volume_usdc=VOLUME_USDC
+    # Generate market card and upload to Twitter
+    media_id = None
+    if not skip_x:
+        print(f"\n[Market Card] Generating and uploading screenshot...")
+        twitter_client = tweepy.Client(
+            consumer_key=X_CONSUMER_KEY,
+            consumer_secret=X_CONSUMER_SECRET,
+            access_token=X_ACCESS_TOKEN,
+            access_token_secret=X_ACCESS_TOKEN_SECRET,
         )
-        print(f"  ✓ Market card uploaded (media_id: {media_id})")
-    except Exception as e:
-        print(f"  ⚠ Market card generation failed: {e}")
-        media_id = None
+
+        try:
+            media_id = generate_and_upload_market_card(
+                market_question=MARKET_QUESTION,
+                market_price_yes=MARKET_PRICE_YES,
+                our_estimate=OUR_ESTIMATE_YES,
+                gap_pct=GAP_PP,
+                confidence=CONFIDENCE,
+                twitter_client=twitter_client,
+                volume_usdc=VOLUME_USDC
+            )
+            print(f"  ✓ Market card uploaded (media_id: {media_id})")
+        except Exception as e:
+            print(f"  ⚠ Market card generation failed: {e}")
+            media_id = None
 
     # Post to platforms
-    print(f"\n[Posting] Publishing to platforms...")
-    try:
-        tg_id = post_telegram()
-    except Exception as e:
-        print(f"✗ Publishing failed at Telegram: {e}")
-        sys.exit(1)
+    tg_id = None
+    x_ids = None
 
-    try:
-        x_ids = post_x(media_id)
-    except Exception as e:
-        print(f"✗ Publishing failed at X: {e}")
-        sys.exit(1)
+    print(f"\n[Posting] Publishing to platforms...")
+    if not skip_telegram:
+        try:
+            tg_id = post_telegram()
+        except Exception as e:
+            print(f"✗ Publishing failed at Telegram: {e}")
+            sys.exit(1)
+    else:
+        print(f"  [Telegram] Skipped (already posted)")
+
+    if not skip_x:
+        try:
+            x_ids = post_x(media_id)
+        except Exception as e:
+            print(f"✗ Publishing failed at X: {e}")
+            sys.exit(1)
+    else:
+        print(f"  [X] Skipped (already posted)")
 
     # Log to published_signals.json
-    try:
-        log_published(tg_id, x_ids)
-        print(f"✓ Logged to published_signals.json")
-    except Exception as e:
-        print(f"⚠ Logging failed: {e}")
+    if tg_id and x_ids:
+        try:
+            log_published(tg_id, x_ids)
+            print(f"✓ Logged to published_signals.json")
+        except Exception as e:
+            print(f"⚠ Logging failed: {e}")
 
     # Sync dashboard
     sync_dashboard()
 
     print(f"\n{'='*60}")
-    print(f"✓ {SIGNAL_ID} published successfully!")
-    print(f"  Telegram: {tg_id}")
-    print(f"  X thread: {x_ids[0]}")
+    print(f"✓ {SIGNAL_ID} publishing complete!")
+    if tg_id:
+        print(f"  Telegram: {tg_id}")
+    if x_ids:
+        print(f"  X thread: {x_ids[0]}")
     print(f"{'='*60}\n")
 
 if __name__ == "__main__":

@@ -30,9 +30,10 @@ def check_signal_already_published(signal_id: str, published_signals_path: str =
     except (FileNotFoundError, json.JSONDecodeError):
         return {"already_published": False, "telegram_message_id": None, "x_tweet_ids": None, "platforms_published": []}
 
-    # Find matching signal
+    # Find matching signal — check signal_id, id, AND market_id fields
+    # (automated pipeline uses market_id as key, manual scripts use signal_id)
     for sig in signals:
-        if sig.get("signal_id") == signal_id or sig.get("id") == signal_id:
+        if sig.get("signal_id") == signal_id or sig.get("id") == signal_id or sig.get("market_id") == signal_id:
             platforms = sig.get("platforms", [])
             return {
                 "already_published": True,

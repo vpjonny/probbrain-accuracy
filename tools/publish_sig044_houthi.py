@@ -4,14 +4,20 @@ Publish SIG-044: Houthi strike on Israel by March 31, 2026
 Direction: NO_UNDERPRICED (we estimate 10%, market at 18.1%)
 """
 
+import argparse
 import os
+import sys
 import json
 import httpx
 import tweepy
 from datetime import datetime, timezone
 
+# Add tools dir to path for local imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from posting_utils import should_post_to_platform
+
 # Load config
-with open("config/publisher.json", "r") as f:
+with open("/home/slova/ProbBrain/config/publisher.json", "r") as f:
     config = json.load(f)
 
 # Signal data
@@ -89,29 +95,34 @@ Get signals on Telegram: https://t.me/ProbBrain
 
 Follow @ProbBrain for more."""
 
-# ===== POST TO TELEGRAM =====
-print("📤 Posting to Telegram...")
-bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-channel_id = os.getenv("TELEGRAM_CHANNEL_ID")
+SIGNAL_ID = signal["signal_id"]
+PUBLISHED_PATH = "/home/slova/ProbBrain/data/published_signals.json"
 
-if not bot_token or not channel_id:
-    print("❌ Error: TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID not set")
-    exit(1)
 
-url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-payload = {"chat_id": channel_id, "text": telegram_msg, "parse_mode": "Markdown"}
-resp = httpx.post(url, json=payload, timeout=30)
-if resp.status_code != 200:
-    print(f"❌ Telegram error: {resp.status_code} {resp.text}")
-    exit(1)
+def post_telegram_msg():
+    """Post to Telegram. Returns message_id."""
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    channel_id = os.getenv("TELEGRAM_CHANNEL_ID")
 
-tg_data = resp.json()
-telegram_message_id = tg_data.get("result", {}).get("message_id")
-print(f"✓ Telegram posted (message_id: {telegram_message_id})")
+    if not bot_token or not channel_id:
+        print("Error: TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID not set")
+        sys.exit(1)
 
-# ===== POST TO X =====
-print("📤 Posting to X...")
-try:
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {"chat_id": channel_id, "text": telegram_msg, "parse_mode": "Markdown"}
+    resp = httpx.post(url, json=payload, timeout=30)
+    if resp.status_code != 200:
+        print(f"Telegram error: {resp.status_code} {resp.text}")
+        sys.exit(1)
+
+    tg_data = resp.json()
+    msg_id = tg_data.get("result", {}).get("message_id")
+    print(f"  ✓ Telegram posted (message_id: {msg_id})")
+    return msg_id
+
+
+def post_x_thread():
+    """Post thread to X. Returns list of tweet IDs."""
     client = tweepy.Client(
         consumer_key=os.getenv("X_CONSUMER_KEY"),
         consumer_secret=os.getenv("X_CONSUMER_SECRET"),
@@ -121,48 +132,106 @@ try:
 
     r1 = client.create_tweet(text=tweet_1)
     tweet_1_id = r1.data["id"]
-    print(f"✓ Tweet 1 posted (id: {tweet_1_id})")
+    print(f"  ✓ Tweet 1 posted (id: {tweet_1_id})")
 
     r2 = client.create_tweet(text=tweet_2, in_reply_to_tweet_id=tweet_1_id)
     tweet_2_id = r2.data["id"]
-    print(f"✓ Tweet 2 posted (id: {tweet_2_id})")
+    print(f"  ✓ Tweet 2 posted (id: {tweet_2_id})")
 
     r3 = client.create_tweet(text=tweet_3, in_reply_to_tweet_id=tweet_2_id)
     tweet_3_id = r3.data["id"]
-    print(f"✓ Tweet 3 posted (id: {tweet_3_id})")
+    print(f"  ✓ Tweet 3 posted (id: {tweet_3_id})")
 
-    x_tweet_ids = [tweet_1_id, tweet_2_id, tweet_3_id]
-except Exception as e:
-    print(f"❌ X error: {e}")
-    exit(1)
+    return [tweet_1_id, tweet_2_id, tweet_3_id]
 
-# ===== LOG TO PUBLISHED_SIGNALS.JSON =====
-print("📝 Logging to published_signals.json...")
-with open("data/published_signals.json", "r") as f:
-    published = json.load(f)
 
-published_entry = {
-    "signal_id": signal["signal_id"],
-    "market_question": signal["market_question"],
-    "our_estimate": signal["our_estimate_yes"],
-    "market_price": signal["market_price_yes"],
-    "gap_pct": signal["gap_pct"],
-    "confidence": signal["confidence"],
-    "closes": signal["closes"],
-    "telegram_message_id": telegram_message_id,
-    "x_tweet_ids": x_tweet_ids,
-    "published_at": datetime.now(timezone.utc).isoformat(),
-    "approval_required": signal["approval_required"]
-}
+def log_published(telegram_message_id, x_tweet_ids):
+    """Log to published_signals.json"""
+    with open(PUBLISHED_PATH, "r") as f:
+        published = json.load(f)
 
-published.append(published_entry)
-with open("data/published_signals.json", "w") as f:
-    json.dump(published, f, indent=2)
+    published_entry = {
+        "signal_id": signal["signal_id"],
+        "market_question": signal["market_question"],
+        "our_estimate": signal["our_estimate_yes"],
+        "market_price": signal["market_price_yes"],
+        "gap_pct": signal["gap_pct"],
+        "confidence": signal["confidence"],
+        "closes": signal["closes"],
+        "telegram_message_id": telegram_message_id,
+        "x_tweet_ids": x_tweet_ids,
+        "published_at": datetime.now(timezone.utc).isoformat(),
+        "platforms": ["telegram", "x"],
+        "approval_required": signal["approval_required"]
+    }
 
-print(f"✓ Logged to published_signals.json")
+    published.append(published_entry)
+    with open(PUBLISHED_PATH, "w") as f:
+        json.dump(published, f, indent=2)
 
-# ===== SYNC DASHBOARD =====
-print("🔄 Syncing dashboard...")
-os.system(f"python3 tools/sync_dashboard.py --signal-id {signal['signal_id']}")
+    print(f"  ✓ Logged to published_signals.json")
 
-print("\n✅ SIG-044 published successfully to Telegram and X")
+
+def main():
+    parser = argparse.ArgumentParser(description=f"Publish {SIGNAL_ID}")
+    parser.add_argument("--force", action="store_true", help="Force re-post even if already published (override dedup)")
+    args = parser.parse_args()
+
+    print(f"\n{'='*60}")
+    print(f"{SIGNAL_ID} Publishing Script")
+    print(f"{'='*60}\n")
+
+    # Dedup checks
+    skip_telegram = False
+    skip_x = False
+    if not args.force:
+        if not should_post_to_platform(SIGNAL_ID, "telegram", PUBLISHED_PATH):
+            print(f"[Dedup] SKIP Telegram — {SIGNAL_ID} already posted to Telegram. Use --force to override.")
+            skip_telegram = True
+        if not should_post_to_platform(SIGNAL_ID, "x", PUBLISHED_PATH):
+            print(f"[Dedup] SKIP X — {SIGNAL_ID} already posted to X. Use --force to override.")
+            skip_x = True
+        if skip_telegram and skip_x:
+            print(f"\n[Dedup] {SIGNAL_ID} already published to all platforms. Nothing to do.")
+            sys.exit(0)
+    else:
+        print(f"[Dedup] --force flag set, skipping dedup checks.")
+
+    # Post to platforms
+    telegram_message_id = None
+    x_tweet_ids = None
+
+    print(f"\n[Posting] Publishing to platforms...")
+    if not skip_telegram:
+        telegram_message_id = post_telegram_msg()
+    else:
+        print(f"  [Telegram] Skipped (already posted)")
+
+    if not skip_x:
+        try:
+            x_tweet_ids = post_x_thread()
+        except Exception as e:
+            print(f"X error: {e}")
+            sys.exit(1)
+    else:
+        print(f"  [X] Skipped (already posted)")
+
+    # Log to published_signals.json
+    if telegram_message_id and x_tweet_ids:
+        log_published(telegram_message_id, x_tweet_ids)
+
+    # Sync dashboard
+    print("[Dashboard] Syncing...")
+    os.system(f"python3 /home/slova/ProbBrain/tools/sync_dashboard.py --signal-id {SIGNAL_ID}")
+
+    print(f"\n{'='*60}")
+    print(f"✓ {SIGNAL_ID} publishing complete!")
+    if telegram_message_id:
+        print(f"  Telegram: {telegram_message_id}")
+    if x_tweet_ids:
+        print(f"  X thread: {x_tweet_ids[0]}")
+    print(f"{'='*60}\n")
+
+
+if __name__ == "__main__":
+    main()
