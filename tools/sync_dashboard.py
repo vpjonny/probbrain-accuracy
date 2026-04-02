@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parent.parent
 SIGNALS_PATH = ROOT / "data" / "signals.json"
 PUBLISHED_PATH = ROOT / "data" / "published_signals.json"
+SLUGS_PATH = ROOT / "data" / "polymarket_slugs.json"
 
 
 def _extract_signal_number(ps: dict) -> int | None:
@@ -111,12 +112,21 @@ def sync(signal_id: str = "") -> bool:
     added = _sync_signals_json()
     logger.info("sync_dashboard: %d new signals added to signals.json", added)
 
-    # Step 1b: Backfill any missing price fields
+    # Step 1b: Validate and fix slugs via Gamma API
+    try:
+        from tools.validate_slugs import validate_and_fix
+        slug_result = validate_and_fix(fix=True)
+        if slug_result["fixed"]:
+            logger.info("sync_dashboard: auto-fixed %d wrong Polymarket slugs", slug_result["fixed"])
+    except Exception as e:
+        logger.warning("sync_dashboard: slug validation skipped — %s", e)
+
+    # Step 1c: Backfill any missing price fields
     fixed = backfill()
     if fixed:
         logger.info("sync_dashboard: backfilled %d signal(s) with missing price data", fixed)
 
-    # Step 1c: Validate — warn but don't block
+    # Step 1d: Validate — warn but don't block
     signals = json.loads(SIGNALS_PATH.read_text()) if SIGNALS_PATH.exists() else []
     issues = validate(signals)
     if issues:

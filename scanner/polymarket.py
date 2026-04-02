@@ -17,7 +17,6 @@ from .models import Market
 logger = logging.getLogger(__name__)
 
 GAMMA_API_BASE = "https://gamma-api.polymarket.com"
-POLYMARKET_BASE = "https://polymarket.com/event"
 
 # Builder attribution key — attributes scanned traffic to ProbBrain for weekly USDC rewards.
 # Header name per Polymarket CLOB API builder attribution spec.

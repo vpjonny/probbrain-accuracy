@@ -65,6 +65,18 @@ python tools/dedup_gate.py --market-id <MARKET_ID> --signal-id <SIG-XXX>
 ```
 If it prints `BLOCKED`, remove that signal from your output. This is a hard gate — do not override it.
 
+## Slug Rules (HARD RULES)
+
+The `slug` field in every signal MUST come directly from the Gamma API response (`slug` field on the market object). **NEVER guess, fabricate, or construct a slug manually.** Wrong slugs cause 404 links on the live dashboard.
+
+- When you fetch a market from `https://gamma-api.polymarket.com/markets/{id}`, the response includes a `slug` field — use that exact value.
+- If the API does not return a slug, leave the `slug` field as the market_id string. The sync pipeline will look it up later.
+- After building your scan output, you can verify slugs: `python tools/validate_slugs.py` (dry run).
+
+**Polymarket URL patterns** (for reference — the dashboard handles this automatically):
+- Standalone markets: `https://polymarket.com/market/{slug}`
+- Group/event markets (slug contains `/`): `https://polymarket.com/event/{slug}`
+
 ## Output JSON Schema
 
 ```json
@@ -76,7 +88,7 @@ If it prints `BLOCKED`, remove that signal from your output. This is a hard gate
     {
       "market_id": "string",
       "question": "string",
-      "slug": "string",
+      "slug": "string (from Gamma API — never fabricated)",
       "market_yes_price": 0.0,
       "our_calibrated_estimate": 0.0,
       "gap_pct": 0.0,
