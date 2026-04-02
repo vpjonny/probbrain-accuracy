@@ -9,7 +9,7 @@ import json
 import logging
 import os
 import time
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from pathlib import Path
 from typing import List, Optional
 
@@ -50,6 +50,33 @@ def _get_config_value(key: str, default):
     """Get a config value with fallback to default."""
     config = _load_publisher_config()
     return config.get(key, default)
+
+
+def _seconds_since_last_publish() -> Optional[float]:
+    """Return seconds elapsed since the most recent publish, or None if no history."""
+    if not PUBLISHED_SIGNALS_PATH.exists():
+        return None
+    try:
+        signals = json.loads(PUBLISHED_SIGNALS_PATH.read_text())
+        if not signals:
+            return None
+        latest_ts = None
+        for s in signals:
+            ts_str = s.get("published_at", "")
+            if not ts_str:
+                continue
+            try:
+                ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if latest_ts is None or ts > latest_ts:
+                    latest_ts = ts
+            except (ValueError, TypeError):
+                continue
+        if latest_ts is None:
+            return None
+        now = datetime.now(timezone.utc)
+        return (now - latest_ts).total_seconds()
+    except (json.JSONDecodeError, KeyError):
+        return None
 
 
 def _get_today_published_count() -> int:
@@ -164,9 +191,19 @@ def publish_signals(markets: List[Market], channel_id: str = "", dub_link: str =
     if not channel:
         raise RuntimeError("TELEGRAM_CHANNEL_ID is not set")
 
-    # Load config with fallbacks
-    min_gap = _get_config_value("min_gap_between_posts_sec", MIN_GAP_BETWEEN_POSTS_SEC)
+    # HARDCODED 30-min minimum gap between any two signals (cross-heartbeat)
+    min_gap = MIN_GAP_BETWEEN_POSTS_SEC  # 1800s — hardcoded, not configurable
     max_daily = _get_config_value("max_signals_per_day_telegram", MAX_SIGNALS_PER_DAY_TELEGRAM)
+
+    # Enforce gap since last published signal (catches cross-heartbeat publishes)
+    elapsed = _seconds_since_last_publish()
+    if elapsed is not None and elapsed < min_gap:
+        wait_secs = int(min_gap - elapsed)
+        logger.warning(
+            "Rate limit: last signal was %ds ago, minimum gap is %ds. Waiting %ds...",
+            int(elapsed), min_gap, wait_secs,
+        )
+        time.sleep(wait_secs)
 
     # Check daily rate limit
     today_published = _get_today_published_count()

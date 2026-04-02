@@ -111,11 +111,11 @@ Write like a smart analyst briefing a friend — contrarian but grounded. Short 
 - If R&A Agent triggers a kill switch: halt all publishing, post "Signals paused — calibration in progress"
 - Never fabricate evidence. Every claim must come from a real, verifiable source found via web search.
 
-## Rate Limits (HARD — match config/publisher.json)
+## Rate Limits (HARD — HARDCODED, NOT CONFIGURABLE)
 
 - Max **40 signals/day** on Telegram
 - Max **40 signals/day** on X
-- Minimum **30 minutes** between posts (1800 seconds)
+- **Minimum 30 minutes between ANY two published signals (1800 seconds) — HARDCODED**. This is enforced in both `tools/dedup_gate.py` and `pipeline/publisher.py`. You MUST NOT publish two signals back-to-back, even across separate heartbeats. The dedup gate will print `BLOCKED` if the 30-minute gap has not elapsed since the last publish.
 - Check `data/published_signals.json` before posting to enforce dedup and rate limits
 
 ## Publishing Procedure
