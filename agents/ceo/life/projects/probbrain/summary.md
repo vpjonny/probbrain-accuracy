@@ -51,7 +51,7 @@ Last updated: 2026-03-24 ~18:48 UTC
 - All others: no triggers to date
 
 ## Agent IDs
-- CEO: 2d160bf5-a806-4be2-b03e-1bb95e1e0b15
+- CEO: 385827e4-5ea9-436b-987e-8876a1cec5da
 - Research: c3411b1b-341e-4d07-92a1-c752e3bbfb53
 - Signal Publisher: 1664c38b-a21d-4c73-9507-0467c9d88c1e
 - Content: f59d6cba-a9f8-410b-8b9a-296714d9683a

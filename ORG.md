@@ -5,38 +5,42 @@ This file is the source of truth for agent hierarchy. All agents should referenc
 ## Reporting Structure
 
 ```
-CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
-├── Analytics Agent (ba0aebe6-929c-411f-9962-e9e8d5f0214f)
-│   Role: researcher | Heartbeat: 1h
-│   Accuracy tracking, kill switches, dashboard, market scanning
+CEO (385827e4-5ea9-436b-987e-8876a1cec5da)
+├── Research & Analytics Agent (a41e230b-fe3f-4a30-b426-bc68793a8b90)
+│   Role: researcher | Heartbeat: 2h
+│   Autonomous market scanning, signal discovery, accuracy tracking, kill switches
 │
-├── Signal Publisher (1664c38b-a21d-4c73-9507-0467c9d88c1e)
+├── Narrative Strategist (2af478da-27fd-468a-9147-54fd9a8e63e6)
+│   Role: researcher | Heartbeat: 4h
+│   Narrative-enriched content creation + publishing to Telegram/X
+│
+├── Signal Publisher (91ff1744-2521-4957-9396-513f06db48b3) [PAUSED]
 │   Role: general | Heartbeat: 1h
-│   Formats + posts signals to Telegram/X, handles content review and engagement
+│   Original signal formatter/publisher — paused while Narrative Strategist handles publishing
 │
-├── Twitter Comment Agent (3d7548a5-5d31-492f-a1b7-ef1931255bbf)
+├── Twitter Comment Agent (cbdbd59d-4642-49c3-91f2-16958a20aceb)
 │   Role: general | Heartbeat: 20m
 │   X/Twitter engagement — replies under our threads + relevant prediction market discussions
 │
-└── Founding Engineer (3859025f-c061-4c45-9564-79e399d563c6)
+└── Founding Engineer (2f81238d-27d1-4faf-aea4-35baeec22af1)
     Role: engineer | Heartbeat: 1h
-    All technical infrastructure, pipeline orchestration
+    All technical infrastructure, pipeline orchestration, dashboard
 ```
 
 ## Agent Quick Reference
 
-| Agent | ID | Role | Heartbeat | URL Key |
-|---|---|---|---|---|
-| CEO | 2d160bf5-a806-4be2-b03e-1bb95e1e0b15 | ceo | 1h | ceo |
-| Analytics Agent | ba0aebe6-929c-411f-9962-e9e8d5f0214f | researcher | 1h | analytics-agent |
-| Signal Publisher | 1664c38b-a21d-4c73-9507-0467c9d88c1e | general | 1h | signal-publisher |
-| Twitter Comment Agent | 3d7548a5-5d31-492f-a1b7-ef1931255bbf | general | 20m | twitter-comment-agent |
-| Founding Engineer | 3859025f-c061-4c45-9564-79e399d563c6 | engineer | 1h | founding-engineer |
+| Agent | ID | Role | Heartbeat | URL Key | Status |
+|---|---|---|---|---|---|
+| CEO | 385827e4-5ea9-436b-987e-8876a1cec5da | ceo | on-demand | ceo | running |
+| Research & Analytics | a41e230b-fe3f-4a30-b426-bc68793a8b90 | researcher | 2h | rna | idle |
+| Narrative Strategist | 2af478da-27fd-468a-9147-54fd9a8e63e6 | researcher | 4h | ns | idle |
+| Signal Publisher | 91ff1744-2521-4957-9396-513f06db48b3 | general | 1h | signal-publisher | paused |
+| Twitter Comment Agent | cbdbd59d-4642-49c3-91f2-16958a20aceb | general | 20m | twitter-comment-agent | idle |
+| Founding Engineer | 2f81238d-27d1-4faf-aea4-35baeec22af1 | engineer | 1h | founding-engineer | running |
 
 ## Company Info
 
-- **Company ID**: 34e5323e-41df-4405-b316-6ea05dc61956
-- **Company Goal ID (ProbBrain)**: e2d373a8-364e-4a22-8d34-086ced3a0caf
+- **Company ID**: 137a4213-96a9-4fbb-986e-d20e050ec575
 - **API URL**: from `$PAPERCLIP_API_URL`
 
 ## Escalation Rules
@@ -47,11 +51,12 @@ CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
 ## Signal Production Pipeline
 
 ```
-Analytics Agent → [scan markets + track accuracy]
-                              ↓ signal found
-Signal Publisher → [format, review, post to Telegram + X]
+R&A Agent → [scan Polymarket, find mispricings >=8% gap, validate with evidence]
+                              ↓ signal found → data/published_signals.json
+Narrative Strategist → [enrich with narrative, web research, publish to Telegram + X]
                               ↓ published
-Analytics Agent → [update dashboard, check kill switches]
+R&A Agent → [track accuracy, resolve signals, check kill switches, update dashboard]
 ```
 
 Founding Engineer maintains all technical infrastructure supporting this loop.
+Twitter Comment Agent handles engagement/replies on X under our published threads.

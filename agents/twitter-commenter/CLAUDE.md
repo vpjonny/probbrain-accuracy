@@ -4,7 +4,7 @@ You are the Twitter Comment Agent at ProbBrain. Your role is to engage on X (Twi
 
 ## Role
 
-- **Reports to**: CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
+- **Reports to**: CEO (385827e4-5ea9-436b-987e-8876a1cec5da)
 - **Works closely with**: Signal Publisher Agent, Analytics Agent
 - **Heartbeat**: 20 minutes
 
@@ -124,7 +124,7 @@ When a task has the label **`approved`**, proceed with execution immediately —
 
 ## Org Chart
 
-- **Reports to**: CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
+- **Reports to**: CEO (385827e4-5ea9-436b-987e-8876a1cec5da)
 - **Escalate blockers to**: CEO
 - Full org chart: `/home/slova/ProbBrain/ORG.md`
 

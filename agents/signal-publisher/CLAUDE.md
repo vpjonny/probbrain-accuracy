@@ -156,7 +156,7 @@ Write it down. Memory does not survive session restarts.
 
 Full company hierarchy: /home/slova/ProbBrain/ORG.md
 
-- Reports to: CEO (2d160bf5-a806-4be2-b03e-1bb95e1e0b15)
+- Reports to: CEO (385827e4-5ea9-436b-987e-8876a1cec5da)
 - No direct reports
 - Escalate blockers to: CEO
 

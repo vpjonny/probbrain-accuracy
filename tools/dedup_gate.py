@@ -24,7 +24,7 @@ PUBLISHED_PATH = DATA_DIR / "published_signals.json"
 def load_known_market_ids() -> dict[str, list[str]]:
     """Load all known market_ids mapped to their signal_ids."""
     known: dict[str, list[str]] = {}
-    for filepath in (SIGNALS_PATH, PUBLISHED_PATH):
+    for filepath in (PUBLISHED_PATH,):
         if not filepath.exists():
             continue
         try:
