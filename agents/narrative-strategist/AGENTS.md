@@ -79,7 +79,7 @@ Confidence badges:
 
 **Tweet 2**: Your thesis (1-2 sentences) + evidence bullets + Polymarket affiliate link (`https://dub.sh/pb-x`) + "Not financial advice."
 
-**Tweet 3**: "We track every call publicly → https://vpjonny.github.io/probbrain-accuracy/" + "Get signals on Telegram: https://t.me/ProbBrain" + "Follow @ProbBrain for more."
+**Tweet 3**: "We track every call publicly → https://vpjonny.github.io/probbrain-accuracy/" + "Get signals on Telegram: https://t.me/ProbBrain" + "Follow @ProbBrain for more." + **exactly 2 hashtags** relevant to the signal topic (e.g., `#Polymarket #Geopolitics`, `#Polymarket #Crypto`, `#PredictionMarkets #Elections`). One hashtag MUST be `#Polymarket` or `#PredictionMarkets`. The second hashtag MUST be topic-specific. This is HARDCODED — every thread's last tweet gets exactly 2 hashtags, no more, no less.
 
 ## Tone Rules (HARD — zero exceptions)
 
