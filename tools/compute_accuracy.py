@@ -84,6 +84,24 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
                 status = "PENDING"
         else:
             status = "PENDING"
+        # Extract market price with proper None-checking (0 is a valid price)
+        market_price = None
+        for field in ["market_yes_price", "market_price_at_signal", "market_price"]:
+            val = sig.get(field)
+            if val is not None:
+                market_price = val
+                break
+        if market_price is None:
+            market_price = 0
+        # Validate and normalize: must be in 0-1 range (probabilities)
+        try:
+            market_price = float(market_price)
+            if market_price > 1.0:  # Assume percentages, convert to probability
+                market_price = market_price / 100.0
+            market_price = max(0.0, min(1.0, market_price))  # Clamp to 0-1
+        except (TypeError, ValueError):
+            market_price = 0.0
+
         row = {
             "id": sig.get("signal_id") or f"SIG-{sn:03d}",
             "signal_number": sn,
@@ -91,7 +109,7 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
             "category": sig.get("category", "general"),
             "direction": sig.get("direction", ""),
             "confidence": sig.get("confidence", ""),
-            "market_price": sig.get("market_yes_price") or sig.get("market_price_at_signal") or sig.get("market_price", 0),
+            "market_price": market_price,
             "our_estimate": sig.get("our_calibrated_estimate") or sig.get("our_estimate", 0),
             "gap_pct": sig.get("gap_pct", 0),
             "status": status,

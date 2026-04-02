@@ -68,7 +68,24 @@ def _sync_signals_json() -> int:
         if sn in existing_nums or sid in existing_ids:
             continue
 
-        market_price = ps.get("market_yes_price") or ps.get("market_price_at_signal") or ps.get("market_price", 0)
+        # Extract market price with proper None-checking (0 is a valid price)
+        market_price = None
+        for field in ["market_yes_price", "market_price_at_signal", "market_price"]:
+            val = ps.get(field)
+            if val is not None:
+                market_price = val
+                break
+        if market_price is None:
+            market_price = 0
+        # Validate and normalize: must be in 0-1 range (probabilities)
+        try:
+            market_price = float(market_price)
+            if market_price > 1.0:  # Assume percentages, convert to probability
+                market_price = market_price / 100.0
+            market_price = max(0.0, min(1.0, market_price))  # Clamp to 0-1
+        except (TypeError, ValueError):
+            market_price = 0.0
+
         our_est = ps.get("our_calibrated_estimate") or ps.get("our_estimate") or ps.get("our_estimate_yes", 0)
         entry = {
             "signal_number": sn,
