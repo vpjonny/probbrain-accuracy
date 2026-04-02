@@ -132,22 +132,49 @@ def _load_published_themes() -> set:
         return set()
 
 
+def _load_all_known_market_ids() -> Set[str]:
+    """Load set of all market IDs from signals.json + published_signals.json."""
+    data_dir = Path(__file__).parent.parent / "data"
+    known_ids: Set[str] = set()
+    for filename in ("signals.json", "published_signals.json"):
+        filepath = data_dir / filename
+        if not filepath.exists():
+            continue
+        try:
+            with open(filepath, "r") as f:
+                data = json.load(f)
+            if isinstance(data, list):
+                for entry in data:
+                    mid = entry.get("market_id")
+                    if mid is not None:
+                        known_ids.add(str(mid))
+        except (json.JSONDecodeError, IOError):
+            continue
+    return known_ids
+
+
 def filter_duplicates(markets: List[Market]) -> List[Market]:
     """
     Remove markets that duplicate or near-duplicate already-published signals.
 
-    Two-pass filtering:
-    1. Exact question match (fast check)
-    2. Semantic theme match (catches GTA VI variants, date variants, etc.)
+    Three-pass filtering:
+    1. Market ID match (hard gate — catches all known markets regardless of question text)
+    2. Exact question match (fast check)
+    3. Semantic theme match (catches GTA VI variants, date variants, etc.)
     """
+    known_market_ids = _load_all_known_market_ids()
     published_questions = _load_published_questions()
     published_themes = _load_published_themes()
 
-    if not published_questions and not published_themes:
+    if not known_market_ids and not published_questions and not published_themes:
         return markets
 
     filtered = []
     for m in markets:
+        # Hard gate: reject if market_id already known
+        if str(m.id) in known_market_ids:
+            continue
+
         normalized_q = _normalize_question(m.question)
         theme = _extract_core_theme(m.question)
 
