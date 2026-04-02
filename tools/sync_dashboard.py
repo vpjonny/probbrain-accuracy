@@ -1,10 +1,10 @@
 """
 sync_dashboard.py — single entry point to sync all signal data to the public dashboard.
 
-Call this after any signal publication to ensure the dashboard stays in sync.
+Call this after any signal publication or resolution to ensure the dashboard stays in sync.
 It does three things:
   1. Ensures every signal in published_signals.json is also in signals.json
-  2. Recomputes dashboard/accuracy.json
+  2. Recomputes dashboard/accuracy.json from resolved.json
   3. Pushes to both origin (probbrain) and accuracy (probbrain-accuracy) repos
 
 Usage:
@@ -13,6 +13,13 @@ Usage:
 Also importable:
     from tools.sync_dashboard import sync
     sync(signal_id="SIG-024")
+
+AUTO-SYNC: This script automatically detects and syncs when resolved.json changes.
+The monitor_resolved.py script can watch for changes and trigger auto-sync continuously.
+
+Usage for auto-sync:
+    python tools/monitor_resolved.py              # One-time check
+    python tools/monitor_resolved.py --watch      # Continuous monitoring (background)
 """
 import json
 import logging
