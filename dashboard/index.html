@@ -722,7 +722,7 @@
       const mkt = Math.round(s.market_price * 100) + '%';
       const ours = Math.round(s.our_estimate * 100) + '%';
       const href = s.polymarket_slug
-        ? 'https://polymarket.com/event/' + s.polymarket_slug + '?via=0x-slova'
+        ? 'https://polymarket.com/' + (s.polymarket_slug.includes('/') ? 'event' : 'market') + '/' + s.polymarket_slug + '?via=0x-slova'
         : '';
       return `<tr${href ? ' data-href="' + href + '"' : ''}>
         <td><span class="signal-num">#${s.signal_number}</span></td>

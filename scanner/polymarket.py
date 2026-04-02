@@ -65,7 +65,8 @@ def _extract_category(market_data: dict) -> str:
 
 def _market_url(market_data: dict) -> str:
     slug = market_data.get("slug") or market_data.get("id", "")
-    return f"{POLYMARKET_BASE}/{slug}"
+    path = "event" if "/" in slug else "market"
+    return f"https://polymarket.com/{path}/{slug}"
 
 
 def _parse_market(raw: dict) -> Optional[Market]:
