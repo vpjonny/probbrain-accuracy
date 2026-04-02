@@ -721,8 +721,8 @@
     }
 
     function renderSignalRow(s) {
-      const mkt = Math.round(s.market_price * 100) + '%';
-      const ours = Math.round(s.our_estimate * 100) + '%';
+      const mkt = s.market_price > 0 ? Math.round(s.market_price * 100) + '%' : '—';
+      const ours = s.our_estimate > 0 ? Math.round(s.our_estimate * 100) + '%' : '—';
       const href = s.polymarket_slug
         ? 'https://polymarket.com/' + (s.polymarket_slug.includes('/') ? 'event' : 'market') + '/' + s.polymarket_slug + '?via=0x-slova'
         : '';

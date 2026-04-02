@@ -48,6 +48,34 @@ def _extract_signal_number(ps: dict) -> int | None:
     return None
 
 
+def _normalize_price(record: dict, fields: list[str], default: float = 0.0) -> float:
+    """Extract a probability value from the first non-None, non-zero field.
+
+    Handles field-name variants (market_yes_price vs market_price_yes) and
+    auto-converts percentages (>1.0) to 0-1 range.  Skips explicit-zero
+    values when a later field holds a real price.
+    """
+    for field in fields:
+        val = record.get(field)
+        if val is not None:
+            try:
+                fval = float(val)
+            except (TypeError, ValueError):
+                continue
+            if fval != 0.0:
+                if fval > 1.0:
+                    fval = fval / 100.0
+                return max(0.0, min(1.0, fval))
+    for field in fields:
+        val = record.get(field)
+        if val is not None:
+            try:
+                return max(0.0, min(1.0, float(val)))
+            except (TypeError, ValueError):
+                continue
+    return default
+
+
 def _sync_signals_json() -> int:
     """Ensure every published signal exists in signals.json. Returns count of added entries."""
     published = json.loads(PUBLISHED_PATH.read_text()) if PUBLISHED_PATH.exists() else []
@@ -68,25 +96,14 @@ def _sync_signals_json() -> int:
         if sn in existing_nums or sid in existing_ids:
             continue
 
-        # Extract market price with proper None-checking (0 is a valid price)
-        market_price = None
-        for field in ["market_yes_price", "market_price_at_signal", "market_price"]:
-            val = ps.get(field)
-            if val is not None:
-                market_price = val
-                break
-        if market_price is None:
-            market_price = 0
-        # Validate and normalize: must be in 0-1 range (probabilities)
-        try:
-            market_price = float(market_price)
-            if market_price > 1.0:  # Assume percentages, convert to probability
-                market_price = market_price / 100.0
-            market_price = max(0.0, min(1.0, market_price))  # Clamp to 0-1
-        except (TypeError, ValueError):
-            market_price = 0.0
-
-        our_est = ps.get("our_calibrated_estimate") or ps.get("our_estimate") or ps.get("our_estimate_yes", 0)
+        market_price = _normalize_price(ps, [
+            "market_yes_price", "market_price_yes",
+            "market_price_at_signal", "market_price",
+        ])
+        our_est = _normalize_price(ps, [
+            "our_calibrated_estimate", "our_estimate",
+            "our_estimate_yes",
+        ])
         entry = {
             "signal_number": sn,
             "signal_id": sid,

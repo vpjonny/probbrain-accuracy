@@ -61,6 +61,37 @@ def _load_slug_map() -> dict:
     return slug_map
 
 
+def _normalize_price(record: dict, fields: list[str], default: float = 0.0) -> float:
+    """Extract a probability value from the first non-None, non-zero field.
+
+    Handles field-name variants (market_yes_price vs market_price_yes) and
+    auto-converts percentages (>1.0) to 0-1 range.  Skips explicit-zero
+    values when a later field holds a real price — this prevents a stale 0
+    from masking a valid fallback like market_price_at_signal.
+    """
+    # First pass: find first non-None, non-zero value
+    for field in fields:
+        val = record.get(field)
+        if val is not None:
+            try:
+                fval = float(val)
+            except (TypeError, ValueError):
+                continue
+            if fval != 0.0:
+                if fval > 1.0:
+                    fval = fval / 100.0
+                return max(0.0, min(1.0, fval))
+    # Second pass: accept explicit zero only if no better value exists
+    for field in fields:
+        val = record.get(field)
+        if val is not None:
+            try:
+                return max(0.0, min(1.0, float(val)))
+            except (TypeError, ValueError):
+                continue
+    return default
+
+
 def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict) -> list:
     """Build the signals array for the dashboard signal table."""
     rows = []
@@ -84,23 +115,14 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
                 status = "PENDING"
         else:
             status = "PENDING"
-        # Extract market price with proper None-checking (0 is a valid price)
-        market_price = None
-        for field in ["market_yes_price", "market_price_at_signal", "market_price"]:
-            val = sig.get(field)
-            if val is not None:
-                market_price = val
-                break
-        if market_price is None:
-            market_price = 0
-        # Validate and normalize: must be in 0-1 range (probabilities)
-        try:
-            market_price = float(market_price)
-            if market_price > 1.0:  # Assume percentages, convert to probability
-                market_price = market_price / 100.0
-            market_price = max(0.0, min(1.0, market_price))  # Clamp to 0-1
-        except (TypeError, ValueError):
-            market_price = 0.0
+        market_price = _normalize_price(sig, [
+            "market_yes_price", "market_price_yes",
+            "market_price_at_signal", "market_price",
+        ])
+        our_estimate = _normalize_price(sig, [
+            "our_calibrated_estimate", "our_estimate",
+            "our_estimate_yes",
+        ])
 
         row = {
             "id": sig.get("signal_id") or f"SIG-{sn:03d}",
@@ -110,7 +132,7 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
             "direction": sig.get("direction", ""),
             "confidence": sig.get("confidence", ""),
             "market_price": market_price,
-            "our_estimate": sig.get("our_calibrated_estimate") or sig.get("our_estimate", 0),
+            "our_estimate": our_estimate,
             "gap_pct": sig.get("gap_pct", 0),
             "status": status,
             "close_date": sig.get("close_date", ""),
