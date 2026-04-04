@@ -160,6 +160,8 @@ def format_ns_signal(
         "\u26a0\ufe0f Not financial advice. Trade at your own risk.",
         "\U0001f4c8 Accuracy track record: https://vpjonny.github.io/probbrain-accuracy/",
         "\U0001f426 Follow us on X: https://x.com/ProbBrain",
+        "",
+        "#Polymarket #PredictionMarkets",
     ]
     return "\n".join(lines)
 

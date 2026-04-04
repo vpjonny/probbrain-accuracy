@@ -23,12 +23,17 @@ DUB_LINK_X = os.getenv("DUB_LINK_TWITTER", "https://dub.sh/pb-x")
 DASHBOARD_URL = "https://vpjonny.github.io/probbrain-accuracy/"
 TELEGRAM_INVITE_URL = os.getenv("DUB_LINK_TELEGRAM_CHANNEL", "https://dub.sh/pb-tg")
 
+# Hardcoded hashtags — ALWAYS appended to tweet 3. Non-negotiable.
+HASHTAG_PRIMARY = "#Polymarket"
+HASHTAG_DEFAULT_SECONDARY = "#PredictionMarkets"
+
 # Standard tweet_3 closing copy — all signal threads MUST use this.
 TWEET3_STANDARD = (
     f"We track every call publicly.\n"
     f"Accuracy dashboard: {DASHBOARD_URL}\n\n"
     f"Join us on Telegram: {TELEGRAM_INVITE_URL}\n"
-    f"Follow @ProbBrain for more signals."
+    f"Follow @ProbBrain for more signals.\n\n"
+    f"{HASHTAG_PRIMARY} {HASHTAG_DEFAULT_SECONDARY}"
 )
 
 
@@ -75,6 +80,7 @@ def build_thread(
     close_date: str,
     volume_usdc: float,
     dub_link: str = "",
+    topic_hashtag: str = "",
 ) -> XThreadContent:
     """Format signal data into a 3-tweet thread."""
     link = dub_link or DUB_LINK_X
@@ -103,11 +109,16 @@ def build_thread(
         body += line
     tweet2 = header + body + footer
 
+    secondary = topic_hashtag.strip() if topic_hashtag.strip() else HASHTAG_DEFAULT_SECONDARY
+    # Ensure it starts with #
+    if secondary and not secondary.startswith("#"):
+        secondary = f"#{secondary}"
     tweet3 = (
         f"We track every call publicly.\n"
         f"Accuracy record: {DASHBOARD_URL}\n\n"
         f"Join us on Telegram: {TELEGRAM_INVITE_URL}\n"
-        f"Follow @ProbBrain for more signals."
+        f"Follow @ProbBrain for more signals.\n\n"
+        f"{HASHTAG_PRIMARY} {secondary}"
     )
 
     return XThreadContent(tweet1=tweet1, tweet2=tweet2, tweet3=tweet3)
