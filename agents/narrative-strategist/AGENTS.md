@@ -163,6 +163,7 @@ When publishing a signal:
 - **NEVER report "Published" in your Paperclip comment unless you have real telegram_message_id AND tweet IDs.** Claiming success without actual API calls is a critical failure.
 - If Telegram or X posting fails, report the failure honestly — do NOT claim the signal was published.
 - Use `market_id` from `data/pending_signals.json` (R&A source), NOT from `data/signals.json` (which may have stale/wrong IDs).
+- **SURGICAL EDITS ONLY (HARD RULE):** When updating `signals.json` or `pending_signals.json`, only modify/remove the SPECIFIC signal you just published. NEVER delete or overwrite other signals in the same file. If you published SIG-063, only SIG-063 should change — SIG-064, SIG-065, etc. must remain untouched. Rewriting the entire file and dropping entries is a data-loss bug.
 
 You can use the existing pipeline modules:
 - `pipeline/publisher.py` — Telegram posting with dedup + rate limits
