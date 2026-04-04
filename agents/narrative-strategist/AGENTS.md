@@ -129,7 +129,19 @@ When publishing a signal:
    If it prints `BLOCKED`, **DO NOT PUBLISH**. Skip this signal entirely.
    If it prints `OK`, proceed to step 2.
 2. **Check rate limit** — 30-min gap from last post, under daily cap
-3. **Post to Telegram** — use the Bot API with `$TELEGRAM_BOT_TOKEN` and `$TELEGRAM_CHANNEL_ID`:
+3. **Format with `format_ns_signal()` (HARD RULE — MUST NOT SKIP)**:
+   ```python
+   from bot.templates import format_ns_signal
+   message = format_ns_signal(
+       question=..., market_yes_pct=..., our_estimate_pct=...,
+       gap_pct=..., direction=..., confidence=...,
+       evidence=[...], counter_evidence="...",
+       close_date="YYYY-MM-DD", volume_usdc=...
+   )
+   ```
+   **NEVER compose the Telegram message text by hand.** Always use `format_ns_signal()`. This ensures every post follows the exact ProbBrain template with badge, gap, evidence, counter-evidence, and footer links.
+
+4. **Post to Telegram** — use the Bot API with `$TELEGRAM_BOT_TOKEN` and `$TELEGRAM_CHANNEL_ID`:
    ```python
    import os, httpx
    bot_token = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -141,7 +153,7 @@ When publishing a signal:
    telegram_message_id = result["result"]["message_id"]
    ```
    **YOU MUST capture `telegram_message_id` from the API response.** If the API call fails or returns `ok: false`, the signal is NOT published — do not proceed.
-4. **Post X thread** — use `pipeline/x_publisher.py` (build_thread + post_thread):
+5. **Post X thread** — use `pipeline/x_publisher.py` (build_thread + post_thread):
    ```python
    from pipeline.x_publisher import build_thread, post_thread
    thread = build_thread(question=..., market_yes_pct=..., our_estimate_pct=..., gap_pct=..., direction=..., confidence=..., evidence=..., close_date=..., volume_usdc=...)
@@ -149,16 +161,17 @@ When publishing a signal:
    assert tweet_ids is not None and len(tweet_ids) == 3, "X posting FAILED"
    ```
    **YOU MUST capture the list of tweet IDs.** If `post_thread` returns `None`, X posting failed — report it, do not claim success.
-5. **VERIFY BEFORE LOGGING (HARD RULE):** Before writing to published_signals.json, confirm:
+6. **VERIFY BEFORE LOGGING (HARD RULE):** Before writing to published_signals.json, confirm:
    - `telegram_message_id` is a real integer (not None, not null)
    - `tweet_ids` is a list of 3 real tweet ID strings (not None, not null)
    If EITHER is missing, you have NOT published. Do NOT log the signal. Report the failure in your Paperclip comment and set the task to `blocked`.
-6. **Log to `data/published_signals.json` ONLY after steps 3-5 pass.** Include: signal_id, market_id, question, telegram_message_id (integer), x_tweet_ids (dict with tweet_1/tweet_2/tweet_3 as strings), published_at. **A signal with null telegram_message_id or null x_tweet_ids is NOT published.**
-7. **Sync dashboard**: `python tools/sync_dashboard.py --signal-id SIG-XXX`
-8. **Commit and push** changes to git
+7. **Log to `data/published_signals.json` ONLY after steps 4-6 pass.** Include: signal_id, market_id, question, telegram_message_id (integer), x_tweet_ids (dict with tweet_1/tweet_2/tweet_3 as strings), published_at. **A signal with null telegram_message_id or null x_tweet_ids is NOT published.**
+8. **Sync dashboard**: `python tools/sync_dashboard.py --signal-id SIG-XXX`
+9. **Commit and push** changes to git
 
 **CRITICAL — ZERO-TOLERANCE RULES:**
-- Steps 1, 5, and 6 are non-negotiable.
+- Steps 1, 3, 6, and 7 are non-negotiable.
+- **NEVER compose Telegram message text by hand.** Always use `from bot.templates import format_ns_signal`.
 - **NEVER log a signal to published_signals.json with null/None IDs.** That means it was NOT posted.
 - **NEVER report "Published" in your Paperclip comment unless you have real telegram_message_id AND tweet IDs.** Claiming success without actual API calls is a critical failure.
 - If Telegram or X posting fails, report the failure honestly — do NOT claim the signal was published.

@@ -93,6 +93,77 @@ def _escape(text: str) -> str:
     return "".join(f"\\{c}" if c in special else c for c in text)
 
 
+def format_ns_signal(
+    question: str,
+    market_yes_pct: float,
+    our_estimate_pct: float,
+    gap_pct: float,
+    direction: str,
+    confidence: str,
+    evidence: list[str],
+    counter_evidence: str,
+    close_date: str,
+    volume_usdc: float,
+) -> str:
+    """
+    Format a signal using the REQUIRED NS Telegram template.
+    ALL agents (CEO, NS, any publisher) MUST use this function.
+    Returns plain text (no MarkdownV2) for Telegram.
+
+    Args:
+        question: Market question (≤80 chars)
+        market_yes_pct: Market YES price as percentage (e.g. 69.5)
+        our_estimate_pct: Our calibrated estimate as percentage (e.g. 55.0)
+        gap_pct: Absolute gap in percentage points (e.g. 14.5)
+        direction: "YES_UNDERPRICED" or "NO_UNDERPRICED"
+        confidence: "HIGH" or "MEDIUM"
+        evidence: List of evidence strings with sources and dates
+        counter_evidence: One sentence acknowledging the other side
+        close_date: Close date string (YYYY-MM-DD)
+        volume_usdc: Volume in USDC
+    """
+    # Badge
+    overpriced = "YES" if direction == "NO_UNDERPRICED" else "NO"
+    bet_direction = "NO" if direction == "NO_UNDERPRICED" else "YES"
+
+    if confidence == "HIGH":
+        badge = f"\U0001f534 HIGH \u2014 Bet {bet_direction}"
+    else:
+        badge = f"\U0001f7e1 MEDIUM \u2014 Lean {bet_direction}"
+
+    # Volume formatting
+    if volume_usdc >= 1_000_000:
+        vol_str = f"${volume_usdc / 1_000_000:.1f}M"
+    else:
+        vol_str = f"${volume_usdc / 1_000:.0f}k"
+
+    # Evidence bullets
+    evidence_lines = "\n".join(f"\u2022 {e}" for e in evidence)
+
+    lines = [
+        f"{badge} MARKET SIGNAL",
+        "",
+        f"\U0001f4ca {question}",
+        "",
+        f"Market: {market_yes_pct:.1f}% YES | Our estimate: {our_estimate_pct:.1f}% YES",
+        f"Gap: {gap_pct:.1f}% (market overpricing {overpriced})",
+        f"Volume: {vol_str}",
+        f"Closes: {close_date}",
+        "",
+        f"Evidence:",
+        evidence_lines,
+        "",
+        f"Counter-evidence: {counter_evidence}",
+        "",
+        "\U0001f517 Trade on Polymarket: https://dub.sh/pb-tg",
+        "",
+        "\u26a0\ufe0f Not financial advice. Trade at your own risk.",
+        "\U0001f4c8 Accuracy track record: https://vpjonny.github.io/probbrain-accuracy/",
+        "\U0001f426 Follow us on X: https://x.com/ProbBrain",
+    ]
+    return "\n".join(lines)
+
+
 def format_signal(
     question: str,
     yes_pct: float,
