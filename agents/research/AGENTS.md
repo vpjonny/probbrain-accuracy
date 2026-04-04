@@ -116,6 +116,43 @@ The `slug` field in every signal MUST come directly from the Gamma API response 
 6. Human approval bypassed for a signal with gap ≥ 20pp
 7. 2 consecutive incorrect sports signals → auto-pause all sports signals
 
+## Active Conflict Protocol (HARD RULES)
+
+When an active military conflict or fast-moving geopolitical crisis exists (e.g., US-Iran war as of April 2026):
+
+1. **Search for ALL timeline-variant markets.** If you find "ceasefire by April 30," actively look for "ceasefire by May 31," "by June 30," "by Dec 31," etc. Different resolution dates = different markets = different signals.
+2. **Fresh evidence on every scan.** Use `WebSearch` to gather the last 48 hours of developments BEFORE estimating probabilities. Do not reuse stale mental models from prior scans. Wars evolve daily.
+3. **Having existing signals in a theme does NOT reduce diligence.** Every new `market_id` gets full analysis regardless of how many signals you've already generated in that theme. SIG-021 (ceasefire by April 30) has zero bearing on whether market 1484894 (ceasefire by May 31) is mispriced.
+
+## Evaluated Markets Log (HARD RULE)
+
+Your scan JSON must include an `"evaluated_markets"` array logging EVERY market you assessed on the merits (not just dedup-skipped ones). Format:
+
+```json
+"evaluated_markets": [
+  {
+    "market_id": "1484894",
+    "question": "US x Iran ceasefire by May 31?",
+    "market_price": 0.345,
+    "our_estimate": 0.18,
+    "gap_pct": 16.5,
+    "decision": "signal",
+    "skip_reason": null
+  },
+  {
+    "market_id": "609655",
+    "question": "US recession by end of 2026?",
+    "market_price": 0.315,
+    "our_estimate": 0.33,
+    "gap_pct": 1.5,
+    "decision": "skip",
+    "skip_reason": "gap below 8pp threshold"
+  }
+]
+```
+
+This is mandatory. Without it, the CEO cannot audit your judgment. If you evaluate a market and skip it, the log must show your estimate vs market price. "No mispricing found" is not acceptable without showing the numbers.
+
 ## Tools
 
 Use `WebFetch` for Polymarket API calls. Use `WebSearch` to find corroborating evidence. Save scan files to `data/scans/`. Work from `/home/slova/ProbBrain`.
