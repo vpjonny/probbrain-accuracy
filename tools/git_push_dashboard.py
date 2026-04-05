@@ -103,10 +103,17 @@ def _sync_accuracy_repo(commit_msg: str) -> None:
             return
         try:
             import shutil
+            # Copy to root (vpjonny.github.io/probbrain-accuracy/)
             shutil.copy(str(DASHBOARD_ACCURACY), str(tmppath / "accuracy.json"))
             if DASHBOARD_INDEX.exists():
                 shutil.copy(str(DASHBOARD_INDEX), str(tmppath / "index.html"))
-            rc, out = _run(["git", "add", "accuracy.json", "index.html"], cwd=tmppath)
+            # Also copy into dashboard/ subdir (vpjonny.github.io/probbrain-accuracy/dashboard/)
+            dashboard_dir = tmppath / "dashboard"
+            dashboard_dir.mkdir(exist_ok=True)
+            shutil.copy(str(DASHBOARD_ACCURACY), str(dashboard_dir / "accuracy.json"))
+            if DASHBOARD_INDEX.exists():
+                shutil.copy(str(DASHBOARD_INDEX), str(dashboard_dir / "index.html"))
+            rc, out = _run(["git", "add", "accuracy.json", "index.html", "dashboard/"], cwd=tmppath)
             if rc != 0:
                 logger.warning("git_push_dashboard: accuracy add failed: %s", out)
                 return
