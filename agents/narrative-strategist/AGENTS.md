@@ -120,63 +120,28 @@ Write like a smart analyst briefing a friend — contrarian but grounded. Short 
 
 ## Publishing Procedure
 
-When publishing a signal:
+**USE THE ONE-COMMAND PUBLISHER (HARD RULE — MUST NOT SKIP):**
 
-1. **RUN DEDUP GATE FIRST (HARD RULE — MUST NOT SKIP)**:
-   ```bash
-   python tools/dedup_gate.py --market-id <MARKET_ID> --signal-id <SIG-XXX>
-   ```
-   If it prints `BLOCKED`, **DO NOT PUBLISH**. Skip this signal entirely.
-   If it prints `OK`, proceed to step 2.
-2. **Check rate limit** — 30-min gap from last post, under daily cap
-3. **Format with `format_ns_signal()` (HARD RULE — MUST NOT SKIP)**:
-   ```python
-   from bot.templates import format_ns_signal
-   message = format_ns_signal(
-       question=..., market_yes_pct=..., our_estimate_pct=...,
-       gap_pct=..., direction=..., confidence=...,
-       evidence=[...], counter_evidence="...",
-       close_date="YYYY-MM-DD", volume_usdc=...
-   )
-   ```
-   **NEVER compose the Telegram message text by hand.** Always use `format_ns_signal()`. This ensures every post follows the exact ProbBrain template with badge, gap, evidence, counter-evidence, and footer links.
+```bash
+python tools/publish_signal.py --signal-id SIG-XXX
+```
 
-4. **Post to Telegram** — use the Bot API with `$TELEGRAM_BOT_TOKEN` and `$TELEGRAM_CHANNEL_ID`:
-   ```python
-   import os, httpx
-   bot_token = os.environ["TELEGRAM_BOT_TOKEN"]
-   channel_id = os.environ["TELEGRAM_CHANNEL_ID"]
-   url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-   resp = httpx.post(url, json={"chat_id": channel_id, "text": message, "disable_web_page_preview": True})
-   result = resp.json()
-   assert result["ok"], f"Telegram post FAILED: {result}"
-   telegram_message_id = result["result"]["message_id"]
-   ```
-   **YOU MUST capture `telegram_message_id` from the API response.** If the API call fails or returns `ok: false`, the signal is NOT published — do not proceed.
-5. **Post X thread** — use `pipeline/x_publisher.py` (build_thread + post_thread):
-   ```python
-   from pipeline.x_publisher import build_thread, post_thread
-   thread = build_thread(question=..., market_yes_pct=..., our_estimate_pct=..., gap_pct=..., direction=..., confidence=..., evidence=..., close_date=..., volume_usdc=...)
-   tweet_ids = post_thread(thread)
-   assert tweet_ids is not None and len(tweet_ids) == 3, "X posting FAILED"
-   ```
-   **YOU MUST capture the list of tweet IDs.** If `post_thread` returns `None`, X posting failed — report it, do not claim success.
-6. **VERIFY BEFORE LOGGING (HARD RULE):** Before writing to published_signals.json, confirm:
-   - `telegram_message_id` is a real integer (not None, not null)
-   - `tweet_ids` is a list of 3 real tweet ID strings (not None, not null)
-   If EITHER is missing, you have NOT published. Do NOT log the signal. Report the failure in your Paperclip comment and set the task to `blocked`.
-7. **Log to `data/published_signals.json` ONLY after steps 4-6 pass.** Include: signal_id, market_id, question, telegram_message_id (integer), x_tweet_ids (dict with tweet_1/tweet_2/tweet_3 as strings), published_at. **A signal with null telegram_message_id or null x_tweet_ids is NOT published.**
-8. **Sync dashboard**: `python tools/sync_dashboard.py --signal-id SIG-XXX`
-9. **Commit and push** changes to git
+This single script handles EVERYTHING: dedup gate, format_ns_signal(), Telegram post, X thread, data file updates, dashboard sync, and git commit+push. It loads `.env` automatically.
 
-**CRITICAL — ZERO-TOLERANCE RULES:**
-- Steps 1, 3, 6, and 7 are non-negotiable.
-- **NEVER compose Telegram message text by hand.** Always use `from bot.templates import format_ns_signal`.
-- **NEVER log a signal to published_signals.json with null/None IDs.** That means it was NOT posted.
-- **NEVER report "Published" in your Paperclip comment unless you have real telegram_message_id AND tweet IDs.** Claiming success without actual API calls is a critical failure.
-- If Telegram or X posting fails, report the failure honestly — do NOT claim the signal was published.
-- Use `market_id` from `data/pending_signals.json` (R&A source), NOT from `data/signals.json` (which may have stale/wrong IDs).
-- **SURGICAL EDITS ONLY (HARD RULE):** When updating `signals.json` or `pending_signals.json`, only modify/remove the SPECIFIC signal you just published. NEVER delete or overwrite other signals in the same file. If you published SIG-063, only SIG-063 should change — SIG-064, SIG-065, etc. must remain untouched. Rewriting the entire file and dropping entries is a data-loss bug.
+**Exit codes:**
+- `0` = SUCCESS — signal published to both Telegram and X
+- `1` = BLOCKED — dedup gate or rate limit prevented publish (skip this signal)
+- `2` = ERROR — something failed (report in Paperclip comment, set task to blocked)
+
+**After running the script:**
+- If exit code 0: report the telegram_message_id and tweet_ids from the output in your Paperclip comment
+- If exit code 1: skip this signal, move to the next one
+- If exit code 2: report the error in your Paperclip comment and set the task to blocked
+
+**CRITICAL RULES:**
+- **ALWAYS use `publish_signal.py`.** Do NOT publish manually with Python code. Do NOT compose Telegram messages by hand.
+- **NEVER report "Published" unless the script printed SUCCESS.** If it didn't succeed, it didn't publish.
+- **NEVER modify data files manually.** The script handles all data file updates surgically.
 
 You can use the existing pipeline modules:
 - `pipeline/publisher.py` — Telegram posting with dedup + rate limits
