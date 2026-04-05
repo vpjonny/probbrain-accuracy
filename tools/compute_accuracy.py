@@ -15,6 +15,7 @@ from tools.sync_dashboard import _extract_signal_number
 
 ROOT = Path(__file__).resolve().parent.parent
 PUBLISHED_PATH = ROOT / "data" / "published_signals.json"
+SIGNALS_PATH = ROOT / "data" / "signals.json"
 RESOLVED_PATH = ROOT / "data" / "resolved.json"
 SLUG_PATH = ROOT / "data" / "polymarket_slugs.json"
 OUTPUT_PATH = ROOT / "dashboard" / "accuracy.json"
@@ -92,16 +93,23 @@ def _normalize_price(record: dict, fields: list[str], default: float = 0.0) -> f
     return default
 
 
-def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict) -> list:
-    """Build the signals array for the dashboard signal table."""
+def _build_signal_rows(published: list, all_signals: list, outcome_by_market: dict, slug_map: dict) -> list:
+    """Build the signals array for the dashboard signal table.
+
+    Includes all signals from both published_signals.json and signals.json.
+    Published signals show WIN/LOSS/PENDING status; unpublished ones show NOT_PUBLISHED.
+    """
     rows = []
+    seen_numbers: set[int] = set()
+
+    # First pass: published signals (these have full accuracy tracking)
     for sig in published:
-        # Skip non-signal entries (e.g. edge threads)
         if sig.get("type"):
             continue
         sn = _extract_signal_number(sig)
         if sn is None:
             continue
+        seen_numbers.add(sn)
         market_id = str(sig.get("market_id", ""))
         outcome_data = outcome_by_market.get(market_id)
         if outcome_data:
@@ -142,11 +150,46 @@ def _build_signal_rows(published: list, outcome_by_market: dict, slug_map: dict)
         if slug:
             row["polymarket_slug"] = slug
         rows.append(row)
+
+    # Second pass: unpublished signals from signals.json
+    for sig in all_signals:
+        sn = sig.get("signal_number")
+        if sn is None or sn in seen_numbers:
+            continue
+        seen_numbers.add(sn)
+        market_price = _normalize_price(sig, [
+            "market_yes_price", "market_price_yes",
+            "market_price_at_signal", "market_price",
+        ])
+        our_estimate = _normalize_price(sig, [
+            "our_calibrated_estimate", "our_estimate",
+            "our_estimate_yes",
+        ])
+        row = {
+            "id": sig.get("signal_id") or sig.get("id") or f"SIG-{sn:03d}",
+            "signal_number": sn,
+            "title": sig.get("question") or sig.get("market_question", ""),
+            "category": sig.get("category", "general"),
+            "direction": sig.get("direction", ""),
+            "confidence": sig.get("confidence", ""),
+            "market_price": market_price,
+            "our_estimate": our_estimate,
+            "gap_pct": sig.get("gap_pct", 0),
+            "status": "NOT_PUBLISHED",
+            "close_date": sig.get("close_date", ""),
+            "published_at": "",
+        }
+        slug = slug_map.get(str(sn), "")
+        if slug:
+            row["polymarket_slug"] = slug
+        rows.append(row)
+
     return rows
 
 
 def compute() -> dict:
     published: list = _load_json(PUBLISHED_PATH, [])
+    all_signals: list = _load_json(SIGNALS_PATH, [])
     resolved_outcomes: list = _load_json(RESOLVED_PATH, [])
     slug_map = _load_slug_map()
 
@@ -253,8 +296,12 @@ def compute() -> dict:
         if conf_data["resolved"] > 0:
             conf_data["accuracy_pct"] = round(conf_data["correct"] / conf_data["resolved"] * 100, 1)
 
+    signal_rows = _build_signal_rows(published, all_signals, outcome_by_market, slug_map)
+    signals_total = len(signal_rows)
+
     result = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
+        "signals_total": signals_total,
         "signals_published": signals_published,
         "signals_resolved": signals_resolved,
         "correct": correct,
@@ -267,8 +314,8 @@ def compute() -> dict:
         "kill_switches_active": existing_accuracy.get("kill_switches_active", []),
         "last_resolved_signal": last_resolved,
         "signals": sorted(
-            _build_signal_rows(published, outcome_by_market, slug_map),
-            key=lambda s: s.get("published_at") or "",
+            signal_rows,
+            key=lambda s: s.get("signal_number") or 0,
             reverse=True,
         ),
     }
