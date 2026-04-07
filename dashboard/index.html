@@ -350,6 +350,52 @@
 
     .empty-row td { color: var(--muted); text-align: center; padding: 32px; }
 
+    /* Filter buttons */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+    }
+
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .filter-btn .filter-count {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.15);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter-btn.active .filter-count {
+      background: rgba(255,255,255,0.25);
+    }
+
     /* Search bar */
     .table-controls {
       display: flex;
@@ -596,6 +642,12 @@
       </div>
     </div>
 
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn active" data-filter="all">Signals <span class="filter-count" id="count-all">—</span></button>
+      <button class="filter-btn" data-filter="resolved">Resolved <span class="filter-count" id="count-resolved">—</span></button>
+      <button class="filter-btn" data-filter="pending">Pending <span class="filter-count" id="count-pending">—</span></button>
+    </div>
+
     <div class="section-title">Signal Log</div>
     <div class="table-controls">
       <div class="search-box">
@@ -740,6 +792,15 @@
           });
           window._searchQuery = document.getElementById('signal-search').value;
           if (!window._currentPage) window._currentPage = 1;
+
+          // Update filter counts
+          const all = window._allSignals;
+          const resolvedCount = all.filter(s => s.status === 'WIN' || s.status === 'LOSS' || s.status === 'delisted').length;
+          const pendingCount = all.filter(s => s.status === 'PENDING' || !s.status).length;
+          document.getElementById('count-all').textContent = all.length;
+          document.getElementById('count-resolved').textContent = resolvedCount;
+          document.getElementById('count-pending').textContent = pendingCount;
+
           renderSignalTable();
 
           // Category breakdown
@@ -767,6 +828,9 @@
 
     const PAGE_SIZE = 25;
 
+    // Filter state
+    window._statusFilter = 'all'; // 'all', 'resolved', 'pending'
+
     // Sort state
     window._sortCol = null;
     window._sortDir = null; // 'asc' or 'desc'
@@ -791,6 +855,15 @@
     function getFilteredSignals() {
       const q = (window._searchQuery || '').toLowerCase().trim();
       let signals = window._allSignals || [];
+
+      // Status filter
+      const f = window._statusFilter || 'all';
+      if (f === 'resolved') {
+        signals = signals.filter(s => s.status === 'WIN' || s.status === 'LOSS' || s.status === 'delisted');
+      } else if (f === 'pending') {
+        signals = signals.filter(s => s.status === 'PENDING' || !s.status);
+      }
+
       if (q) {
         signals = signals.filter(s =>
           (s.title || '').toLowerCase().includes(q) ||
@@ -909,6 +982,17 @@
       window._searchQuery = this.value;
       window._currentPage = 1;
       renderSignalTable();
+    });
+
+    // Filter handler
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        window._statusFilter = this.dataset.filter;
+        window._currentPage = 1;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderSignalTable();
+      });
     });
 
     // Sort handler
