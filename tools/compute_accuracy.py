@@ -126,10 +126,11 @@ def _build_signal_rows(published: list, all_signals: list, outcome_by_market: di
         market_price = _normalize_price(sig, [
             "market_yes_price", "market_price_yes",
             "market_price_at_signal", "market_price",
+            "market_yes_pct",
         ])
         our_estimate = _normalize_price(sig, [
             "our_calibrated_estimate", "our_estimate",
-            "our_estimate_yes",
+            "our_estimate_yes", "our_estimate_pct",
         ])
 
         row = {
@@ -160,10 +161,11 @@ def _build_signal_rows(published: list, all_signals: list, outcome_by_market: di
         market_price = _normalize_price(sig, [
             "market_yes_price", "market_price_yes",
             "market_price_at_signal", "market_price",
+            "market_yes_pct",
         ])
         our_estimate = _normalize_price(sig, [
             "our_calibrated_estimate", "our_estimate",
-            "our_estimate_yes",
+            "our_estimate_yes", "our_estimate_pct",
         ])
         row = {
             "id": sig.get("signal_id") or sig.get("id") or f"SIG-{sn:03d}",
@@ -217,7 +219,14 @@ def compute() -> dict:
         category = sig.get("category", "general")
         confidence = sig.get("confidence", "UNKNOWN")
         direction = sig.get("direction", "")
-        our_estimate = sig.get("our_calibrated_estimate", None)
+        our_estimate_raw = sig.get("our_calibrated_estimate") or sig.get("our_estimate") or sig.get("our_estimate_pct")
+        if our_estimate_raw is not None:
+            our_estimate = _normalize_price(sig, [
+                "our_calibrated_estimate", "our_estimate",
+                "our_estimate_yes", "our_estimate_pct",
+            ])
+        else:
+            our_estimate = None
 
         # Init category bucket
         if category not in by_category:

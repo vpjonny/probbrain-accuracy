@@ -99,10 +99,11 @@ def _sync_signals_json() -> int:
         market_price = _normalize_price(ps, [
             "market_yes_price", "market_price_yes",
             "market_price_at_signal", "market_price",
+            "market_yes_pct",
         ])
         our_est = _normalize_price(ps, [
             "our_calibrated_estimate", "our_estimate",
-            "our_estimate_yes",
+            "our_estimate_yes", "our_estimate_pct",
         ])
         entry = {
             "signal_number": sn,
