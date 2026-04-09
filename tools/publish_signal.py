@@ -66,14 +66,17 @@ def run_dedup_gate(market_id: str, signal_id: str) -> bool:
     return True
 
 
-def publish_telegram(message: str) -> int | None:
-    """Post to Telegram. Returns message_id or None."""
+def publish_telegram(message: str, image_path: str | None = None) -> int | None:
+    """Post to Telegram. Returns message_id or None.
+    If image_path is provided, sends a photo with caption instead of text."""
     import httpx
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
     channel_id = os.environ.get("TELEGRAM_CHANNEL_ID", "")
     if not bot_token or not channel_id:
         print("ERROR: TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID not set", file=sys.stderr)
         return None
+
+    # Send text message first
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     resp = httpx.post(url, json={
         "chat_id": channel_id,
@@ -86,13 +89,29 @@ def publish_telegram(message: str) -> int | None:
         return None
     msg_id = result["result"]["message_id"]
     print(f"Telegram: message_id={msg_id}")
+
+    # Send market card photo as a reply if provided
+    if image_path and Path(image_path).exists():
+        photo_url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+        with open(image_path, "rb") as img:
+            photo_resp = httpx.post(photo_url, data={
+                "chat_id": channel_id,
+                "reply_to_message_id": str(msg_id),
+            }, files={"photo": (Path(image_path).name, img, "image/jpeg")},
+            timeout=60.0)
+        photo_result = photo_resp.json()
+        if photo_result.get("ok"):
+            print(f"Telegram: photo sent as reply to msg {msg_id}")
+        else:
+            print(f"WARNING: Telegram photo failed (text was sent): {photo_result}", file=sys.stderr)
+
     return msg_id
 
 
-def publish_x(signal: dict) -> list[str] | None:
+def publish_x(signal: dict, image_path: str | None = None) -> list[str] | None:
     """Post X thread. Returns list of 3 tweet IDs or None."""
     sys.path.insert(0, str(ROOT))
-    from pipeline.x_publisher import build_thread, post_thread
+    from pipeline.x_publisher import build_thread, post_thread, upload_media
 
     evidence = signal.get("evidence", [])[:3]  # X thread uses top 3
     thread = build_thread(
@@ -106,7 +125,16 @@ def publish_x(signal: dict) -> list[str] | None:
         close_date=signal["close_date"],
         volume_usdc=signal.get("volume_usdc", 0)
     )
-    tweet_ids = post_thread(thread)
+
+    # Upload media if image provided
+    tweet1_media_ids = None
+    if image_path and Path(image_path).exists():
+        media_id = upload_media(image_path)
+        if media_id:
+            tweet1_media_ids = [media_id]
+            print(f"X: uploaded media_id={media_id}")
+
+    tweet_ids = post_thread(thread, tweet1_media_ids=tweet1_media_ids)
     if tweet_ids is None or len(tweet_ids) != 3:
         print(f"ERROR: X posting failed: {tweet_ids}", file=sys.stderr)
         return None
@@ -178,6 +206,7 @@ def sync_and_push(signal_id: str):
 def main():
     parser = argparse.ArgumentParser(description="Publish a signal end-to-end")
     parser.add_argument("--signal-id", required=True, help="Signal ID (e.g. SIG-073)")
+    parser.add_argument("--image-path", default=None, help="Path to market card image for tweet 1 and Telegram")
     args = parser.parse_args()
 
     load_dotenv()
@@ -220,13 +249,13 @@ def main():
     )
 
     # Step 3: Publish to Telegram
-    telegram_msg_id = publish_telegram(message)
+    telegram_msg_id = publish_telegram(message, image_path=args.image_path)
     if telegram_msg_id is None:
         print("FAILED: Telegram publish failed", file=sys.stderr)
         sys.exit(2)
 
     # Step 4: Publish to X
-    tweet_ids = publish_x(signal)
+    tweet_ids = publish_x(signal, image_path=args.image_path)
     if tweet_ids is None:
         print("FAILED: X publish failed (Telegram was posted)", file=sys.stderr)
         sys.exit(2)

@@ -37,7 +37,7 @@ TWEET3_STANDARD = (
 )
 
 
-def _client() -> tweepy.Client:
+def _get_credentials():
     consumer_key = os.getenv("X_CONSUMER_KEY", "").strip()
     consumer_secret = os.getenv("X_CONSUMER_SECRET", "").strip()
     access_token = os.getenv("X_ACCESS_TOKEN", "").strip()
@@ -54,12 +54,37 @@ def _client() -> tweepy.Client:
     if missing:
         raise RuntimeError(f"Missing X credentials: {', '.join(missing)}")
 
+    return consumer_key, consumer_secret, access_token, access_token_secret
+
+
+def _client() -> tweepy.Client:
+    ck, cs, at, ats = _get_credentials()
     return tweepy.Client(
-        consumer_key=consumer_key,
-        consumer_secret=consumer_secret,
-        access_token=access_token,
-        access_token_secret=access_token_secret,
+        consumer_key=ck,
+        consumer_secret=cs,
+        access_token=at,
+        access_token_secret=ats,
     )
+
+
+def _api_v1() -> tweepy.API:
+    """Get v1.1 API client (needed for media uploads)."""
+    ck, cs, at, ats = _get_credentials()
+    auth = tweepy.OAuth1UserHandler(ck, cs, at, ats)
+    return tweepy.API(auth)
+
+
+def upload_media(image_path: str) -> Optional[str]:
+    """Upload an image and return the media_id string, or None on failure."""
+    try:
+        api = _api_v1()
+        media = api.media_upload(filename=image_path)
+        media_id = str(media.media_id)
+        logger.info("Uploaded media (id=%s) from %s", media_id, image_path)
+        return media_id
+    except Exception as exc:
+        logger.error("Media upload failed: %s", exc)
+        return None
 
 
 @dataclass
@@ -124,10 +149,11 @@ def build_thread(
     return XThreadContent(tweet1=tweet1, tweet2=tweet2, tweet3=tweet3)
 
 
-def post_thread(thread: XThreadContent, dry_run: bool = False) -> Optional[list[str]]:
+def post_thread(thread: XThreadContent, dry_run: bool = False, tweet1_media_ids: Optional[list[str]] = None) -> Optional[list[str]]:
     """
     Post a 3-tweet thread. Returns list of tweet IDs, or None on failure.
     Set dry_run=True to log without posting (useful for approval checks).
+    tweet1_media_ids: optional list of media IDs to attach to tweet 1.
     """
     if dry_run:
         logger.info("DRY RUN — X thread would be:\n\nTweet 1:\n%s\n\nTweet 2:\n%s\n\nTweet 3:\n%s",
@@ -143,7 +169,10 @@ def post_thread(thread: XThreadContent, dry_run: bool = False) -> Optional[list[
     ids = []
 
     try:
-        r1 = client.create_tweet(text=thread.tweet1)
+        t1_kwargs = {"text": thread.tweet1}
+        if tweet1_media_ids:
+            t1_kwargs["media_ids"] = tweet1_media_ids
+        r1 = client.create_tweet(**t1_kwargs)
         t1_id = r1.data["id"]
         ids.append(t1_id)
         logger.info("Posted tweet 1 (id=%s)", t1_id)
