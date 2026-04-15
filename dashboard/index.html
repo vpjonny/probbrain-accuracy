@@ -723,8 +723,9 @@
     }
 
     function loadData() {
-      fetch('accuracy.json?t=' + Date.now())
-        .then(r => r.json())
+      var jsonUrl = 'accuracy.json?t=' + Date.now();
+      fetch(jsonUrl)
+        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(d => {
           document.getElementById('updated').textContent = d.updated_at
             ? 'Last updated: ' + new Date(d.updated_at).toUTCString() + ' \u00b7 auto-refreshes every 60s'
@@ -824,8 +825,12 @@
             catSection.style.display = 'none';
           }
         })
-        .catch(() => {
-          document.getElementById('updated').textContent = 'Dashboard data unavailable.';
+        .catch(function(err) {
+          console.error('Dashboard load error:', err, 'URL:', jsonUrl);
+          var el = document.getElementById('updated');
+          el.textContent = 'Error loading data: ' + err.message + '. Retrying...';
+          el.style.color = '#ef4444';
+          setTimeout(loadData, 3000);
         });
     }
 
