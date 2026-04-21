@@ -142,12 +142,37 @@ def publish_x(signal: dict, image_path: str | None = None) -> list[str] | None:
     return tweet_ids
 
 
-def update_data_files(signal_id: str, signal: dict, telegram_msg_id: int, tweet_ids: list[str]):
+def _mark_telegram_published(signal_id: str, signal: dict, telegram_msg_id: int):
+    """Mark signal as published immediately after Telegram succeeds.
+    This prevents duplicate posts if X fails later."""
+    # Add minimal entry to published_signals.json for dedup
+    with open(DATA_DIR / "published_signals.json") as f:
+        published = json.load(f)
+    
+    # Check if already marked (shouldn't happen, but be safe)
+    if any(p.get("signal_id") == signal_id for p in published):
+        return
+    
+    entry = {
+        "signal_id": signal_id,
+        "market_id": signal["market_id"],
+        "telegram_message_id": telegram_msg_id,
+        "published_at": datetime.now(timezone.utc).isoformat(),
+        "_partial": True,  # Flag that X may not have completed
+    }
+    published.append(entry)
+    with open(DATA_DIR / "published_signals.json", "w") as f:
+        json.dump(published, f, indent=2)
+    print(f"Marked {signal_id} as published (dedup protection)")
+
+
+def update_data_files(signal_id: str, signal: dict, telegram_msg_id: int, tweet_ids: list[str] | None):
     """Update published_signals.json, signals.json, pending_signals.json."""
-    # Add to published
+    # Update the existing entry in published_signals.json (added by _mark_telegram_published)
     with open(DATA_DIR / "published_signals.json") as f:
         published = json.load(f)
 
+    # Find and update the partial entry, or append new
     entry = {
         "signal_id": signal_id,
         "market_id": signal["market_id"],
@@ -162,13 +187,23 @@ def update_data_files(signal_id: str, signal: dict, telegram_msg_id: int, tweet_
         "volume_usdc": signal.get("volume_usdc", 0),
         "telegram_message_id": telegram_msg_id,
         "x_tweet_ids": {
-            "tweet_1": tweet_ids[0],
-            "tweet_2": tweet_ids[1],
-            "tweet_3": tweet_ids[2],
-        },
+            "tweet_1": tweet_ids[0] if tweet_ids else None,
+            "tweet_2": tweet_ids[1] if tweet_ids and len(tweet_ids) > 1 else None,
+            "tweet_3": tweet_ids[2] if tweet_ids and len(tweet_ids) > 2 else None,
+        } if tweet_ids else None,
         "published_at": datetime.now(timezone.utc).isoformat(),
     }
-    published.append(entry)
+    
+    # Replace partial entry or append
+    found = False
+    for i, p in enumerate(published):
+        if p.get("signal_id") == signal_id:
+            published[i] = entry
+            found = True
+            break
+    if not found:
+        published.append(entry)
+    
     with open(DATA_DIR / "published_signals.json", "w") as f:
         json.dump(published, f, indent=2)
 
@@ -254,13 +289,20 @@ def main():
         print("FAILED: Telegram publish failed", file=sys.stderr)
         sys.exit(2)
 
-    # Step 4: Publish to X
-    tweet_ids = publish_x(signal, image_path=args.image_path)
-    if tweet_ids is None:
-        print("FAILED: X publish failed (Telegram was posted)", file=sys.stderr)
-        sys.exit(2)
+    # Step 3.5: Mark as published IMMEDIATELY after Telegram succeeds
+    # This prevents duplicate posts if X fails later
+    _mark_telegram_published(args.signal_id, signal, telegram_msg_id)
 
-    # Step 5: Update data files
+    # Step 4: Publish to X (best effort - Telegram already marked)
+    tweet_ids = None
+    try:
+        tweet_ids = publish_x(signal, image_path=args.image_path)
+        if tweet_ids is None:
+            print("WARNING: X publish failed (Telegram was posted, continuing...)", file=sys.stderr)
+    except Exception as e:
+        print(f"WARNING: X publish error: {e} (Telegram was posted, continuing...)", file=sys.stderr)
+
+    # Step 5: Update data files with full info (including X if it worked)
     update_data_files(args.signal_id, signal, telegram_msg_id, tweet_ids)
 
     # Step 6: Sync dashboard and push
