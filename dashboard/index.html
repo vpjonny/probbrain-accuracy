@@ -588,6 +588,14 @@
     .activity-chip.shadow { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.06); }
     .activity-chip.publish { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.06); }
 
+    /* Row highlight when arrived from activity chip */
+    @keyframes rowHighlight {
+      0%   { background: rgba(99, 102, 241, 0.0); }
+      15%  { background: rgba(99, 102, 241, 0.28); }
+      100% { background: rgba(99, 102, 241, 0.0); }
+    }
+    tr.row-flash > td { animation: rowHighlight 1.6s ease-out; }
+
     /* Sparkline cell in signal table */
     .sparkline { display: inline-block; vertical-align: middle; }
     .sparkline svg { display: block; }
@@ -1583,8 +1591,42 @@
       });
     });
 
-    // Open signal detail modal on table row click and on resolving-soon card click
+    // Click routing:
+    //   activity chip → scroll the Signal Log to that row and flash it
+    //   table row     → open detail modal
+    //   resolving-soon card → open detail modal
+    function scrollToSignal(signalId) {
+      // Make sure no filter is hiding the row.
+      window._statusFilter = 'all';
+      window._modeFilter = 'all';
+      document.querySelectorAll('.filter-btn[data-filter]').forEach(b =>
+        b.classList.toggle('active', b.dataset.filter === 'all'));
+      document.querySelectorAll('.filter-btn[data-mode]').forEach(b =>
+        b.classList.toggle('active', b.dataset.mode === 'all'));
+      // Clear active search so the row is in the filtered set.
+      const search = document.getElementById('signal-search');
+      if (search.value) { search.value = ''; window._searchQuery = ''; }
+
+      // Find which page the signal sits on, jump there, then scroll.
+      const filtered = (typeof getFilteredSignals === 'function') ? getFilteredSignals() : (window._allSignals || []);
+      const idx = filtered.findIndex(s => (s.id || s.signal_id) === signalId);
+      if (idx === -1) return;
+      window._currentPage = Math.floor(idx / PAGE_SIZE) + 1;
+      renderSignalTable();
+      requestAnimationFrame(() => {
+        const row = document.querySelector(`tr[data-signal-id="${CSS.escape(signalId)}"]`);
+        if (!row) return;
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.remove('row-flash');
+        // Force reflow so the animation re-triggers if the user clicks again.
+        void row.offsetWidth;
+        row.classList.add('row-flash');
+      });
+    }
+
     document.addEventListener('click', function (e) {
+      const chip = e.target.closest('.activity-chip[data-signal-id]');
+      if (chip) { scrollToSignal(chip.dataset.signalId); return; }
       const row = e.target.closest('tr[data-signal-id]');
       if (row) { openSignalModal(row.dataset.signalId); return; }
       const card = e.target.closest('.rs-card[data-signal-id]');
