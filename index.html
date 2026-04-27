@@ -510,6 +510,86 @@
     .disclaimer { font-size: 0.72rem; color: var(--muted2); }
 
     /* Visit Counter */
+    /* History chart */
+    .chart-section { margin: 24px 0; }
+    #history-chart svg { width: 100%; height: 220px; max-width: 1100px; display: block; }
+    .chart-line { fill: none; stroke: #3b82f6; stroke-width: 2; }
+    .chart-baseline { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
+    .chart-axis { stroke: var(--border, #1a1a1a); stroke-width: 1; }
+    .chart-label { fill: var(--muted); font-size: 11px; font-family: ui-monospace, monospace; }
+    .chart-dot { fill: #3b82f6; }
+    .chart-dot.win { fill: #10b981; }
+    .chart-dot.loss { fill: #ef4444; }
+
+    /* Resolving Soon */
+    .resolving-soon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin: 12px 0 24px;
+    }
+    .rs-card {
+      background: var(--card, rgba(255,255,255,0.02));
+      border: 1px solid var(--border, #1a1a1a);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .rs-card:hover { border-color: #3b82f6; }
+    .rs-card .rs-id { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .rs-card .rs-q { font-size: 13px; margin: 4px 0 8px; line-height: 1.3; }
+    .rs-card .rs-meta { display: flex; gap: 12px; font-size: 11px; color: var(--muted); flex-wrap: wrap; }
+    .rs-card .rs-meta strong { color: var(--text); font-variant-numeric: tabular-nums; }
+    .rs-card .rs-eta { color: #f59e0b; font-weight: 700; }
+
+    /* Reliability diagram */
+    #reliability-chart svg { width: 100%; max-width: 480px; height: 320px; display: block; margin: 0 auto; }
+    .rd-diag { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; fill: none; }
+    .rd-line { stroke: #3b82f6; stroke-width: 2; fill: none; }
+    .rd-dot { fill: #3b82f6; stroke: #fff; stroke-width: 1; }
+    .rd-axis { stroke: var(--border, #1a1a1a); }
+    .rd-label { fill: var(--muted); font-size: 11px; font-family: ui-monospace, monospace; }
+
+    /* Filter divider for the new mode toggle */
+    .filter-divider { width: 1px; background: var(--border, #1a1a1a); height: 22px; margin: 0 6px; align-self: center; }
+
+    /* Signal detail modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg, #0a0a0a); border: 1px solid var(--border, #1a1a1a);
+      border-radius: 12px; max-width: 720px; width: 100%; max-height: 85vh;
+      overflow-y: auto; padding: 24px; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 12px; right: 12px;
+      background: transparent; border: none; color: var(--muted); cursor: pointer;
+      font-size: 22px; line-height: 1; padding: 4px 10px;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal h3 { margin: 0 0 6px; font-size: 16px; font-weight: 600; }
+    .modal .modal-q { font-size: 14px; color: var(--text); margin-bottom: 16px; line-height: 1.4; }
+    .modal .modal-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px; margin-bottom: 18px;
+    }
+    .modal .modal-stat {
+      padding: 8px 12px; background: rgba(255,255,255,0.03);
+      border-radius: 6px; border: 1px solid var(--border, #1a1a1a);
+    }
+    .modal .modal-stat-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .modal .modal-stat-value { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .modal .modal-section-title { font-size: 12px; color: var(--muted); margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .modal .modal-evidence { padding-left: 18px; margin: 0; font-size: 13px; line-height: 1.5; }
+    .modal .modal-evidence li { margin-bottom: 4px; }
+    .modal .modal-counter { font-size: 13px; color: var(--muted); font-style: italic; }
+    .modal .modal-link { color: #3b82f6; text-decoration: none; font-size: 13px; }
+    .modal .modal-link:hover { text-decoration: underline; }
+
     .visit-counter {
       position: fixed;
       bottom: 16px;
@@ -619,9 +699,9 @@
     <div class="section-title">Performance Overview</div>
     <div class="kpi-grid">
       <div class="kpi-card accent-blue">
-        <div class="kpi-label">Published</div>
+        <div class="kpi-label">Published to X</div>
         <div class="kpi-value blue" id="published">—</div>
-        <div class="kpi-sub">signals total</div>
+        <div class="kpi-sub" id="published-sub">analyzed: —</div>
       </div>
       <div class="kpi-card" id="card-resolved">
         <div class="kpi-label">Resolved</div>
@@ -636,7 +716,7 @@
       <div class="kpi-card" id="card-brier">
         <div class="kpi-label">Brier Score</div>
         <div class="kpi-value muted" id="brier">—</div>
-        <div class="kpi-sub">lower = better</div>
+        <div class="kpi-sub" id="brier-sub">vs 0.25 random baseline</div>
       </div>
       <div class="kpi-card" id="card-streak">
         <div class="kpi-label">Streak</div>
@@ -645,10 +725,34 @@
       </div>
     </div>
 
+    <div id="chart-section" class="chart-section" style="display:none">
+      <div class="section-title">
+        Cumulative Accuracy
+        <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:8px">
+          rolling accuracy after each resolved signal · dashed line = 50% random baseline
+        </span>
+      </div>
+      <div id="history-chart"></div>
+    </div>
+
+    <div id="resolving-soon-section" style="display:none">
+      <div class="section-title">
+        Resolving Soon
+        <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:8px">
+          published signals nearest to their close date
+        </span>
+      </div>
+      <div id="resolving-soon-grid" class="resolving-soon-grid"></div>
+    </div>
+
     <div class="filter-bar" id="filter-bar">
       <button class="filter-btn active" data-filter="all">Signals <span class="filter-count" id="count-all">—</span></button>
       <button class="filter-btn" data-filter="resolved">Resolved <span class="filter-count" id="count-resolved">—</span></button>
       <button class="filter-btn" data-filter="pending">Pending <span class="filter-count" id="count-pending">—</span></button>
+      <span class="filter-divider"></span>
+      <button class="filter-btn active" data-mode="all">All</button>
+      <button class="filter-btn" data-mode="live">Live <span class="filter-count" id="count-live">—</span></button>
+      <button class="filter-btn" data-mode="shadow">Shadow <span class="filter-count" id="count-shadow">—</span></button>
     </div>
 
     <div class="section-title">Signal Log</div>
@@ -685,6 +789,16 @@
       <div class="cat-grid" id="cat-grid"></div>
     </div>
 
+    <div id="reliability-section" style="display:none">
+      <div class="section-title">
+        Reliability
+        <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:8px">
+          how well our predicted probabilities match outcomes · diagonal = perfect calibration
+        </span>
+      </div>
+      <div id="reliability-chart"></div>
+    </div>
+
     <div id="shadow-section" style="display:none">
       <div class="section-title">
         Shadow Categories
@@ -705,8 +819,15 @@
     <span class="visit-label">visits</span>
   </div>
 
+  <div class="modal-backdrop" id="signal-modal" role="dialog" aria-hidden="true">
+    <div class="modal" id="signal-modal-content"></div>
+  </div>
+
   <footer class="footer">
-    <div id="updated">Loading...</div>
+    <div>
+      <div id="updated">Loading...</div>
+      <div id="last-activity" style="font-size: 11px; color: var(--muted); margin-top: 4px;"></div>
+    </div>
     <div class="disclaimer">Not financial advice. All numbers are exact — no rounding up.</div>
   </footer>
 
@@ -734,17 +855,193 @@
       return `<span class="gap-pill ${cls}">${g.toFixed(1)}pp</span>`;
     }
 
+    function renderHistoryChart(history) {
+      const wrap = document.getElementById('history-chart');
+      const section = document.getElementById('chart-section');
+      if (!history || history.length < 2) { section.style.display = 'none'; return; }
+      section.style.display = '';
+
+      const W = 1100, H = 220, padL = 40, padR = 16, padT = 12, padB = 28;
+      const innerW = W - padL - padR, innerH = H - padT - padB;
+      const xs = history.map((e, i) => i);
+      const ys = history.map(e => e.rolling_accuracy_pct);
+      const xMax = xs.length - 1;
+      const yMin = 0, yMax = 100;
+      const xPos = i => padL + (i / Math.max(1, xMax)) * innerW;
+      const yPos = v => padT + (1 - (v - yMin) / (yMax - yMin)) * innerH;
+
+      const path = history.map((e, i) => `${i === 0 ? 'M' : 'L'}${xPos(i).toFixed(1)},${yPos(e.rolling_accuracy_pct).toFixed(1)}`).join(' ');
+      const baselineY = yPos(50);
+      const dots = history.map((e, i) =>
+        `<circle class="chart-dot ${e.correct ? 'win' : 'loss'}" cx="${xPos(i)}" cy="${yPos(e.rolling_accuracy_pct)}" r="3">
+          <title>${e.signal_id} · ${e.correct ? 'WIN' : 'LOSS'} · rolling ${e.rolling_accuracy_pct.toFixed(0)}% (n=${e.n})</title>
+        </circle>`).join('');
+      const yLabels = [0, 25, 50, 75, 100].map(v =>
+        `<text class="chart-label" x="${padL - 6}" y="${yPos(v) + 4}" text-anchor="end">${v}%</text>`).join('');
+      const xFirst = history[0].resolved_at?.slice(0, 10) || '';
+      const xLast = history[history.length - 1].resolved_at?.slice(0, 10) || '';
+
+      wrap.innerHTML = `
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+          <line class="chart-axis" x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}"/>
+          <line class="chart-axis" x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}"/>
+          ${yLabels}
+          <line class="chart-baseline" x1="${padL}" y1="${baselineY}" x2="${W - padR}" y2="${baselineY}"/>
+          <text class="chart-label" x="${W - padR}" y="${baselineY - 4}" text-anchor="end">50% baseline</text>
+          <path class="chart-line" d="${path}"/>
+          ${dots}
+          <text class="chart-label" x="${padL}" y="${H - 8}" text-anchor="start">${xFirst}</text>
+          <text class="chart-label" x="${W - padR}" y="${H - 8}" text-anchor="end">${xLast}</text>
+        </svg>`;
+    }
+
+    function renderResolvingSoon(rows) {
+      const section = document.getElementById('resolving-soon-section');
+      const grid = document.getElementById('resolving-soon-grid');
+      if (!rows || !rows.length) { section.style.display = 'none'; return; }
+      section.style.display = '';
+      grid.innerHTML = rows.map(r => {
+        const dtc = r.days_to_close;
+        const eta = dtc === 0 ? 'closes today' : dtc === 1 ? 'closes in 1 day' : `closes in ${dtc} days`;
+        const ours = r.our_estimate != null ? (r.our_estimate * 100).toFixed(0) + '%' : '—';
+        const market = r.market_yes_at_signal != null ? (r.market_yes_at_signal * 100).toFixed(0) + '%' : '—';
+        return `
+          <div class="rs-card" data-signal-id="${r.signal_id}">
+            <div class="rs-id">${r.signal_id} · ${r.category}</div>
+            <div class="rs-q">${r.question}</div>
+            <div class="rs-meta">
+              <span>Market: <strong>${market}</strong></span>
+              <span>Ours: <strong>${ours}</strong></span>
+              <span class="rs-eta">${eta}</span>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderReliabilityDiagram(rel) {
+      const section = document.getElementById('reliability-section');
+      const wrap = document.getElementById('reliability-chart');
+      const points = (rel || []).filter(b => b.n > 0 && b.realized_rate != null);
+      if (points.length < 2) { section.style.display = 'none'; return; }
+      section.style.display = '';
+
+      const S = 320, pad = 30;
+      const inner = S - pad * 2;
+      const xy = (x, y) => [pad + x * inner, S - pad - y * inner];
+      const diag = `M${xy(0, 0).join(',')} L${xy(1, 1).join(',')}`;
+      const sorted = points.slice().sort((a, b) => a.predicted_avg - b.predicted_avg);
+      const linePath = sorted.map((b, i) => `${i === 0 ? 'M' : 'L'}${xy(b.predicted_avg, b.realized_rate).join(',')}`).join(' ');
+      const dots = sorted.map(b => {
+        const [cx, cy] = xy(b.predicted_avg, b.realized_rate);
+        const r = Math.min(8, 3 + Math.sqrt(b.n));
+        return `<circle class="rd-dot" cx="${cx}" cy="${cy}" r="${r}">
+          <title>predicted ${(b.predicted_avg * 100).toFixed(0)}% · realized ${(b.realized_rate * 100).toFixed(0)}% · n=${b.n}</title>
+        </circle>`;
+      }).join('');
+      const ticks = [0, 25, 50, 75, 100].map(v => {
+        const [x] = xy(v / 100, 0);
+        const [, y] = xy(0, v / 100);
+        return `<text class="rd-label" x="${x}" y="${S - pad + 14}" text-anchor="middle">${v}%</text>
+                <text class="rd-label" x="${pad - 6}" y="${y + 3}" text-anchor="end">${v}%</text>`;
+      }).join('');
+
+      wrap.innerHTML = `
+        <svg viewBox="0 0 ${S + 80} ${S + 12}" preserveAspectRatio="xMidYMid meet">
+          <line class="rd-axis" x1="${pad}" y1="${pad}" x2="${pad}" y2="${S - pad}"/>
+          <line class="rd-axis" x1="${pad}" y1="${S - pad}" x2="${S - pad}" y2="${S - pad}"/>
+          <path class="rd-diag" d="${diag}"/>
+          <path class="rd-line" d="${linePath}"/>
+          ${dots}
+          ${ticks}
+          <text class="rd-label" x="${pad + inner / 2}" y="${S + 4}" text-anchor="middle">predicted YES probability</text>
+          <text class="rd-label" x="${pad - 18}" y="${pad + inner / 2}" transform="rotate(-90 ${pad - 18} ${pad + inner / 2})" text-anchor="middle">realized YES rate</text>
+        </svg>`;
+    }
+
+    function openSignalModal(signalId) {
+      const sig = (window._allSignals || []).find(s => s.id === signalId || s.signal_id === signalId);
+      if (!sig) return;
+      const modal = document.getElementById('signal-modal');
+      const content = document.getElementById('signal-modal-content');
+      const market = sig.market_price != null ? (sig.market_price * 100).toFixed(1) + '%' : '—';
+      const ourCal = sig.our_estimate != null ? (sig.our_estimate * 100).toFixed(1) + '%' : '—';
+      const ourRaw = sig.our_estimate_raw != null ? (sig.our_estimate_raw * 100).toFixed(1) + '%' : ourCal;
+      const slugUrl = sig.polymarket_slug ? `https://polymarket.com/event/${sig.polymarket_slug}` : null;
+      const evidence = (sig.evidence || []).map(e => `<li>${e}</li>`).join('');
+      const counter = sig.counter_evidence || '';
+      const calLine = sig.calibration_weight != null
+        ? `weight ${sig.calibration_weight} (bucket n=${sig.calibration_bucket_n ?? 0})`
+        : '—';
+      const shadowFlag = sig.shadow ? '<span style="color:#a78bfa;font-weight:700;margin-left:8px">🕶 SHADOW (not on X)</span>' : '';
+
+      content.innerHTML = `
+        <button class="modal-close" aria-label="Close">×</button>
+        <h3>${sig.id} · ${dirBadge(sig.direction)} ${confBadge(sig.confidence)} ${shadowFlag}</h3>
+        <div class="modal-q">${sig.title || ''}</div>
+        <div class="modal-grid">
+          <div class="modal-stat"><div class="modal-stat-label">Market YES</div><div class="modal-stat-value">${market}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Our raw</div><div class="modal-stat-value">${ourRaw}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Our calibrated</div><div class="modal-stat-value">${ourCal}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Gap</div><div class="modal-stat-value">${sig.gap_pct != null ? sig.gap_pct.toFixed(1) + 'pp' : '—'}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Cal. gap</div><div class="modal-stat-value">${sig.calibrated_gap_pct != null ? sig.calibrated_gap_pct.toFixed(1) + 'pp' : '—'}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Status</div><div class="modal-stat-value">${statusBadge(sig.status)}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Closes</div><div class="modal-stat-value">${sig.close_date || '—'}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Calibration</div><div class="modal-stat-value" style="font-size:12px">${calLine}</div></div>
+        </div>
+        ${evidence ? `<div class="modal-section-title">Evidence</div><ol class="modal-evidence">${evidence}</ol>` : ''}
+        ${counter ? `<div class="modal-section-title">Counter-evidence</div><div class="modal-counter">${counter}</div>` : ''}
+        ${slugUrl ? `<div class="modal-section-title">Source</div><a class="modal-link" href="${slugUrl}" target="_blank" rel="noopener">View market on Polymarket →</a>` : ''}
+      `;
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      content.querySelector('.modal-close').addEventListener('click', closeSignalModal);
+    }
+
+    function closeSignalModal() {
+      const modal = document.getElementById('signal-modal');
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.getElementById('signal-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'signal-modal') closeSignalModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSignalModal();
+    });
+
+    // Format a timestamp as "X hours ago" / "X days ago"
+    function ago(iso) {
+      if (!iso) return '\u2014';
+      const t = new Date(iso).getTime();
+      if (isNaN(t)) return '\u2014';
+      const s = Math.max(0, (Date.now() - t) / 1000);
+      if (s < 60) return Math.floor(s) + 's ago';
+      if (s < 3600) return Math.floor(s / 60) + 'm ago';
+      if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+      return Math.floor(s / 86400) + 'd ago';
+    }
+
     function loadData() {
       var jsonUrl = 'accuracy.json?t=' + Date.now();
       fetch(jsonUrl)
         .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(d => {
+          window._lastData = d;
+
           document.getElementById('updated').textContent = d.updated_at
             ? 'Last updated: ' + new Date(d.updated_at).toUTCString() + ' \u00b7 auto-refreshes every 60s'
             : 'No data yet.';
+          document.getElementById('last-activity').textContent =
+            'Last published: ' + ago(d.last_published_at) +
+            '  \u00b7  Last resolved: ' + ago(d.last_resolved_signal);
 
-          // Published
+          // Published-to-X (with analyzed sub-line)
           document.getElementById('published').textContent = d.signals_published ?? '0';
+          const analyzed = d.signals_analyzed ?? d.signals_total ?? 0;
+          const shadowed = d.signals_shadow ?? 0;
+          document.getElementById('published-sub').textContent =
+            'analyzed: ' + analyzed + (shadowed ? ' \u00b7 ' + shadowed + ' shadow' : '');
 
           // Resolved
           document.getElementById('resolved').textContent = d.signals_resolved ?? '0';
@@ -771,16 +1068,21 @@
 
           // Brier
           const brierEl = document.getElementById('brier');
+          const brierSub = document.getElementById('brier-sub');
           const cardBrier = document.getElementById('card-brier');
+          const baselineB = d.random_brier_baseline ?? 0.25;
           if (d.brier_score != null) {
             const cls = d.brier_score <= 0.2 ? 'green' : d.brier_score <= 0.33 ? 'yellow' : 'red';
             brierEl.textContent = d.brier_score.toFixed(3);
             brierEl.className = 'kpi-value ' + cls;
             cardBrier.className = 'kpi-card accent-' + cls;
+            const arrow = d.brier_score <= baselineB ? '▲' : '▼';
+            brierSub.textContent = arrow + ' vs ' + baselineB + ' random baseline (lower = better)';
           } else {
             brierEl.textContent = '—';
             brierEl.className = 'kpi-value muted';
             cardBrier.className = 'kpi-card';
+            brierSub.textContent = 'vs ' + baselineB + ' random baseline';
           }
 
           // Streak
@@ -813,10 +1115,17 @@
           const all = window._allSignals;
           const resolvedCount = all.filter(s => s.status === 'WIN' || s.status === 'LOSS' || s.status === 'delisted').length;
           const pendingCount = all.filter(s => s.status === 'PENDING' || !s.status).length;
+          const liveCount = all.filter(s => !s.shadow).length;
+          const shadowCount = all.filter(s => s.shadow).length;
           document.getElementById('count-all').textContent = all.length;
           document.getElementById('count-resolved').textContent = resolvedCount;
           document.getElementById('count-pending').textContent = pendingCount;
+          document.getElementById('count-live').textContent = liveCount;
+          document.getElementById('count-shadow').textContent = shadowCount;
 
+          renderHistoryChart(d.history);
+          renderResolvingSoon(d.resolving_soon);
+          renderReliabilityDiagram(d.reliability);
           renderSignalTable();
 
           // Category breakdown
@@ -968,6 +1277,14 @@
         signals = signals.filter(s => s.status === 'PENDING' || !s.status);
       }
 
+      // Mode filter (live vs shadow)
+      const mode = window._modeFilter || 'all';
+      if (mode === 'live') {
+        signals = signals.filter(s => !s.shadow);
+      } else if (mode === 'shadow') {
+        signals = signals.filter(s => s.shadow);
+      }
+
       if (q) {
         signals = signals.filter(s =>
           (s.title || '').toLowerCase().includes(q) ||
@@ -988,11 +1305,9 @@
     function renderSignalRow(s) {
       const mkt = s.market_price > 0 ? Math.round(s.market_price * 100) + '%' : '—';
       const ours = s.our_estimate > 0 ? Math.round(s.our_estimate * 100) + '%' : '—';
-      const href = s.polymarket_slug
-        ? 'https://polymarket.com/' + (s.polymarket_slug.includes('/') ? 'event' : 'market') + '/' + s.polymarket_slug + '?via=0x-slova'
-        : '';
-      return `<tr${href ? ' data-href="' + href + '"' : ''}>
-        <td><span class="signal-num">#${s.signal_number}</span></td>
+      const shadowMark = s.shadow ? ' <span style="color:#a78bfa;font-size:10px" title="Shadow signal — not posted to X">🕶</span>' : '';
+      return `<tr data-signal-id="${s.id}" style="cursor:pointer">
+        <td><span class="signal-num">#${s.signal_number}</span>${shadowMark}</td>
         <td>
           <div class="signal-title">${s.title}</div>
           <div class="signal-cat">${s.category}</div>
@@ -1088,15 +1403,34 @@
       renderSignalTable();
     });
 
-    // Filter handler
+    // Status filter handler
     document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
       btn.addEventListener('click', function () {
         window._statusFilter = this.dataset.filter;
         window._currentPage = 1;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         renderSignalTable();
       });
+    });
+
+    // Live/Shadow mode filter handler
+    document.querySelectorAll('.filter-btn[data-mode]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        window._modeFilter = this.dataset.mode;
+        window._currentPage = 1;
+        document.querySelectorAll('.filter-btn[data-mode]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderSignalTable();
+      });
+    });
+
+    // Open signal detail modal on table row click and on resolving-soon card click
+    document.addEventListener('click', function (e) {
+      const row = e.target.closest('tr[data-signal-id]');
+      if (row) { openSignalModal(row.dataset.signalId); return; }
+      const card = e.target.closest('.rs-card[data-signal-id]');
+      if (card) openSignalModal(card.dataset.signalId);
     });
 
     // Sort handler
