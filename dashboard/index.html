@@ -599,6 +599,51 @@
       .bg-blobs { opacity: 0.2; }
     }
 
+    /* Subtle $ glyphs scattered behind everything but above the gradient blobs.
+       Different sizes / rotations / hues mirror the blob palette so they feel
+       part of the same atmosphere instead of slapped on. Two drift slowly. */
+    .bg-money {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      overflow: hidden; user-select: none;
+    }
+    .money-glyph {
+      position: absolute;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 1;
+      white-space: nowrap;
+      text-shadow: 0 0 60px currentColor;
+      will-change: transform;
+    }
+    .money-glyph.g1 { top: 6vh;  left: 4vw;   font-size: clamp(140px, 18vw, 280px); transform: rotate(-12deg);
+                      color: rgba(34, 197, 94, 1);  opacity: 0.055; }
+    .money-glyph.g2 { top: 16vh; right: 10vw;  font-size: clamp(80px, 10vw, 160px);  transform: rotate(8deg);
+                      color: rgba(99, 102, 241, 1); opacity: 0.04; }
+    .money-glyph.g3 { top: 46vh; left: 24vw;   font-size: clamp(60px, 8vw, 130px);   transform: rotate(-6deg);
+                      color: rgba(167, 139, 250, 1); opacity: 0.06; }
+    .money-glyph.g4 { top: 56vh; right: 6vw;   font-size: clamp(200px, 24vw, 380px); transform: rotate(14deg);
+                      color: rgba(59, 130, 246, 1); opacity: 0.045; }
+    .money-glyph.g5 { bottom: 6vh; left: 12vw; font-size: clamp(110px, 13vw, 220px); transform: rotate(-20deg);
+                      color: rgba(239, 68, 68, 1);  opacity: 0.05; }
+    .money-glyph.g6 { top: 30vh; left: 52vw;   font-size: clamp(60px, 6vw, 100px);   transform: rotate(4deg);
+                      color: rgba(34, 197, 94, 1);  opacity: 0.05; }
+    .money-glyph.g7 { top: 72vh; left: 42vw;   font-size: clamp(80px, 9vw, 140px);   transform: rotate(-8deg);
+                      color: rgba(99, 102, 241, 1); opacity: 0.04; }
+    .money-glyph.drift-a { animation: money-drift-a 48s ease-in-out infinite alternate; }
+    .money-glyph.drift-b { animation: money-drift-b 64s ease-in-out infinite alternate; }
+    @keyframes money-drift-a {
+      from { transform: translate(0, 0) rotate(-12deg); }
+      to   { transform: translate(7vw, 4vh) rotate(-7deg); }
+    }
+    @keyframes money-drift-b {
+      from { transform: translate(0, 0) rotate(14deg); }
+      to   { transform: translate(-6vw, -3vh) rotate(19deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .money-glyph { animation: none !important; }
+    }
+
     /* Skeleton loading */
     @keyframes shimmer {
       0%   { background-position: -200% 0; }
@@ -837,6 +882,16 @@
     <div class="bg-blob loss"></div>
     <div class="bg-blob pending"></div>
     <div class="bg-blob shadow"></div>
+  </div>
+
+  <div class="bg-money" aria-hidden="true">
+    <div class="money-glyph g1 drift-a">$</div>
+    <div class="money-glyph g2">$</div>
+    <div class="money-glyph g3">$</div>
+    <div class="money-glyph g4 drift-b">$</div>
+    <div class="money-glyph g5">$</div>
+    <div class="money-glyph g6">$</div>
+    <div class="money-glyph g7">$</div>
   </div>
 
   <div class="activity-strip" id="activity-strip" style="display:none"></div>
