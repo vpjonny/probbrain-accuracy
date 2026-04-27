@@ -1025,13 +1025,15 @@
       });
     });
 
-    // Visit counter — uses counterapi.dev (free, no signup)
+    // Visit counter — uses abacus.jasoncameron.dev (free, no signup).
+    // Replaced counterapi.dev: their v1 endpoint started returning 503 and v2
+    // requires a registered workspace. Abacus increments+returns on each GET.
     (function() {
-      fetch('https://api.counterapi.dev/v1/probbrain-dashboard/visits/up')
+      fetch('https://abacus.jasoncameron.dev/hit/probbrain-dashboard/visits')
         .then(r => r.json())
         .then(d => {
-          if (d && d.count != null) {
-            document.getElementById('visit-count').textContent = d.count.toLocaleString();
+          if (d && d.value != null) {
+            document.getElementById('visit-count').textContent = d.value.toLocaleString();
             document.getElementById('visit-counter').classList.add('loaded');
           }
         })
