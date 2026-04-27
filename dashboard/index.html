@@ -7,6 +7,9 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>ProbBrain — Signal Accuracy Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -30,11 +33,22 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: 'cv11' 1, 'ss01' 1;
+    }
+
+    /* Tabular numerics for any cell that should align as numbers */
+    .kpi-value, .signal-num, .gap-pill, .prob-col, .filter-count,
+    .visit-count, .rd-label, .chart-label, .modal-stat-value,
+    table td, .rs-card .rs-meta strong {
+      font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      font-feature-settings: 'tnum' 1, 'zero' 1;
     }
 
     /* Header */
@@ -88,12 +102,14 @@
       height: 7px;
       border-radius: 50%;
       background: var(--green);
-      animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+      0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6), 0 0 0 0 rgba(34, 197, 94, 0.4); transform: scale(1); }
+      70%  { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0), 0 0 0 16px rgba(34, 197, 94, 0); transform: scale(1.05); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0), 0 0 0 0 rgba(34, 197, 94, 0); transform: scale(1); }
     }
 
     .header-right { display: flex; align-items: center; gap: 8px; }
@@ -510,6 +526,76 @@
     .disclaimer { font-size: 0.72rem; color: var(--muted2); }
 
     /* Visit Counter */
+    /* Skeleton loading */
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton {
+      display: inline-block;
+      min-width: 60px;
+      min-height: 1em;
+      background: linear-gradient(90deg, #1a1a1a 0%, #262626 50%, #1a1a1a 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s linear infinite;
+      border-radius: 4px;
+      color: transparent !important;
+    }
+
+    /* KPI / category card hover lift */
+    .kpi-card, .cat-card, .rs-card {
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s;
+    }
+    .kpi-card:hover, .cat-card:hover, .rs-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Activity feed strip */
+    .activity-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 24px;
+      background: linear-gradient(180deg, rgba(99,102,241,0.05) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+    .activity-strip::-webkit-scrollbar { height: 4px; }
+    .activity-strip::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+    .activity-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .activity-chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .activity-chip .ac-icon { font-size: 13px; line-height: 1; }
+    .activity-chip .ac-id { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+    .activity-chip .ac-time { color: var(--muted); font-size: 10px; margin-left: 4px; }
+    .activity-chip.win { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); }
+    .activity-chip.loss { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); }
+    .activity-chip.shadow { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.06); }
+    .activity-chip.publish { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.06); }
+
+    /* Sparkline cell in signal table */
+    .sparkline { display: inline-block; vertical-align: middle; }
+    .sparkline svg { display: block; }
+    .sparkline-up   { stroke: #ef4444; }   /* price went up = NO_UNDERPRICED bet hurts (we said NO) */
+    .sparkline-down { stroke: #10b981; }   /* price went down */
+    .sparkline-flat { stroke: var(--muted); }
+    .sparkline-fill { fill: currentColor; opacity: 0.08; }
+
     /* History chart */
     .chart-section { margin: 24px 0; }
     #history-chart svg { width: 100%; height: 220px; max-width: 1100px; display: block; }
@@ -665,6 +751,8 @@
     </div>
   </header>
 
+  <div class="activity-strip" id="activity-strip" style="display:none"></div>
+
   <div class="ticker-bar">
     <div class="ticker-track">
       <div class="ticker-segment">
@@ -700,27 +788,27 @@
     <div class="kpi-grid">
       <div class="kpi-card accent-blue">
         <div class="kpi-label">Published to X</div>
-        <div class="kpi-value blue" id="published">—</div>
+        <div class="kpi-value blue skeleton" id="published">0000</div>
         <div class="kpi-sub" id="published-sub">analyzed: —</div>
       </div>
       <div class="kpi-card" id="card-resolved">
         <div class="kpi-label">Resolved</div>
-        <div class="kpi-value muted" id="resolved">—</div>
+        <div class="kpi-value muted skeleton" id="resolved">0000</div>
         <div class="kpi-sub" id="resolved-sub">of total</div>
       </div>
       <div class="kpi-card" id="card-accuracy">
         <div class="kpi-label">Accuracy</div>
-        <div class="kpi-value muted" id="accuracy">—</div>
+        <div class="kpi-value muted skeleton" id="accuracy">00.0%</div>
         <div class="kpi-sub" id="accuracy-sub">awaiting resolution</div>
       </div>
       <div class="kpi-card" id="card-brier">
         <div class="kpi-label">Brier Score</div>
-        <div class="kpi-value muted" id="brier">—</div>
+        <div class="kpi-value muted skeleton" id="brier">0.000</div>
         <div class="kpi-sub" id="brier-sub">vs 0.25 random baseline</div>
       </div>
       <div class="kpi-card" id="card-streak">
         <div class="kpi-label">Streak</div>
-        <div class="kpi-value muted" id="streak">—</div>
+        <div class="kpi-value muted skeleton" id="streak">000</div>
         <div class="kpi-sub" id="streak-sub">no resolved signals</div>
       </div>
     </div>
@@ -771,6 +859,7 @@
             <th data-sort="market">Market</th>
             <th data-sort="direction">Direction</th>
             <th data-sort="market_price">Market vs Ours</th>
+            <th>Drift</th>
             <th data-sort="gap">Gap</th>
             <th data-sort="confidence">Confidence</th>
             <th data-sort="status">Status</th>
@@ -778,7 +867,7 @@
           </tr>
         </thead>
         <tbody id="signal-body">
-          <tr class="empty-row"><td colspan="8">Loading signals...</td></tr>
+          <tr class="empty-row"><td colspan="9">Loading signals...</td></tr>
         </tbody>
       </table>
       <div class="pagination" id="pagination" style="display:none"></div>
@@ -853,6 +942,73 @@
     function gapPill(g) {
       const cls = g >= 30 ? 'gap-high' : g >= 10 ? 'gap-medium' : 'gap-low';
       return `<span class="gap-pill ${cls}">${g.toFixed(1)}pp</span>`;
+    }
+
+    // Animate a numeric KPI from current → target over `ms` (ease-out cubic).
+    function animateKPI(el, target, suffix = '', decimals = 0) {
+      if (el.dataset.target === String(target)) return;  // already animating to this value
+      el.dataset.target = String(target);
+      el.classList.remove('skeleton');
+      const start = parseFloat((el.textContent || '0').replace(/[^\d.-]/g, '')) || 0;
+      const t0 = performance.now();
+      const ms = 600;
+      function tick(now) {
+        const t = Math.min(1, (now - t0) / ms);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const v = start + (target - start) * eased;
+        el.textContent = (decimals ? v.toFixed(decimals) : Math.round(v).toString()) + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Sparkline: tiny inline SVG of price drift since publish.
+    function renderSparkline(series, width = 80, height = 22) {
+      if (!series || series.length === 0) return '<span style="color:var(--muted2);font-size:10px">—</span>';
+      if (series.length === 1) {
+        // Single point: render as a centered dot, neutral color.
+        const cx = width / 2, cy = height / 2;
+        return `<span class="sparkline" title="Awaiting next price snapshot"><svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><circle cx="${cx}" cy="${cy}" r="2" fill="var(--muted)"/></svg></span>`;
+      }
+      const ys = series.map(p => p.p);
+      const yMin = Math.min(...ys), yMax = Math.max(...ys);
+      const yRange = (yMax - yMin) || 1;
+      const x = i => (i / (series.length - 1)) * (width - 4) + 2;
+      const y = v => height - 2 - ((v - yMin) / yRange) * (height - 4);
+      const first = series[0].p, last = series[series.length - 1].p;
+      const delta = last - first;
+      const cls = Math.abs(delta) < 0.005 ? 'sparkline-flat' : (delta > 0 ? 'sparkline-up' : 'sparkline-down');
+      const path = series.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.p).toFixed(1)}`).join(' ');
+      const fillPath = path + ` L${x(series.length - 1).toFixed(1)},${height - 2} L${x(0).toFixed(1)},${height - 2} Z`;
+      const pct = (delta * 100).toFixed(1);
+      const sign = delta > 0 ? '+' : '';
+      return `<span class="sparkline" title="${first.toFixed(2)} → ${last.toFixed(2)} (${sign}${pct}pp)">
+        <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+          <path class="${cls} sparkline-fill" d="${fillPath}" stroke="none"/>
+          <path class="${cls}" d="${path}" fill="none" stroke-width="1.5"/>
+        </svg></span>`;
+    }
+
+    function renderActivity(events) {
+      const strip = document.getElementById('activity-strip');
+      if (!events || !events.length) { strip.style.display = 'none'; return; }
+      strip.style.display = 'flex';
+      const ICON = {
+        published: { i: '📤', cls: 'publish', label: 'Published' },
+        resolved_win: { i: '✓', cls: 'win', label: 'Win' },
+        resolved_loss: { i: '✗', cls: 'loss', label: 'Loss' },
+        shadowed: { i: '🕶', cls: 'shadow', label: 'Shadowed' },
+      };
+      strip.innerHTML = events.map(e => {
+        const meta = ICON[e.type] || { i: '•', cls: '', label: e.type };
+        const t = ago(e.ts);
+        return `<span class="activity-chip ${meta.cls}" data-signal-id="${e.signal_id}" title="${e.title}">
+          <span class="ac-icon">${meta.i}</span>
+          <span>${meta.label}</span>
+          <span class="ac-id">${e.signal_id}</span>
+          <span class="ac-time">${t}</span>
+        </span>`;
+      }).join('');
     }
 
     function renderHistoryChart(history) {
@@ -1037,14 +1193,14 @@
             '  \u00b7  Last resolved: ' + ago(d.last_resolved_signal);
 
           // Published-to-X (with analyzed sub-line)
-          document.getElementById('published').textContent = d.signals_published ?? '0';
+          animateKPI(document.getElementById('published'), d.signals_published ?? 0);
           const analyzed = d.signals_analyzed ?? d.signals_total ?? 0;
           const shadowed = d.signals_shadow ?? 0;
           document.getElementById('published-sub').textContent =
             'analyzed: ' + analyzed + (shadowed ? ' \u00b7 ' + shadowed + ' shadow' : '');
 
           // Resolved
-          document.getElementById('resolved').textContent = d.signals_resolved ?? '0';
+          animateKPI(document.getElementById('resolved'), d.signals_resolved ?? 0);
           const pctRes = d.signals_published ? Math.round((d.signals_resolved / d.signals_published) * 100) : 0;
           document.getElementById('resolved-sub').textContent = pctRes + '% of total';
 
@@ -1054,8 +1210,8 @@
           const cardAcc = document.getElementById('card-accuracy');
           if (d.accuracy_pct != null) {
             const cls = d.accuracy_pct >= 65 ? 'green' : d.accuracy_pct >= 50 ? 'yellow' : 'red';
-            accEl.textContent = d.accuracy_pct.toFixed(1) + '%';
             accEl.className = 'kpi-value ' + cls;
+            animateKPI(accEl, d.accuracy_pct, '%', 1);
             cardAcc.className = 'kpi-card accent-' + cls;
             const arrow = d.accuracy_pct >= 65 ? '\u25b2' : d.accuracy_pct >= 50 ? '\u25a4' : '\u25bc';
             accSub.textContent = arrow + ' vs 50% baseline';
@@ -1123,6 +1279,7 @@
           document.getElementById('count-live').textContent = liveCount;
           document.getElementById('count-shadow').textContent = shadowCount;
 
+          renderActivity(d.activity);
           renderHistoryChart(d.history);
           renderResolvingSoon(d.resolving_soon);
           renderReliabilityDiagram(d.reliability);
@@ -1314,6 +1471,7 @@
         </td>
         <td>${dirBadge(s.direction)}</td>
         <td><span class="prob-col"><span class="prob-market">${mkt}</span><span class="prob-sep">/</span><span class="prob-ours">${ours}</span></span></td>
+        <td>${renderSparkline(s.price_history)}</td>
         <td>${gapPill(s.gap_pct)}</td>
         <td>${confBadge(s.confidence)}</td>
         <td>${statusBadge(s.status)}</td>
@@ -1365,7 +1523,7 @@
 
       if (!filtered.length) {
         const msg = window._searchQuery ? 'No signals match your search.' : 'No signals published yet.';
-        tbody.innerHTML = `<tr class="empty-row"><td colspan="8">${msg}</td></tr>`;
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="9">${msg}</td></tr>`;
         pagination.style.display = 'none';
         pageInfo.textContent = '';
         return;
