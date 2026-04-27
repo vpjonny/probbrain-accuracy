@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Polymarket Kelly Criterion Calculator — ProbBrain</title>
-<meta name="description" content="Free Polymarket Kelly Criterion calculator. Compute the optimal stake size for any prediction-market bet given your edge, bankroll, and risk tolerance. Auto-fills from live ProbBrain signals.">
-<meta name="keywords" content="polymarket kelly calculator, kelly criterion, polymarket bet sizing, prediction market kelly, fractional kelly">
-<meta property="og:title" content="Polymarket Kelly Criterion Calculator">
-<meta property="og:description" content="Free tool to compute optimal stake size for Polymarket bets. Auto-fills from live ProbBrain signals.">
+<title>Polymarket Kelly Calculator — ProbBrain</title>
+<meta name="description" content="Robust Kelly Criterion calculator for Polymarket: Bayesian credible-bound shrinkage, walk-the-book sizing, Monte Carlo bankroll simulation, and a decomposition cascade. Auto-fills from live ProbBrain signals.">
+<meta name="keywords" content="polymarket kelly calculator, bayesian kelly, walk the book, monte carlo bankroll, prediction market sizing, fractional kelly">
+<meta property="og:title" content="Polymarket Kelly Calculator — ProbBrain">
+<meta property="og:description" content="Robust Kelly with credible-bound shrinkage, walk-the-book pricing, and Monte Carlo simulation. Auto-fills from live ProbBrain signals.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://vpjonny.github.io/probbrain-accuracy/kelly.html">
 <meta name="twitter:card" content="summary">
@@ -16,413 +16,895 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          ink:    { 950: '#0a0a0a', 900: '#111111', 800: '#171717', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a' },
+          fg:     { DEFAULT: '#e8e8e8', dim: '#a0a0a0', muted: '#666666' },
+          ok:     '#22c55e',
+          warn:   '#f59e0b',
+          bad:    '#ef4444',
+          accent: '#6366f1',
+          info:   '#3b82f6',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0a0a0a; --bg2: #111; --bg3: #1a1a1a;
-  --border: #222; --text: #e8e8e8; --muted: #666;
-  --green: #22c55e; --red: #ef4444; --blue: #3b82f6; --accent: #6366f1; --yellow: #eab308;
-}
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'cv11' 1, 'ss01' 1;
-}
-.mono, input, .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: 'tnum' 1; }
-.wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 48px; }
+  * { box-sizing: border-box; }
+  body {
+    background: #0a0a0a; color: #e8e8e8;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11' 1, 'ss01' 1;
+  }
+  .num, input[type="number"], select {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+  }
 
-/* Animated gradient blobs (Telegram-style, matches dashboard) */
-.bg-blobs {
-  position: fixed; inset: 0; z-index: -1; overflow: hidden;
-  pointer-events: none; filter: blur(80px) saturate(1.3); opacity: 0.32;
-}
-.bg-blob { position: absolute; border-radius: 50%; will-change: transform; }
-.bg-blob.one   { width: 32vmin; height: 32vmin; top: -12vmin; left: -12vmin;
-                 background: radial-gradient(circle, rgba(34,197,94,1) 0%, rgba(34,197,94,0) 65%);
-                 animation: drift-a 24s ease-in-out infinite alternate; }
-.bg-blob.two   { width: 32vmin; height: 32vmin; top: -12vmin; right: -12vmin;
-                 background: radial-gradient(circle, rgba(99,102,241,1) 0%, rgba(99,102,241,0) 65%);
-                 animation: drift-b 28s ease-in-out infinite alternate; }
-.bg-blob.three { width: 36vmin; height: 36vmin; bottom: -12vmin; left: -12vmin;
-                 background: radial-gradient(circle, rgba(59,130,246,1) 0%, rgba(59,130,246,0) 65%);
-                 animation: drift-c 26s ease-in-out infinite alternate; }
-.bg-blob.four  { width: 28vmin; height: 28vmin; bottom: -12vmin; right: -12vmin;
-                 background: radial-gradient(circle, rgba(167,139,250,1) 0%, rgba(167,139,250,0) 65%);
-                 animation: drift-d 30s ease-in-out infinite alternate; }
-@keyframes drift-a { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40vw,28vh) scale(1.15); } 100% { transform: translate(62vw,52vh) scale(0.88); } }
-@keyframes drift-b { 0% { transform: translate(0,0) scale(0.92); } 50% { transform: translate(-50vw,36vh) scale(1.18); } 100% { transform: translate(-26vw,60vh) scale(1.02); } }
-@keyframes drift-c { 0% { transform: translate(0,0) scale(1.08); } 50% { transform: translate(46vw,-32vh) scale(0.92); } 100% { transform: translate(22vw,-56vh) scale(1.15); } }
-@keyframes drift-d { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-42vw,-26vh) scale(0.86); } 100% { transform: translate(-66vw,-46vh) scale(1.12); } }
-@media (prefers-reduced-motion: reduce) { .bg-blob { animation: none !important; transform: none !important; } .bg-blobs { opacity: 0.2; } }
+  /* ─── Animated gradient blobs (mirrors dashboard) ─── */
+  .bg-blobs { position: fixed; inset: 0; z-index: -1; overflow: hidden;
+              pointer-events: none; filter: blur(80px) saturate(1.3); opacity: 0.32; }
+  .bg-blob { position: absolute; border-radius: 50%; will-change: transform; }
+  .bg-blob.b1 { width: 32vmin; height: 32vmin; top: -12vmin; left: -12vmin;
+                background: radial-gradient(circle, rgba(34,197,94,1) 0%, rgba(34,197,94,0) 65%);
+                animation: drift-a 24s ease-in-out infinite alternate; }
+  .bg-blob.b2 { width: 32vmin; height: 32vmin; top: -12vmin; right: -12vmin;
+                background: radial-gradient(circle, rgba(99,102,241,1) 0%, rgba(99,102,241,0) 65%);
+                animation: drift-b 28s ease-in-out infinite alternate; }
+  .bg-blob.b3 { width: 36vmin; height: 36vmin; bottom: -12vmin; left: -12vmin;
+                background: radial-gradient(circle, rgba(59,130,246,1) 0%, rgba(59,130,246,0) 65%);
+                animation: drift-c 26s ease-in-out infinite alternate; }
+  .bg-blob.b4 { width: 28vmin; height: 28vmin; bottom: -12vmin; right: -12vmin;
+                background: radial-gradient(circle, rgba(167,139,250,1) 0%, rgba(167,139,250,0) 65%);
+                animation: drift-d 30s ease-in-out infinite alternate; }
+  @keyframes drift-a { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40vw,28vh) scale(1.15); } 100% { transform: translate(62vw,52vh) scale(0.88); } }
+  @keyframes drift-b { 0% { transform: translate(0,0) scale(0.92); } 50% { transform: translate(-50vw,36vh) scale(1.18); } 100% { transform: translate(-26vw,60vh) scale(1.02); } }
+  @keyframes drift-c { 0% { transform: translate(0,0) scale(1.08); } 50% { transform: translate(46vw,-32vh) scale(0.92); } 100% { transform: translate(22vw,-56vh) scale(1.15); } }
+  @keyframes drift-d { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-42vw,-26vh) scale(0.86); } 100% { transform: translate(-66vw,-46vh) scale(1.12); } }
 
-/* Subtle $ glyphs (matches dashboard) */
-.bg-money { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; user-select: none; }
-.money-glyph {
-  position: absolute; font-family: 'JetBrains Mono', monospace; font-weight: 800;
-  letter-spacing: -0.06em; line-height: 1; white-space: nowrap; text-shadow: 0 0 60px currentColor; will-change: transform;
-}
-.money-glyph.g1 { top: 6vh;  left: 4vw;   font-size: clamp(140px, 18vw, 280px); transform: rotate(-12deg); color: rgba(34,197,94,1);  opacity: 0.055; animation: money-drift-a 48s ease-in-out infinite alternate; }
-.money-glyph.g2 { top: 16vh; right: 10vw; font-size: clamp(80px, 10vw, 160px);  transform: rotate(8deg);   color: rgba(99,102,241,1); opacity: 0.04; }
-.money-glyph.g3 { top: 50vh; left: 26vw;  font-size: clamp(60px, 8vw, 130px);   transform: rotate(-6deg);  color: rgba(167,139,250,1); opacity: 0.06; }
-.money-glyph.g4 { top: 60vh; right: 6vw;  font-size: clamp(200px, 24vw, 380px); transform: rotate(14deg);  color: rgba(59,130,246,1); opacity: 0.045; animation: money-drift-b 64s ease-in-out infinite alternate; }
-.money-glyph.g5 { bottom: 6vh; left: 12vw; font-size: clamp(110px, 13vw, 220px); transform: rotate(-20deg); color: rgba(239,68,68,1);  opacity: 0.05; }
-@keyframes money-drift-a { from { transform: translate(0,0) rotate(-12deg); } to { transform: translate(7vw,4vh) rotate(-7deg); } }
-@keyframes money-drift-b { from { transform: translate(0,0) rotate(14deg); }  to { transform: translate(-6vw,-3vh) rotate(19deg); } }
-@media (prefers-reduced-motion: reduce) { .money-glyph { animation: none !important; } }
+  /* ─── $ glyphs (mirrors dashboard) ─── */
+  .bg-money { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; user-select: none; }
+  .glyph { position: absolute; font-family: 'JetBrains Mono', monospace; font-weight: 800;
+           letter-spacing: -0.06em; line-height: 1; white-space: nowrap; text-shadow: 0 0 60px currentColor; }
+  .glyph.g1 { top: 6vh;  left: 4vw;  font-size: clamp(140px,18vw,280px); transform: rotate(-12deg); color: #22c55e; opacity: .055; }
+  .glyph.g2 { top: 16vh; right: 10vw; font-size: clamp(80px,10vw,160px);  transform: rotate(8deg);   color: #6366f1; opacity: .04; }
+  .glyph.g3 { top: 50vh; left: 26vw;  font-size: clamp(60px,8vw,130px);   transform: rotate(-6deg);  color: #a78bfa; opacity: .06; }
+  .glyph.g4 { top: 60vh; right: 6vw;  font-size: clamp(200px,24vw,380px); transform: rotate(14deg);  color: #3b82f6; opacity: .045; }
+  .glyph.g5 { bottom: 6vh; left: 12vw; font-size: clamp(110px,13vw,220px); transform: rotate(-20deg); color: #ef4444; opacity: .05; }
 
-/* Header (matches dashboard) */
-.header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 0; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-  border-bottom: 1px solid var(--border);
-}
-.header-left { display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
-.logo span { color: var(--accent); }
-.tool-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.4);
-  border-radius: 20px; padding: 3px 10px;
-  font-size: 0.72rem; font-weight: 600; color: var(--accent);
-  letter-spacing: 0.06em; text-transform: uppercase;
-}
-.live-badge {
-  display: flex; align-items: center; gap: 6px;
-  background: #0f2010; border: 1px solid #1a4020; border-radius: 20px;
-  padding: 3px 10px; font-size: 0.72rem; font-weight: 600;
-  color: var(--green); letter-spacing: 0.06em; text-transform: uppercase;
-}
-.pulse-dot {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
-  box-shadow: 0 0 0 0 rgba(34,197,94,0.7);
-  animation: pulse 2.4s cubic-bezier(0.4,0,0.6,1) infinite;
-}
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); transform: scale(1); }
-  70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); transform: scale(1.05); }
-  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); transform: scale(1); }
-}
-.back-link {
-  color: var(--muted); text-decoration: none; font-size: 13px;
-  padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
-  background: var(--bg3); transition: border-color 0.15s, color 0.15s;
-}
-.back-link:hover { border-color: var(--accent); color: var(--text); }
+  @media (prefers-reduced-motion: reduce) { .bg-blob { animation: none !important; } .bg-blobs { opacity: .2; } }
 
-h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
-.subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+  /* ─── Header pulse dot ─── */
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,.7);
+    animation: pulse 2.4s cubic-bezier(.4,0,.6,1) infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); transform: scale(1); }
+    70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); transform: scale(1); }
+  }
 
-.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 720px) { .calc-grid { grid-template-columns: 1fr; } }
+  /* ─── Inputs ─── */
+  input[type="number"], select, input[type="range"] { background: #1a1a1a; color: #e8e8e8; border: 1px solid #222; }
+  input[type="number"]:focus, select:focus { outline: none; border-color: #6366f1; }
+  .input-row label { color: #a0a0a0; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  .input-row .hint { color: #666; font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px;
+                        background: linear-gradient(90deg, #6366f1, #3b82f6); border: none; }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; cursor: pointer; box-shadow: 0 0 0 1px #6366f1;
+  }
 
-.panel {
-  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-  border-radius: 10px; padding: 20px;
-}
-.panel h2 { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; font-weight: 600; }
+  /* Toggle pills */
+  .pill {
+    flex: 1; padding: 8px 0; text-align: center; border-radius: 6px;
+    border: 1px solid #222; background: #1a1a1a; color: #a0a0a0;
+    font-weight: 600; font-size: 13px; cursor: pointer; transition: all .12s;
+    font-family: inherit;
+  }
+  .pill:hover { color: #e8e8e8; }
+  .pill.active { background: #6366f1; color: #fff; border-color: #6366f1; box-shadow: 0 0 14px rgba(99,102,241,.35); }
+  .pill.yes.active { background: #22c55e; border-color: #22c55e; box-shadow: 0 0 14px rgba(34,197,94,.35); }
+  .pill.no.active  { background: #ef4444; border-color: #ef4444; box-shadow: 0 0 14px rgba(239,68,68,.35); }
 
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-.field input, .field select {
-  width: 100%; padding: 10px 12px; font-size: 15px; font-weight: 600;
-  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text);
-  font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
-  transition: border-color 0.15s;
-}
-.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
-.side-toggle { display: flex; gap: 8px; }
-.side-toggle button {
-  flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border);
-  background: var(--bg3); color: var(--muted); cursor: pointer; font-weight: 600; font-size: 14px;
-  transition: all 0.15s; font-family: inherit;
-}
-.side-toggle button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.kelly-fractions { display: flex; gap: 6px; flex-wrap: wrap; }
-.kelly-fractions button {
-  padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border);
-  background: var(--bg3); color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 600;
-  font-family: 'JetBrains Mono', monospace;
-}
-.kelly-fractions button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  /* Tabs */
+  .tab {
+    padding: 8px 14px; border-radius: 999px; background: transparent;
+    color: #a0a0a0; font-weight: 600; font-size: 12px;
+    cursor: pointer; transition: all .12s; border: 1px solid transparent;
+    font-family: inherit; text-transform: uppercase; letter-spacing: .08em;
+  }
+  .tab:hover { color: #e8e8e8; }
+  .tab.active { background: #1a1a1a; color: #e8e8e8; border-color: #222; }
 
-.result-row {
-  display: flex; justify-content: space-between; align-items: baseline;
-  padding: 10px 0; border-bottom: 1px solid var(--border);
-}
-.result-row:last-child { border-bottom: none; }
-.result-label { font-size: 12px; color: var(--muted); }
-.result-value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', monospace; }
-.result-value.green { color: var(--green); }
-.result-value.red { color: var(--red); }
-.result-value.muted { color: var(--muted); }
+  /* Hero */
+  .hero {
+    border-radius: 14px; padding: 22px 24px;
+    background: linear-gradient(135deg, rgba(99,102,241,.16) 0%, rgba(34,197,94,.12) 100%);
+    border: 1px solid rgba(99,102,241,.32);
+    transition: border-color .25s, background .25s;
+  }
+  .hero.warn { background: linear-gradient(135deg, rgba(245,158,11,.16) 0%, rgba(99,102,241,.08) 100%); border-color: rgba(245,158,11,.45); }
+  .hero.bad  { background: linear-gradient(135deg, rgba(239,68,68,.18) 0%, rgba(115,16,16,.1) 100%); border-color: rgba(239,68,68,.5); }
 
-.headline {
-  margin: 24px 0; padding: 22px; border-radius: 12px;
-  background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(34,197,94,0.1) 100%);
-  border: 1px solid rgba(99,102,241,0.3);
-  text-align: center;
-}
-.headline.bad { background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(115,16,16,0.1) 100%); border-color: rgba(239,68,68,0.4); }
-.headline-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.headline-value { font-size: 2.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.headline-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  /* Cascade */
+  .cascade {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: rgba(255,255,255,.02); border: 1px solid #222;
+    border-radius: 10px; overflow: hidden;
+  }
+  .cascade-row { display: grid; grid-template-columns: 1fr 130px 90px; align-items: center; padding: 9px 16px; gap: 8px; }
+  .cascade-row + .cascade-row { border-top: 1px solid #1a1a1a; }
+  .cascade-row.delta { color: #a0a0a0; padding-left: 28px; }
+  .cascade-row.delta .num { color: #ef4444; }
+  .cascade-row.delta.add .num { color: #22c55e; }
+  .cascade-row.sum { background: rgba(99,102,241,.06); }
+  .cascade-row.final { background: linear-gradient(90deg, rgba(34,197,94,.08), rgba(99,102,241,.08)); font-weight: 700; }
+  .cascade-row .num { text-align: right; }
+  .cascade-row .pct { text-align: right; color: #666; font-size: 12px; }
 
-.cta {
-  margin-top: 32px; padding: 22px; border-radius: 12px;
-  background: rgba(59,130,246,0.08); border: 2px solid rgba(59,130,246,0.5);
-  text-align: center;
-}
-.cta h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--blue); }
-.cta p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-.cta a { display: inline-block; padding: 12px 28px; background: var(--blue); color: #fff;
-  text-decoration: none; font-weight: 700; border-radius: 6px; transition: opacity 0.15s; }
-.cta a:hover { opacity: 0.9; }
+  /* CTA button */
+  .cta-btn {
+    position: relative; display: inline-flex; align-items: center; gap: 7px;
+    padding: 12px 24px; border-radius: 8px; color: #fff; font-weight: 700;
+    text-decoration: none; font-size: 14px; letter-spacing: 0.02em;
+    background: linear-gradient(110deg, #6366f1 0%, #3b82f6 45%, #8b5cf6 100%);
+    background-size: 220% 100%;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.25), inset 0 0 0 1px rgba(255,255,255,.08),
+      0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(99,102,241,.45), 0 8px 32px rgba(99,102,241,.18);
+    overflow: hidden; isolation: isolate;
+    animation: cta-shift 7s ease-in-out infinite;
+    transition: transform .2s, box-shadow .25s;
+  }
+  .cta-btn::before {
+    content: ''; position: absolute; top: -10%; left: -60%; width: 50%; height: 120%;
+    background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,.35) 50%, transparent 75%);
+    transform: skewX(-20deg); animation: cta-shimmer 4.5s ease-in-out infinite;
+    pointer-events: none; z-index: 1;
+  }
+  .cta-btn > * { position: relative; z-index: 2; }
+  .cta-btn:hover { transform: translateY(-1px) scale(1.03);
+                   box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 0 0 1px rgba(255,255,255,.15),
+                               0 2px 4px rgba(0,0,0,.4), 0 6px 28px rgba(99,102,241,.7), 0 14px 56px rgba(99,102,241,.35); }
+  @keyframes cta-shift   { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  @keyframes cta-shimmer { 0% { left: -60%; } 55% { left: 160%; } 100% { left: 160%; } }
 
-.explain { margin-top: 32px; }
-.explain summary { cursor: pointer; padding: 12px 0; color: var(--accent); font-weight: 600; font-size: 14px; }
-.explain summary:hover { color: var(--text); }
-.explain[open] summary { color: var(--text); }
-.explain-body { padding: 12px 0; font-size: 14px; line-height: 1.7; color: #c0c0c0; }
-.explain-body code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green); }
-.explain-body p { margin-bottom: 12px; }
-.explain-body strong { color: var(--text); }
+  /* Stat card */
+  .stat-card { background: rgba(255,255,255,.02); border: 1px solid #222; border-radius: 8px; padding: 12px 14px; }
+  .stat-card .label { font-size: 10.5px; color: #666; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+  .stat-card .val   { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; font-feature-settings: 'tnum' 1; }
 
-.signal-loader { margin-bottom: 16px; padding: 12px; background: var(--bg2); border: 1px dashed var(--border); border-radius: 8px; }
-.signal-loader label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-.signal-loader select { width: 100%; padding: 8px 12px; font-size: 13px; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  /* Tooltips on cascade rows */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]:hover::after {
+    content: attr(data-tip); position: absolute; left: 0; top: 100%; margin-top: 6px;
+    background: #111; border: 1px solid #2a2a2a; padding: 8px 10px; border-radius: 6px;
+    font-size: 11px; color: #c0c0c0; white-space: normal; max-width: 320px; z-index: 50;
+    font-family: 'Inter', sans-serif; line-height: 1.4; letter-spacing: 0;
+  }
 
-.footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
-.footer a { color: var(--blue); text-decoration: none; }
+  /* Section header */
+  .section-h { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; margin-bottom: 12px; }
+
+  /* Fade transition for tab content */
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; animation: fade-in .25s ease; }
+  @keyframes fade-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-  <div class="bg-blobs" aria-hidden="true">
-    <div class="bg-blob one"></div>
-    <div class="bg-blob two"></div>
-    <div class="bg-blob three"></div>
-    <div class="bg-blob four"></div>
-  </div>
-  <div class="bg-money" aria-hidden="true">
-    <div class="money-glyph g1">$</div>
-    <div class="money-glyph g2">$</div>
-    <div class="money-glyph g3">$</div>
-    <div class="money-glyph g4">$</div>
-    <div class="money-glyph g5">$</div>
-  </div>
 
-<div class="wrap">
-  <div class="header">
-    <div class="header-left">
-      <div class="logo">Prob<span>Brain</span></div>
-      <div class="tool-badge">🧮 Tool</div>
-      <div class="live-badge"><div class="pulse-dot"></div>Live</div>
+<!-- Atmospheric background -->
+<div class="bg-blobs" aria-hidden="true">
+  <div class="bg-blob b1"></div><div class="bg-blob b2"></div>
+  <div class="bg-blob b3"></div><div class="bg-blob b4"></div>
+</div>
+<div class="bg-money" aria-hidden="true">
+  <div class="glyph g1">$</div><div class="glyph g2">$</div><div class="glyph g3">$</div>
+  <div class="glyph g4">$</div><div class="glyph g5">$</div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-ink-600">
+    <div class="flex items-center gap-3">
+      <div class="text-xl font-extrabold tracking-tight">Prob<span class="text-accent">Brain</span></div>
+      <div class="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/40 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-accent">🧮 Tool</div>
+      <div class="inline-flex items-center gap-1.5 bg-[#0f2010] border border-[#1a4020] rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-ok">
+        <span class="pulse-dot"></span>Live
+      </div>
     </div>
-    <a class="back-link" href="./">← back to dashboard</a>
+    <a href="./" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">← back to dashboard</a>
+  </header>
+
+  <!-- Title -->
+  <div class="my-6">
+    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Polymarket Kelly Calculator</h1>
+    <p class="text-sm text-fg-dim mt-1 max-w-3xl">
+      Robust Kelly with Bayesian credible-bound shrinkage, walk-the-book pricing, and Monte Carlo bankroll simulation.
+      The cascade below shows you exactly <em class="text-fg">why</em> the recommended size isn't bigger.
+    </p>
   </div>
 
-  <h1>Polymarket Kelly Criterion Calculator</h1>
-  <p class="subtitle">Compute the optimal stake size for any Polymarket bet given your edge, bankroll, and risk tolerance. Full Kelly maximizes long-run growth but is famously aggressive — most pros use ¼ or ½ Kelly to cap variance.</p>
-
-  <div class="signal-loader">
-    <label for="signal-select">Auto-fill from a live ProbBrain signal:</label>
-    <select id="signal-select">
-      <option value="">— pick a signal to copy its market price + calibrated estimate —</option>
+  <!-- Auto-fill from live signal -->
+  <div class="mb-6 flex items-center gap-3 flex-wrap">
+    <span class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold">Auto-fill from a live signal</span>
+    <select id="signal-select" class="bg-ink-700 border border-ink-600 rounded-md px-3 py-1.5 text-sm flex-1 max-w-md">
+      <option value="">— pick a ProbBrain signal to seed inputs —</option>
     </select>
   </div>
 
-  <div class="calc-grid">
-    <div class="panel">
-      <h2>Inputs</h2>
+  <!-- Main grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-      <div class="field">
-        <label>Bankroll (USD)</label>
-        <input type="number" id="bankroll" value="1000" min="0" step="50">
+    <!-- LEFT RAIL -->
+    <div class="lg:col-span-1 space-y-5">
+
+      <!-- Position -->
+      <section class="bg-white/[.02] border border-ink-600 rounded-xl p-4">
+        <div class="section-h">Position</div>
+        <div class="space-y-3">
+          <div class="input-row">
+            <div class="flex justify-between items-center mb-1.5"><label>Bankroll (USD)</label><span class="hint num" id="bankroll-hint">$10,000</span></div>
+            <input id="bankroll" type="number" min="0" step="100" value="10000" class="w-full px-3 py-2 rounded-md text-sm">
+          </div>
+          <div class="input-row">
+            <label class="block mb-1.5">Direction</label>
+            <div class="flex gap-2">
+              <button id="dir-yes" class="pill yes active" data-dir="YES">YES</button>
+              <button id="dir-no"  class="pill no"        data-dir="NO">NO</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="input-row">
+              <label class="block mb-1.5">Best YES bid</label>
+              <input id="bid" type="number" min="0" max="1" step="0.01" value="0.20" class="w-full px-3 py-2 rounded-md text-sm">
+            </div>
+            <div class="input-row">
+              <label class="block mb-1.5">Best YES ask</label>
+              <input id="ask" type="number" min="0" max="1" step="0.01" value="0.23" class="w-full px-3 py-2 rounded-md text-sm">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="flex justify-between items-center mb-1.5"><label>Top-of-book size (USD)</label><span class="hint">size you can hit at displayed price</span></div>
+            <input id="top-size" type="number" min="0" step="100" value="1000" class="w-full px-3 py-2 rounded-md text-sm">
+          </div>
+          <div class="input-row">
+            <div class="flex justify-between items-center mb-1.5"><label>Book depth (offset, USD)</label><span class="hint">3 levels past top</span></div>
+            <div class="grid grid-cols-2 gap-1.5 text-[12px]">
+              <input id="bo1" type="number" step="0.001" value="0.005" class="px-2 py-1.5 rounded-md">
+              <input id="bs1" type="number" step="500" value="2000" class="px-2 py-1.5 rounded-md">
+              <input id="bo2" type="number" step="0.001" value="0.010" class="px-2 py-1.5 rounded-md">
+              <input id="bs2" type="number" step="500" value="5000" class="px-2 py-1.5 rounded-md">
+              <input id="bo3" type="number" step="0.001" value="0.020" class="px-2 py-1.5 rounded-md">
+              <input id="bs3" type="number" step="500" value="15000" class="px-2 py-1.5 rounded-md">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Belief -->
+      <section class="bg-white/[.02] border border-ink-600 rounded-xl p-4">
+        <div class="section-h">Belief</div>
+        <div class="space-y-3">
+          <div class="input-row">
+            <div class="flex justify-between items-center mb-1.5"><label>Your P(YES) estimate</label><span class="hint num" id="phat-hint">27%</span></div>
+            <input id="phat" type="number" min="0" max="1" step="0.01" value="0.27" class="w-full px-3 py-2 rounded-md text-sm">
+          </div>
+          <div class="input-row">
+            <label class="block mb-1.5">Confidence (effective sample size)</label>
+            <div class="flex gap-2">
+              <button class="pill" data-conf="10">Low · n=10</button>
+              <button class="pill active" data-conf="30">Med · n=30</button>
+              <button class="pill" data-conf="100">High · n=100</button>
+            </div>
+            <div class="hint mt-1.5 num" id="beta-hint">→ Beta(α=9.10, β=22.90)</div>
+          </div>
+          <div class="input-row">
+            <div class="flex justify-between items-center mb-1.5"><label>Credible level</label><span class="hint num" id="cl-hint">75%</span></div>
+            <input id="credible" type="range" min="0.5" max="0.95" step="0.05" value="0.75" class="w-full">
+          </div>
+        </div>
+      </section>
+
+      <!-- Sizing -->
+      <section class="bg-white/[.02] border border-ink-600 rounded-xl p-4">
+        <div class="section-h">Sizing</div>
+        <div class="space-y-3">
+          <div class="input-row">
+            <div class="flex justify-between items-center mb-1.5"><label>Kelly fraction</label><span class="hint num" id="kf-hint">0.25</span></div>
+            <input id="kelly-frac" type="range" min="0.05" max="1" step="0.05" value="0.25" class="w-full">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="input-row">
+              <label class="block mb-1.5">Days to resolution</label>
+              <input id="days" type="number" min="1" step="1" value="30" class="w-full px-3 py-2 rounded-md text-sm">
+            </div>
+            <div class="input-row">
+              <label class="block mb-1.5">Bet horizon (n)</label>
+              <input id="horizon" type="number" min="10" step="10" value="100" class="w-full px-3 py-2 rounded-md text-sm">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT PANE -->
+    <div class="lg:col-span-2 space-y-5">
+
+      <!-- Hero -->
+      <div id="hero" class="hero">
+        <div class="text-[11px] uppercase tracking-widest text-fg-muted">Recommended size</div>
+        <div id="hero-num" class="num text-5xl font-extrabold tracking-tight mt-1">$—</div>
+        <div id="hero-sub" class="num text-sm text-fg-dim mt-1">enter inputs to compute</div>
       </div>
 
-      <div class="field">
-        <label>Side you're betting</label>
-        <div class="side-toggle">
-          <button id="side-yes" class="active">YES</button>
-          <button id="side-no">NO</button>
+      <!-- Tabs -->
+      <div class="flex items-center gap-2 border-b border-ink-600">
+        <button class="tab active" data-tab="sizing">Sizing</button>
+        <button class="tab" data-tab="sim">Simulation</button>
+        <button class="tab" data-tab="diag">Diagnostics</button>
+      </div>
+
+      <!-- Sizing pane -->
+      <div id="tab-sizing" class="tab-pane active space-y-4">
+        <div>
+          <div class="section-h mb-2">Decomposition cascade</div>
+          <div class="cascade num" id="cascade"></div>
+          <div class="text-[11px] text-fg-muted mt-2">Each minus-row is the dollars the previous step shrinks by. Hover any row for the reason.</div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="stat-card"><div class="label">Naive Kelly</div><div class="val text-fg-dim" id="s-naive">—</div></div>
+          <div class="stat-card"><div class="label">Robust Kelly</div><div class="val text-fg-dim" id="s-robust">—</div></div>
+          <div class="stat-card"><div class="label">Book-aware</div><div class="val text-fg-dim" id="s-book">—</div></div>
+          <div class="stat-card"><div class="label">Final f</div><div class="val" id="s-final">—</div></div>
+        </div>
+
+        <div class="cta-flex flex justify-center pt-2">
+          <a class="cta-btn" href="https://dub.sh/pb-x" target="_blank" rel="nofollow sponsored">
+            <span>🔮 Trade this on Polymarket</span>
+            <span style="opacity:.8">→</span>
+          </a>
         </div>
       </div>
 
-      <div class="field">
-        <label>Market YES price (0–1, e.g. 0.20)</label>
-        <input type="number" id="market" value="0.20" min="0.01" max="0.99" step="0.01">
-      </div>
-
-      <div class="field">
-        <label>Your estimate of P(YES) (0–1)</label>
-        <input type="number" id="estimate" value="0.05" min="0" max="1" step="0.01">
-      </div>
-
-      <div class="field">
-        <label>Kelly fraction</label>
-        <div class="kelly-fractions">
-          <button data-frac="0.1">0.1×</button>
-          <button data-frac="0.25" class="active">¼ Kelly</button>
-          <button data-frac="0.5">½ Kelly</button>
-          <button data-frac="1">Full Kelly</button>
+      <!-- Simulation pane -->
+      <div id="tab-sim" class="tab-pane space-y-4">
+        <div class="bg-white/[.02] border border-ink-600 rounded-xl p-4">
+          <div class="section-h mb-2">Monte Carlo bankroll · 10k trajectories</div>
+          <canvas id="sim-chart" height="240"></canvas>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="stat-card"><div class="label">P(reach 2×)</div><div class="val text-ok" id="m-p2x">—</div></div>
+          <div class="stat-card"><div class="label">P(below 0.5×)</div><div class="val text-bad" id="m-pdraw">—</div></div>
+          <div class="stat-card"><div class="label">Median final</div><div class="val" id="m-medfin">—</div></div>
+          <div class="stat-card"><div class="label">Max drawdown · p50</div><div class="val text-warn" id="m-dd50">—</div></div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div class="stat-card"><div class="label">DD · p5 / p95</div><div class="val text-fg-dim" id="m-dd595">—</div></div>
+          <div class="stat-card"><div class="label">Final · 25–75%</div><div class="val text-fg-dim" id="m-q2575">—</div></div>
+          <div class="stat-card"><div class="label">Final · 5–95%</div><div class="val text-fg-dim" id="m-q595">—</div></div>
         </div>
       </div>
-    </div>
 
-    <div class="panel">
-      <h2>Output</h2>
+      <!-- Diagnostics pane -->
+      <div id="tab-diag" class="tab-pane space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="stat-card"><div class="label">Edge (conservative, post-shrink)</div><div class="val" id="d-edge-cons">—</div></div>
+          <div class="stat-card"><div class="label">Edge (raw, point estimate)</div><div class="val text-fg-dim" id="d-edge-raw">—</div></div>
+          <div class="stat-card"><div class="label">Spread cost</div><div class="val text-fg-dim" id="d-spread">—</div></div>
+          <div class="stat-card"><div class="label">m_eff (after walking book)</div><div class="val" id="d-meff">—</div></div>
+          <div class="stat-card"><div class="label">Decimal odds offered (b)</div><div class="val" id="d-odds">—</div></div>
+          <div class="stat-card"><div class="label">$ return per $ staked (raw)</div><div class="val" id="d-perdollar">—</div></div>
+          <div class="stat-card"><div class="label">Log-growth · g per bet</div><div class="val" id="d-g">—</div></div>
+          <div class="stat-card"><div class="label">Log-growth · annualized</div><div class="val" id="d-gann">—</div></div>
+          <div class="stat-card"><div class="label">KL divergence vs market</div><div class="val" id="d-kl">—</div></div>
+          <div class="stat-card"><div class="label">P(win) used</div><div class="val text-fg-dim" id="d-pwin">—</div></div>
+        </div>
+        <details class="bg-white/[.02] border border-ink-600 rounded-xl p-4">
+          <summary class="cursor-pointer text-sm font-semibold text-accent">How the math works</summary>
+          <div class="text-sm text-fg-dim mt-3 space-y-2 leading-relaxed">
+            <p><span class="text-fg font-semibold">Naive Kelly:</span> <code class="font-mono text-ok">f = (p_win − m) / (1 − m)</code> where m is the displayed price and p_win your point estimate.</p>
+            <p><span class="text-fg font-semibold">Robust shrink:</span> we don't trust your point estimate. We treat your belief as <code class="font-mono">Beta(p̂·n + 1, (1−p̂)·n + 1)</code> with n from the confidence radio, then take the <code class="font-mono">(1−CL)/2</code> tail as <code class="font-mono">p_conservative</code>. Kelly is recomputed at this lower bound. Robust-optimization choice over the credible set, not posterior-mean shrinkage (Bayesian Kelly with log utility doesn't shrink).</p>
+            <p><span class="text-fg font-semibold">Walk the book:</span> your stake doesn't fill at top of book. We solve for the fixed point <code class="font-mono">S* = bankroll · (p_cons − m_eff(S*)) / (1 − m_eff(S*))</code> with a damped iteration. m_eff is the volume-weighted fill price walking through the input depth.</p>
+            <p><span class="text-fg font-semibold">Fractional Kelly:</span> finally multiplied by your chosen fraction (¼ Kelly common — halves variance, only modestly reduces growth).</p>
+            <p><span class="text-fg font-semibold">KL divergence:</span> <code class="font-mono">p·log₂(p/m) + (1−p)·log₂((1−p)/(1−m))</code>. The asymptotic Kelly growth rate of full-Kelly betting at fair odds. "Bits of disagreement with the market."</p>
+          </div>
+        </details>
+      </div>
 
-      <div class="result-row">
-        <span class="result-label">Implied market probability</span>
-        <span class="result-value muted" id="r-implied">—</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">Your edge</span>
-        <span class="result-value" id="r-edge">—</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">Decimal odds offered</span>
-        <span class="result-value" id="r-odds">—</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">Full Kelly fraction</span>
-        <span class="result-value" id="r-kelly-full">—</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">Stake at chosen Kelly</span>
-        <span class="result-value" id="r-stake">—</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">If you win, payoff</span>
-        <span class="result-value green" id="r-win">—</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">If you lose</span>
-        <span class="result-value red" id="r-lose">—</span>
-      </div>
-      <div class="result-row">
-        <span class="result-label">Expected value</span>
-        <span class="result-value" id="r-ev">—</span>
-      </div>
     </div>
   </div>
 
-  <div class="headline" id="headline">
-    <div class="headline-label">Recommended stake</div>
-    <div class="headline-value mono" id="headline-stake">$—</div>
-    <div class="headline-sub" id="headline-sub">enter your numbers above</div>
-  </div>
-
-  <div class="cta">
-    <h3>Ready to size your bet?</h3>
-    <p>Live trading happens on Polymarket — the world's largest prediction market.</p>
-    <a href="https://dub.sh/pb-x" target="_blank" rel="nofollow sponsored">🔮 Trade on Polymarket →</a>
-  </div>
-
-  <details class="explain">
-    <summary>How Kelly works (and why it matters for Polymarket)</summary>
-    <div class="explain-body">
-      <p><strong>The Kelly Criterion</strong> tells you the bet size that maximizes long-run logarithmic growth of your bankroll. It's the mathematically optimal answer to "how much should I bet?" given a known edge.</p>
-      <p>The formula for a binary bet: <code>f* = (b·p − q) / b</code></p>
-      <p>where <code>b</code> = decimal odds (net profit per unit staked), <code>p</code> = your probability of winning, <code>q = 1 − p</code>.</p>
-      <p><strong>Polymarket specifics:</strong> if you buy YES at $0.20, you risk $0.20 to win $0.80 per share — so <code>b = 0.80 / 0.20 = 4.0</code>. If you genuinely think YES will resolve at 40%, full Kelly says bet ~25% of your bankroll.</p>
-      <p><strong>Why fractional Kelly?</strong> Full Kelly is path-volatile. A 25% Kelly bet that loses 3 times in a row drops your bankroll 50%+. Most professional bettors use <strong>¼ to ½ Kelly</strong> to keep drawdowns survivable. Variance halves; expected growth only drops slightly.</p>
-      <p><strong>Negative edge?</strong> If your estimate doesn't beat the market price after fees, the optimal bet is <code>$0</code> — Kelly explicitly says don't bet. This calculator will show that result.</p>
-      <p><strong>Caveats:</strong> Kelly assumes you know <code>p</code>. Most retail bettors over-estimate their edge. If you're not 70%+ confident your estimate beats the market's, halve your Kelly fraction. Liquidity on Polymarket also caps real-world stake size — check the order book.</p>
-    </div>
-  </details>
-
-  <div class="footer">
-    Powered by <a href="./">ProbBrain</a> · Follow <a href="https://x.com/ProbBrain" target="_blank" rel="noopener">@ProbBrain</a> on X · Not financial advice.
-  </div>
+  <footer class="mt-12 pt-6 border-t border-ink-600 text-xs text-fg-muted text-center">
+    Powered by <a href="./" class="text-info hover:underline">ProbBrain</a> ·
+    Follow <a href="https://x.com/ProbBrain" class="text-info hover:underline" target="_blank" rel="noopener">@ProbBrain</a> on X ·
+    Not financial advice.
+  </footer>
 </div>
 
 <script>
-let side = 'YES';
-let kellyFrac = 0.25;
+// ─────────────────────────────────────────────────────────────────────────────
+// Numerical Recipes-style incomplete beta + Beta inverse CDF
+// ─────────────────────────────────────────────────────────────────────────────
+function lgamma(x) {
+  const c = [76.18009172947146, -86.50532032941677, 24.01409824083091,
+             -1.231739572450155, 0.001208650973866179, -0.000005395239384953];
+  let y = x, tmp = x + 5.5;
+  tmp -= (x + 0.5) * Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j = 0; j < 6; j++) { y += 1; ser += c[j] / y; }
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+function betacf(a, b, x) {
+  const MAXIT = 200, EPS = 3e-7, FPMIN = 1e-30;
+  const qab = a + b, qap = a + 1, qam = a - 1;
+  let c = 1, d = 1 - qab * x / qap;
+  if (Math.abs(d) < FPMIN) d = FPMIN;
+  d = 1 / d; let h = d;
+  for (let m = 1; m <= MAXIT; m++) {
+    const m2 = 2 * m;
+    let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d; const del = d * c; h *= del;
+    if (Math.abs(del - 1) < EPS) break;
+  }
+  return h;
+}
+function betaCDF(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b)
+                     + a * Math.log(x) + b * Math.log(1 - x));
+  if (x < (a + 1) / (a + b + 2)) return bt * betacf(a, b, x) / a;
+  return 1 - bt * betacf(b, a, 1 - x) / b;
+}
+function betaInvCDF(p, a, b) {
+  if (p <= 0) return 0; if (p >= 1) return 1;
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (betaCDF(mid, a, b) < p) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
 
-function $(id) { return document.getElementById(id); }
-function fmt$(n) { if (!isFinite(n)) return '$—'; return '$' + (Math.abs(n) >= 1000 ? n.toFixed(0) : n.toFixed(2)); }
-function fmtPct(n) { if (!isFinite(n)) return '—'; return (n * 100).toFixed(1) + '%'; }
+// ─────────────────────────────────────────────────────────────────────────────
+// State + element refs
+// ─────────────────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const state = { dir: 'YES', conf: 30 };
+let chart = null;
 
-function recalc() {
+// ─────────────────────────────────────────────────────────────────────────────
+// Walk the book — given dollar stake S, return volume-weighted fill price m_eff
+// ─────────────────────────────────────────────────────────────────────────────
+function buildAskLevels(m, topSize, depth) {
+  return [
+    { price: m,                     size: topSize },
+    { price: m + depth[0].offset,   size: depth[0].size },
+    { price: m + depth[1].offset,   size: depth[1].size },
+    { price: m + depth[2].offset,   size: depth[2].size },
+  ];
+}
+function fillPrice(stakeDollars, levels) {
+  if (stakeDollars <= 0) return levels[0].price;
+  let remaining = stakeDollars, weightedCost = 0, filled = 0;
+  for (const lvl of levels) {
+    if (remaining <= 0) break;
+    const fill = Math.min(remaining, lvl.size);
+    weightedCost += fill * lvl.price;
+    filled += fill;
+    remaining -= fill;
+  }
+  // If liquidity exhausted, treat overflow as filled at the worst (last) price.
+  if (remaining > 0) {
+    const last = levels[levels.length - 1].price;
+    weightedCost += remaining * last;
+    filled += remaining;
+  }
+  return weightedCost / Math.max(1e-9, filled);
+}
+function solveBookAware(bankroll, pCons, m, topSize, depth) {
+  const levels = buildAskLevels(m, topSize, depth);
+  let fInit = Math.max(0, (pCons - m) / Math.max(1e-9, 1 - m));
+  let S = bankroll * fInit;
+  let mEff = m;
+  for (let i = 0; i < 12; i++) {
+    mEff = fillPrice(S, levels);
+    const fNew = Math.max(0, (pCons - mEff) / Math.max(1e-9, 1 - mEff));
+    const SNew = bankroll * fNew;
+    if (Math.abs(SNew - S) < 0.5) { S = SNew; break; }
+    S = 0.5 * S + 0.5 * SNew;
+  }
+  mEff = fillPrice(S, levels);
+  const fBook = Math.max(0, (pCons - mEff) / Math.max(1e-9, 1 - mEff));
+  return { fBook, mEff, levels };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Monte Carlo
+// ─────────────────────────────────────────────────────────────────────────────
+function monteCarlo(fFinal, pWinSim, bEff, horizon, trials = 10000) {
+  const n = horizon;
+  // Per-step quantiles. We accumulate values per step then quantile across.
+  // For memory, store samples as Float64Array of size trials*(n+1) only if tractable,
+  // otherwise bucket. n=100, trials=10k → 1M floats = 8MB — fine.
+  const all = new Float64Array(trials * (n + 1));
+  const reach2 = []; // boolean per trial
+  let p2x = 0, pdraw = 0;
+  for (let t = 0; t < trials; t++) {
+    let W = 1.0;
+    let minW = 1.0, maxW = 1.0;
+    all[t * (n + 1)] = 1.0;
+    for (let s = 1; s <= n; s++) {
+      const stake = fFinal * W;
+      if (Math.random() < pWinSim) W += stake * bEff;
+      else W -= stake;
+      if (W < 0) W = 0; // can't go negative
+      if (W < minW) minW = W;
+      if (W > maxW) maxW = W;
+      all[t * (n + 1) + s] = W;
+    }
+    if (maxW >= 2.0) p2x++;
+    if (minW <= 0.5) pdraw++;
+    reach2.push(maxW >= 2.0);
+  }
+  // Quantiles per step
+  function quantile(arr, q) {
+    const sorted = arr.slice().sort((a, b) => a - b);
+    const idx = Math.min(sorted.length - 1, Math.floor(q * sorted.length));
+    return sorted[idx];
+  }
+  const median = new Float64Array(n + 1);
+  const q25 = new Float64Array(n + 1);
+  const q75 = new Float64Array(n + 1);
+  const q05 = new Float64Array(n + 1);
+  const q95 = new Float64Array(n + 1);
+  const stepBuf = new Float64Array(trials);
+  for (let s = 0; s <= n; s++) {
+    for (let t = 0; t < trials; t++) stepBuf[t] = all[t * (n + 1) + s];
+    median[s] = quantile(stepBuf, 0.5);
+    q25[s]    = quantile(stepBuf, 0.25);
+    q75[s]    = quantile(stepBuf, 0.75);
+    q05[s]    = quantile(stepBuf, 0.05);
+    q95[s]    = quantile(stepBuf, 0.95);
+  }
+  // Drawdown distribution
+  const ddBuf = new Float64Array(trials);
+  for (let t = 0; t < trials; t++) {
+    let mn = 1.0;
+    for (let s = 0; s <= n; s++) {
+      const w = all[t * (n + 1) + s];
+      if (w < mn) mn = w;
+    }
+    ddBuf[t] = mn;
+  }
+  return {
+    median, q25, q75, q05, q95,
+    pReach2: p2x / trials, pDrawTo05: pdraw / trials,
+    medianFinal: median[n], q25Final: q25[n], q75Final: q75[n],
+    q05Final: q05[n], q95Final: q95[n],
+    dd05: quantile(ddBuf, 0.05), dd50: quantile(ddBuf, 0.5), dd95: quantile(ddBuf, 0.95),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main recompute
+// ─────────────────────────────────────────────────────────────────────────────
+function fmt$(n, dec = 0) {
+  if (!isFinite(n)) return '$—';
+  const sign = n < 0 ? '−' : '';
+  const v = Math.abs(n);
+  if (v >= 1000) return sign + '$' + Math.round(v).toLocaleString();
+  return sign + '$' + v.toFixed(dec);
+}
+function fmtPct(n, dec = 1) { if (!isFinite(n)) return '—'; return (n * 100).toFixed(dec) + '%'; }
+function fmtBP(n) { if (!isFinite(n)) return '—'; return ((n) * 100).toFixed(1) + 'pp'; }
+
+function readInputs() {
   const bankroll = parseFloat($('bankroll').value) || 0;
-  const market = parseFloat($('market').value) || 0;
-  const p = parseFloat($('estimate').value) || 0;
+  const dir = state.dir;
+  const bid = Math.max(0.001, Math.min(0.999, parseFloat($('bid').value) || 0));
+  const ask = Math.max(0.001, Math.min(0.999, parseFloat($('ask').value) || 0));
+  const phat = Math.max(0, Math.min(1, parseFloat($('phat').value) || 0));
+  const conf = state.conf;
+  const cl = parseFloat($('credible').value) || 0.75;
+  const kf = parseFloat($('kelly-frac').value) || 0.25;
+  const days = Math.max(1, parseFloat($('days').value) || 30);
+  const horizon = Math.max(10, Math.min(500, parseInt($('horizon').value) || 100));
+  const topSize = Math.max(0, parseFloat($('top-size').value) || 0);
+  const depth = [
+    { offset: parseFloat($('bo1').value) || 0, size: parseFloat($('bs1').value) || 0 },
+    { offset: parseFloat($('bo2').value) || 0, size: parseFloat($('bs2').value) || 0 },
+    { offset: parseFloat($('bo3').value) || 0, size: parseFloat($('bs3').value) || 0 },
+  ];
+  return { bankroll, dir, bid, ask, phat, conf, cl, kf, days, horizon, topSize, depth };
+}
 
-  // Validate inputs.
-  if (!(market > 0 && market < 1) || !(p >= 0 && p <= 1) || bankroll <= 0) {
+function recompute() {
+  const I = readInputs();
+
+  // Hint labels
+  $('bankroll-hint').textContent = '$' + Math.round(I.bankroll).toLocaleString();
+  $('phat-hint').textContent = (I.phat * 100).toFixed(0) + '%';
+  $('cl-hint').textContent = (I.cl * 100).toFixed(0) + '%';
+  $('kf-hint').textContent = I.kf.toFixed(2);
+
+  // Beta posterior
+  const alpha = I.phat * I.conf + 1;
+  const beta  = (1 - I.phat) * I.conf + 1;
+  $('beta-hint').textContent = `→ Beta(α=${alpha.toFixed(2)}, β=${beta.toFixed(2)})`;
+
+  // Validate ordering
+  if (I.ask <= I.bid) {
+    setNoBet('Input error', 'Ask must be greater than bid.');
     return;
   }
 
-  // For Polymarket: entry price = market for YES side, (1 - market) for NO side.
-  // P(win) = p for YES, (1 - p) for NO.
-  const entry = side === 'YES' ? market : (1 - market);
-  const pWin = side === 'YES' ? p : (1 - p);
-  const qWin = 1 - pWin;
-  // Decimal odds (net profit per dollar staked) = (1 - entry) / entry, since each share costs `entry` and pays $1 if it wins.
-  const b = (1 - entry) / entry;
-  // Edge = pWin - entry (your prob minus the implied prob of the side you take)
-  const edge = pWin - entry;
-  const fullKelly = (b * pWin - qWin) / b;
-  const fractionUsed = Math.max(0, fullKelly) * kellyFrac;
-  const stake = bankroll * fractionUsed;
-  const winPayoff = stake * b;
-  const losePayoff = -stake;
-  const ev = pWin * winPayoff + qWin * losePayoff;
+  // Effective price m and p_win for the chosen direction
+  const m     = I.dir === 'YES' ? I.ask    : (1 - I.bid);
+  const pWin  = I.dir === 'YES' ? I.phat   : (1 - I.phat);
 
-  $('r-implied').textContent = fmtPct(market) + ' YES · ' + fmtPct(1 - market) + ' NO';
-  $('r-edge').textContent = (edge >= 0 ? '+' : '') + fmtPct(edge);
-  $('r-edge').className = 'result-value ' + (edge > 0.005 ? 'green' : edge < -0.005 ? 'red' : 'muted');
-  $('r-odds').textContent = b.toFixed(2) + 'x';
-  $('r-kelly-full').textContent = fmtPct(fullKelly);
-  $('r-stake').textContent = fmt$(stake);
-  $('r-win').textContent = '+' + fmt$(winPayoff);
-  $('r-lose').textContent = fmt$(losePayoff);
-  $('r-ev').textContent = (ev >= 0 ? '+' : '') + fmt$(ev);
-  $('r-ev').className = 'result-value ' + (ev > 0 ? 'green' : 'red');
+  // Conservative win probability via credible bound
+  const tail = (1 - I.cl) / 2;
+  let pCons;
+  if (I.dir === 'YES') pCons = betaInvCDF(tail, alpha, beta);
+  else                 pCons = 1 - betaInvCDF(1 - tail, alpha, beta);
 
-  // Headline
-  const head = $('headline');
-  const headStake = $('headline-stake');
-  const headSub = $('headline-sub');
-  if (fullKelly <= 0) {
-    head.classList.add('bad');
-    headStake.textContent = "Don't bet";
-    headSub.textContent = `Negative edge — your ${fmtPct(pWin)} estimate doesn't beat the ${fmtPct(entry)} entry price for ${side}.`;
+  // Kelly cascade
+  const fNaiveBase   = Math.max(0, (pWin   - m) / Math.max(1e-9, 1 - m));
+  const fRobustBase  = Math.max(0, (pCons  - m) / Math.max(1e-9, 1 - m));
+  const sNaive  = I.bankroll * fNaiveBase;
+  const sRobust = I.bankroll * fRobustBase;
+
+  // Walk the book using the conservative belief
+  const { fBook, mEff } = solveBookAware(I.bankroll, pCons, m, I.topSize, I.depth);
+  const sBook = I.bankroll * fBook;
+  const fFinal = Math.min(1, fBook * I.kf);
+  const sFinal = I.bankroll * fFinal;
+
+  // Diagnostics
+  const edgeCons = pCons - mEff;
+  const edgeRaw  = I.phat - (I.dir === 'YES' ? I.ask : I.bid);
+  const spread   = I.ask - I.bid;
+  const b        = (1 - mEff) / Math.max(1e-9, mEff);
+  const perDollar = pWin * b - (1 - pWin);
+  const klBits   = pWin * (Math.log(pWin / Math.max(1e-9, m)) / Math.log(2))
+                 + (1 - pWin) * (Math.log((1 - pWin) / Math.max(1e-9, 1 - m)) / Math.log(2));
+  const g        = pWin * Math.log(1 + fBook * b) + (1 - pWin) * Math.log(Math.max(1e-9, 1 - fBook));
+  const gAnn     = g * (365 / I.days);
+
+  // Update sizing strip
+  $('s-naive').textContent  = fmt$(sNaive)  + '  · ' + fmtPct(fNaiveBase);
+  $('s-robust').textContent = fmt$(sRobust) + '  · ' + fmtPct(fRobustBase);
+  $('s-book').textContent   = fmt$(sBook)   + '  · ' + fmtPct(fBook);
+  $('s-final').textContent  = fmt$(sFinal)  + '  · ' + fmtPct(fFinal);
+
+  // Cascade
+  renderCascade({
+    sNaive, sRobust, sBook, sFinal, fNaiveBase, fRobustBase, fBook, fFinal, kf: I.kf,
+  });
+
+  // Hero
+  const hero = $('hero');
+  hero.classList.remove('warn', 'bad');
+  if (fFinal <= 0 || sFinal < 1) {
+    if (fNaiveBase <= 0) {
+      setNoBet('No edge at displayed price',
+        `Your point estimate ${(I.phat*100).toFixed(0)}% doesn't beat the displayed ${ I.dir === 'YES' ? 'ask' : 'bid' } of ${(m*100).toFixed(0)}%.`);
+    } else {
+      setNoBet('No bet at conservative belief',
+        `Your ${(I.cl*100).toFixed(0)}% lower-bound probability ${(pCons*100).toFixed(0)}% doesn't beat ${ I.dir === 'YES' ? 'ask' : 'effective NO entry' } at ${(m*100).toFixed(0)}%.`);
+    }
   } else {
-    head.classList.remove('bad');
-    headStake.textContent = fmt$(stake);
-    headSub.textContent = `${(kellyFrac * 100).toFixed(0)}% of full Kelly · ${fmtPct(fractionUsed)} of bankroll · expected +${fmtPct(ev / Math.max(1, stake))} per dollar staked`;
+    hero.classList.remove('warn', 'bad');
+    if (edgeCons < 0.02) hero.classList.add('warn');
+    $('hero-num').textContent = fmt$(sFinal);
+    $('hero-sub').textContent =
+      `${fmtPct(fFinal)} of bankroll · ` +
+      `expected log-growth +${(g*100).toFixed(2)}% per bet · ` +
+      `${fmtBP(edgeCons)} conservative edge`;
   }
+
+  // Diagnostics tab
+  $('d-edge-cons').textContent  = fmtBP(edgeCons);
+  $('d-edge-raw').textContent   = fmtBP(edgeRaw);
+  $('d-spread').textContent     = (spread * 100).toFixed(1) + 'pp';
+  $('d-meff').textContent       = (mEff * 100).toFixed(1) + '%';
+  $('d-odds').textContent       = b.toFixed(2) + '×';
+  $('d-perdollar').textContent  = (perDollar >= 0 ? '+' : '') + '$' + perDollar.toFixed(3);
+  $('d-g').textContent          = (g * 100).toFixed(3) + '%';
+  $('d-gann').textContent       = (gAnn * 100).toFixed(1) + '%';
+  $('d-kl').textContent         = klBits.toFixed(3) + ' bits';
+  $('d-pwin').textContent       = `${fmtPct(pWin)} (cons. ${fmtPct(pCons)})`;
+  // tint diagnostics
+  $('d-edge-cons').className = 'val ' + (edgeCons > 0.02 ? 'text-ok' : edgeCons > 0 ? 'text-warn' : 'text-bad');
+  $('d-edge-raw').className  = 'val ' + (edgeRaw  > 0.02 ? 'text-ok' : edgeRaw  > 0 ? 'text-warn' : 'text-bad');
+
+  // Monte Carlo (uses point estimate p_hat for fairness — not the conservative bound)
+  const pWinSim = I.dir === 'YES' ? I.phat : (1 - I.phat);
+  const bEff = (1 - mEff) / Math.max(1e-9, mEff);
+  const mc = monteCarlo(fFinal, pWinSim, bEff, I.horizon, 10000);
+  $('m-p2x').textContent   = fmtPct(mc.pReach2);
+  $('m-pdraw').textContent = fmtPct(mc.pDrawTo05);
+  $('m-medfin').textContent = mc.medianFinal.toFixed(2) + '×';
+  $('m-dd50').textContent   = mc.dd50.toFixed(2) + '×';
+  $('m-dd595').textContent  = mc.dd05.toFixed(2) + '× / ' + mc.dd95.toFixed(2) + '×';
+  $('m-q2575').textContent  = mc.q25Final.toFixed(2) + '× / ' + mc.q75Final.toFixed(2) + '×';
+  $('m-q595').textContent   = mc.q05Final.toFixed(2) + '× / ' + mc.q95Final.toFixed(2) + '×';
+  renderChart(mc, I.horizon);
 }
 
-// Bind inputs
-['bankroll', 'market', 'estimate'].forEach(id => $(id).addEventListener('input', recalc));
+function setNoBet(headline, sub) {
+  $('hero').classList.add('bad');
+  $('hero-num').textContent = headline;
+  $('hero-sub').textContent = sub;
+  // zero out cascade
+  renderCascade({ sNaive: 0, sRobust: 0, sBook: 0, sFinal: 0, fNaiveBase: 0, fRobustBase: 0, fBook: 0, fFinal: 0, kf: 0.25 });
+  // zero MC stats
+  ['m-p2x','m-pdraw','m-medfin','m-dd50','m-dd595','m-q2575','m-q595'].forEach(id => $(id).textContent = '—');
+  if (chart) { chart.destroy(); chart = null; }
+}
 
-// Side toggle
-$('side-yes').addEventListener('click', () => {
-  side = 'YES'; $('side-yes').classList.add('active'); $('side-no').classList.remove('active'); recalc();
+function renderCascade(c) {
+  const el = $('cascade');
+  const dNaiveToRobust = c.sNaive - c.sRobust;     // shrink due to robust
+  const dRobustToBook  = c.sRobust - c.sBook;      // shrink due to walk-the-book
+  const dBookToFinal   = c.sBook - c.sFinal;       // shrink due to fractional kelly
+  const tipNaive  = "Naive Kelly using your point estimate and the displayed price. Ignores estimation noise and order-book impact.";
+  const tipRobust = "Replace your point estimate with the lower bound of a Beta posterior at the chosen credible level. Robust-optimization shrinkage over the credible set.";
+  const tipBook   = "Walk the order book: as you add stake you fill at progressively worse prices. Solved as a fixed point of S = bankroll · (p_cons − m_eff(S)) / (1 − m_eff(S)).";
+  const tipFinal  = "Multiplied by your chosen Kelly fraction. ¼ Kelly halves variance and only modestly reduces growth — common practice.";
+  el.innerHTML = `
+    <div class="cascade-row" data-tip="${tipNaive}">
+      <span>Naive Kelly</span>
+      <span class="num">${fmt$(c.sNaive)}</span>
+      <span class="pct">${fmtPct(c.fNaiveBase)}</span>
+    </div>
+    <div class="cascade-row delta" data-tip="${tipRobust}">
+      <span>− robust shrink (credible bound)</span>
+      <span class="num">${fmt$(-Math.abs(dNaiveToRobust))}</span>
+      <span class="pct">−${fmtPct(c.fNaiveBase - c.fRobustBase)}</span>
+    </div>
+    <div class="cascade-row sum">
+      <span>= Robust Kelly</span>
+      <span class="num">${fmt$(c.sRobust)}</span>
+      <span class="pct">${fmtPct(c.fRobustBase)}</span>
+    </div>
+    <div class="cascade-row delta" data-tip="${tipBook}">
+      <span>− order-book slip</span>
+      <span class="num">${fmt$(-Math.abs(dRobustToBook))}</span>
+      <span class="pct">−${fmtPct(c.fRobustBase - c.fBook)}</span>
+    </div>
+    <div class="cascade-row sum">
+      <span>= Book-aware</span>
+      <span class="num">${fmt$(c.sBook)}</span>
+      <span class="pct">${fmtPct(c.fBook)}</span>
+    </div>
+    <div class="cascade-row delta" data-tip="${tipFinal}">
+      <span>× ${c.kf.toFixed(2)} fractional Kelly</span>
+      <span class="num">${fmt$(-Math.abs(dBookToFinal))}</span>
+      <span class="pct">−${fmtPct(c.fBook - c.fFinal)}</span>
+    </div>
+    <div class="cascade-row final">
+      <span>= Recommended</span>
+      <span class="num">${fmt$(c.sFinal)}</span>
+      <span class="pct">${fmtPct(c.fFinal)}</span>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Chart.js — bankroll percentile fans
+// ─────────────────────────────────────────────────────────────────────────────
+function renderChart(mc, n) {
+  const ctx = document.getElementById('sim-chart');
+  if (!ctx) return;
+  if (chart) chart.destroy();
+  const labels = Array.from({ length: n + 1 }, (_, i) => i);
+  const ds = (label, data, color, fill, dash) => ({
+    label, data, borderColor: color, borderWidth: dash ? 1 : 1.6, borderDash: dash || [],
+    fill, backgroundColor: fill ? color : 'transparent',
+    pointRadius: 0, tension: 0.05,
+  });
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        ds('5%',     Array.from(mc.q05),    'rgba(99,102,241,0.0)', false),
+        ds('95%',    Array.from(mc.q95),    'rgba(99,102,241,0.4)', '-1'),
+        ds('25%',    Array.from(mc.q25),    'rgba(34,197,94,0.0)',  false),
+        ds('75%',    Array.from(mc.q75),    'rgba(34,197,94,0.5)',  '-1'),
+        ds('Median', Array.from(mc.median), '#22c55e',              false),
+        ds('Baseline (1.0×)', Array(n + 1).fill(1.0), 'rgba(255,255,255,0.25)', false, [4, 4]),
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111', borderColor: '#2a2a2a', borderWidth: 1,
+          titleColor: '#e8e8e8', bodyColor: '#e8e8e8',
+          callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}×` },
+        },
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Bets', color: '#666', font: { size: 11 } },
+          ticks: { color: '#666', font: { family: 'JetBrains Mono', size: 10 } },
+          grid:  { color: 'rgba(255,255,255,.04)' },
+        },
+        y: {
+          title: { display: true, text: 'Bankroll multiple', color: '#666', font: { size: 11 } },
+          type: 'logarithmic',
+          ticks: { color: '#666', font: { family: 'JetBrains Mono', size: 10 },
+                   callback: v => v.toFixed(2) + '×' },
+          grid:  { color: 'rgba(255,255,255,.04)' },
+        },
+      },
+    },
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Wiring
+// ─────────────────────────────────────────────────────────────────────────────
+['bankroll','bid','ask','top-size','bo1','bs1','bo2','bs2','bo3','bs3',
+ 'phat','credible','kelly-frac','days','horizon'].forEach(id => {
+  $(id).addEventListener('input', recompute);
 });
-$('side-no').addEventListener('click', () => {
-  side = 'NO'; $('side-no').classList.add('active'); $('side-yes').classList.remove('active'); recalc();
-});
 
-// Kelly fraction toggle
-document.querySelectorAll('.kelly-fractions button').forEach(b =>
-  b.addEventListener('click', () => {
-    kellyFrac = parseFloat(b.dataset.frac);
-    document.querySelectorAll('.kelly-fractions button').forEach(o => o.classList.remove('active'));
-    b.classList.add('active');
-    recalc();
-  })
-);
+document.querySelectorAll('[data-dir]').forEach(b => b.addEventListener('click', () => {
+  state.dir = b.dataset.dir;
+  document.querySelectorAll('[data-dir]').forEach(o => o.classList.toggle('active', o === b));
+  recompute();
+}));
+document.querySelectorAll('[data-conf]').forEach(b => b.addEventListener('click', () => {
+  state.conf = parseInt(b.dataset.conf);
+  document.querySelectorAll('[data-conf]').forEach(o => o.classList.toggle('active', o === b));
+  recompute();
+}));
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(o => o.classList.toggle('active', o === t));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+  if (t.dataset.tab === 'sim' && chart) chart.resize();
+}));
 
-// Auto-fill from live ProbBrain signals
+// ─────────────────────────────────────────────────────────────────────────────
+// Auto-fill from live ProbBrain signal
+// ─────────────────────────────────────────────────────────────────────────────
 fetch('./accuracy.json?t=' + Date.now()).then(r => r.json()).then(d => {
   const open = (d.signals || []).filter(s =>
-    s.status === 'PENDING' && s.market_price > 0 && s.our_estimate > 0
-  ).sort((a, b) => (b.signal_number || 0) - (a.signal_number || 0)).slice(0, 25);
+    (s.status === 'PENDING' || s.status === 'SHADOW') && s.market_price > 0 && s.our_estimate > 0
+  ).sort((a, b) => (b.signal_number || 0) - (a.signal_number || 0)).slice(0, 30);
   const sel = $('signal-select');
   open.forEach(s => {
     const opt = document.createElement('option');
@@ -430,21 +912,26 @@ fetch('./accuracy.json?t=' + Date.now()).then(r => r.json()).then(d => {
     opt.dataset.market = s.market_price;
     opt.dataset.estimate = s.our_estimate;
     opt.dataset.direction = s.direction;
-    opt.textContent = `${s.id} · ${s.title.slice(0, 60)}`;
+    opt.dataset.shadow = s.shadow ? '1' : '0';
+    opt.textContent = `${s.id}${s.shadow ? ' 🕶' : ''} · ${(s.title || '').slice(0, 60)}`;
     sel.appendChild(opt);
   });
   sel.addEventListener('change', () => {
     const opt = sel.options[sel.selectedIndex];
     if (!opt.value) return;
-    $('market').value = parseFloat(opt.dataset.market).toFixed(2);
-    $('estimate').value = parseFloat(opt.dataset.estimate).toFixed(2);
-    if (opt.dataset.direction === 'NO_UNDERPRICED') $('side-no').click();
-    else $('side-yes').click();
-    recalc();
+    const market = parseFloat(opt.dataset.market);
+    const est    = parseFloat(opt.dataset.estimate);
+    // Fill bid/ask as a tight 1pp spread around market price.
+    $('bid').value = Math.max(0.01, market - 0.005).toFixed(3);
+    $('ask').value = Math.min(0.99, market + 0.005).toFixed(3);
+    $('phat').value = est.toFixed(3);
+    if (opt.dataset.direction === 'NO_UNDERPRICED') $('dir-no').click();
+    else $('dir-yes').click();
+    recompute();
   });
 }).catch(() => {});
 
-recalc();
+recompute();
 </script>
 </body>
 </html>
