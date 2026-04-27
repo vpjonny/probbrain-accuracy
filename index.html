@@ -526,6 +526,79 @@
     .disclaimer { font-size: 0.72rem; color: var(--muted2); }
 
     /* Visit Counter */
+    /* Animated multi-blob background — Telegram-style, tied to Polymarket stats.
+       Each blob's radius is set from JS to reflect its share of signals; the
+       whole layer briefly intensifies when a new event arrives in the data feed.
+       Heavy blur + low opacity so it sits behind everything without competing
+       with foreground content. */
+    .bg-blobs {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+      filter: blur(80px) saturate(1.3);
+      opacity: 0.32;
+      transition: opacity 1.4s ease-out;
+    }
+    .bg-blobs.flashing { opacity: 0.62; transition: opacity 0.3s ease-out; }
+    .bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      width: var(--blob-size, 36vmin);
+      height: var(--blob-size, 36vmin);
+      will-change: transform;
+      transition: width 1.6s ease-out, height 1.6s ease-out;
+    }
+    .bg-blob.win {
+      --blob-size: var(--blob-win, 32vmin);
+      background: radial-gradient(circle, rgba(34, 197, 94, 1) 0%, rgba(34, 197, 94, 0) 65%);
+      top: -12vmin; left: -12vmin;
+      animation: drift-a 24s ease-in-out infinite alternate;
+    }
+    .bg-blob.loss {
+      --blob-size: var(--blob-loss, 32vmin);
+      background: radial-gradient(circle, rgba(239, 68, 68, 1) 0%, rgba(239, 68, 68, 0) 65%);
+      top: -12vmin; right: -12vmin;
+      animation: drift-b 28s ease-in-out infinite alternate;
+    }
+    .bg-blob.pending {
+      --blob-size: var(--blob-pending, 36vmin);
+      background: radial-gradient(circle, rgba(99, 102, 241, 1) 0%, rgba(99, 102, 241, 0) 65%);
+      bottom: -12vmin; left: -12vmin;
+      animation: drift-c 26s ease-in-out infinite alternate;
+    }
+    .bg-blob.shadow {
+      --blob-size: var(--blob-shadow, 24vmin);
+      background: radial-gradient(circle, rgba(167, 139, 250, 1) 0%, rgba(167, 139, 250, 0) 65%);
+      bottom: -12vmin; right: -12vmin;
+      animation: drift-d 30s ease-in-out infinite alternate;
+    }
+    @keyframes drift-a {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(40vw, 28vh) scale(1.15); }
+      100% { transform: translate(62vw, 52vh) scale(0.88); }
+    }
+    @keyframes drift-b {
+      0%   { transform: translate(0, 0) scale(0.92); }
+      50%  { transform: translate(-50vw, 36vh) scale(1.18); }
+      100% { transform: translate(-26vw, 60vh) scale(1.02); }
+    }
+    @keyframes drift-c {
+      0%   { transform: translate(0, 0) scale(1.08); }
+      50%  { transform: translate(46vw, -32vh) scale(0.92); }
+      100% { transform: translate(22vw, -56vh) scale(1.15); }
+    }
+    @keyframes drift-d {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(-42vw, -26vh) scale(0.86); }
+      100% { transform: translate(-66vw, -46vh) scale(1.12); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bg-blob { animation: none !important; transform: none !important; }
+      .bg-blobs { opacity: 0.2; }
+    }
+
     /* Skeleton loading */
     @keyframes shimmer {
       0%   { background-position: -200% 0; }
@@ -758,6 +831,13 @@
       </a>
     </div>
   </header>
+
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="bg-blob win"></div>
+    <div class="bg-blob loss"></div>
+    <div class="bg-blob pending"></div>
+    <div class="bg-blob shadow"></div>
+  </div>
 
   <div class="activity-strip" id="activity-strip" style="display:none"></div>
 
@@ -995,6 +1075,38 @@
           <path class="${cls} sparkline-fill" d="${fillPath}" stroke="none"/>
           <path class="${cls}" d="${path}" fill="none" stroke-width="1.5"/>
         </svg></span>`;
+    }
+
+    // Map signal counts to blob radii (vmin units). Larger share = bigger blob.
+    function updateBackgroundBlobs(d) {
+      const correct = d.correct || 0;
+      const resolved = d.signals_resolved || 0;
+      const losses = Math.max(0, resolved - correct);
+      const pending = Math.max(0, (d.signals_published || 0) - resolved);
+      const shadow = d.signals_shadow || 0;
+      const total = correct + losses + pending + shadow;
+      const root = document.documentElement.style;
+      // Min 18vmin so a category with zero signals still has presence; max 70vmin.
+      const size = (n) => (total ? 18 + (n / total) * 52 : 30).toFixed(1) + 'vmin';
+      root.setProperty('--blob-win', size(correct));
+      root.setProperty('--blob-loss', size(losses));
+      root.setProperty('--blob-pending', size(pending));
+      root.setProperty('--blob-shadow', size(shadow));
+    }
+
+    // Flash the background when the activity feed brings in a newer event than
+    // we'd previously seen. Skipped on first load (we only flash for *changes*).
+    function maybeFlashOnNewEvent(events) {
+      if (!events || !events.length) return;
+      const newestTs = events[0].ts || '';
+      if (window._lastSeenEventTs && newestTs > window._lastSeenEventTs) {
+        const bg = document.querySelector('.bg-blobs');
+        if (bg) {
+          bg.classList.add('flashing');
+          setTimeout(() => bg.classList.remove('flashing'), 1800);
+        }
+      }
+      window._lastSeenEventTs = newestTs;
     }
 
     function renderActivity(events) {
@@ -1287,6 +1399,8 @@
           document.getElementById('count-live').textContent = liveCount;
           document.getElementById('count-shadow').textContent = shadowCount;
 
+          updateBackgroundBlobs(d);
+          maybeFlashOnNewEvent(d.activity);
           renderActivity(d.activity);
           renderHistoryChart(d.history);
           renderResolvingSoon(d.resolving_soon);
