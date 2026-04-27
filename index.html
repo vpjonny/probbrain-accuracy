@@ -1,10 +1,1045 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url=dashboard/">
-  <title>Redirecting to ProbBrain Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>ProbBrain — Signal Accuracy Hub</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --border: #222222;
+      --border2: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #666;
+      --muted2: #444;
+      --green: #22c55e;
+      --green-dim: #14532d;
+      --yellow: #eab308;
+      --yellow-dim: #713f12;
+      --red: #ef4444;
+      --red-dim: #7f1d1d;
+      --blue: #3b82f6;
+      --accent: #6366f1;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 12px; }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #eab308;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+    .logo span { color: var(--accent); }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #0f2010;
+      border: 1px solid #1a4020;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .header-right { display: flex; align-items: center; gap: 8px; }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .social-link:hover { border-color: var(--accent); background: #16172a; }
+    .social-link svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* Ticker */
+    .ticker-bar {
+      overflow: hidden;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 0;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: ticker 30s linear infinite;
+    }
+
+    .ticker-segment {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .ticker-text {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .ticker-sep {
+      color: var(--muted2);
+      margin: 0 24px;
+      font-size: 0.6rem;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Main */
+    .main { padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .kpi-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--border2);
+    }
+
+    .kpi-card.accent-green::before { background: var(--green); }
+    .kpi-card.accent-yellow::before { background: var(--yellow); }
+    .kpi-card.accent-red::before { background: var(--red); }
+    .kpi-card.accent-blue::before { background: var(--blue); }
+
+    .kpi-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .kpi-value.green { color: var(--green); }
+    .kpi-value.yellow { color: var(--yellow); }
+    .kpi-value.red { color: var(--red); }
+    .kpi-value.blue { color: var(--blue); }
+    .kpi-value.muted { color: var(--muted); }
+
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trend-up { color: var(--green); }
+    .trend-down { color: var(--red); }
+    .trend-flat { color: var(--muted); }
+
+    /* Signal Table */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 36px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+
+    thead { background: var(--bg2); }
+
+    th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th[data-sort] {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
+    }
+
+    th[data-sort]:hover { color: var(--text); }
+
+    th[data-sort]::after {
+      content: ' \2195';
+      opacity: 0.3;
+      font-size: 0.8em;
+    }
+
+    th[data-sort].sort-asc::after { content: ' \2191'; opacity: 1; color: var(--accent); }
+    th[data-sort].sort-desc::after { content: ' \2193'; opacity: 1; color: var(--accent); }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #111; }
+    tbody tr[data-href] { cursor: pointer; }
+    tbody tr[data-href]:hover { background: #161622; }
+
+    td { padding: 13px 14px; vertical-align: middle; }
+
+    .signal-num { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+
+    .signal-title { font-weight: 500; max-width: 260px; }
+    .signal-cat { font-size: 0.7rem; color: var(--muted); margin-top: 2px; text-transform: capitalize; }
+
+    .dir-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .dir-no { background: var(--red-dim); color: #fca5a5; }
+    .dir-yes { background: var(--green-dim); color: #86efac; }
+
+    .conf-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .conf-high { background: var(--red-dim); color: #fca5a5; }
+    .conf-medium { background: var(--yellow-dim); color: #fde68a; }
+    .conf-low { background: var(--muted2); color: #aaa; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .status-pending { background: #1a1a2e; color: #818cf8; border: 1px solid #312e81; }
+    .status-win { background: var(--green-dim); color: #86efac; border: 1px solid #166534; }
+    .status-loss { background: var(--red-dim); color: #fca5a5; border: 1px solid #991b1b; }
+    .status-delisted { background: #2a1a1a; color: #999; border: 1px solid #4a2a2a; }
+
+    .prob-col { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .prob-market { color: var(--muted); }
+    .prob-sep { color: var(--muted2); margin: 0 4px; }
+    .prob-ours { font-weight: 600; }
+
+    .gap-pill {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .gap-high { background: #1a0f2e; color: #c084fc; }
+    .gap-medium { background: #1e1a0f; color: #fde68a; }
+    .gap-low { background: #111; color: var(--muted); }
+
+    .close-date { color: var(--muted); font-size: 0.78rem; }
+
+    .empty-row td { color: var(--muted); text-align: center; padding: 32px; }
+
+    /* Filter buttons */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+    }
+
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .filter-btn .filter-count {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.15);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter-btn.active .filter-count {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Search bar */
+    .table-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 8px 14px;
+      flex: 1;
+      max-width: 400px;
+      transition: border-color 0.15s;
+    }
+
+    .search-box:focus-within { border-color: var(--accent); }
+
+    .search-box svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+
+    .search-box input {
+      border: none;
+      background: none;
+      color: var(--text);
+      font-size: 0.84rem;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .search-box input::placeholder { color: var(--muted2); }
+
+    .page-info { font-size: 0.75rem; color: var(--muted); }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      background: var(--bg2);
+    }
+
+    .page-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      font-family: inherit;
+    }
+
+    .page-btn:hover:not(:disabled) { border-color: var(--accent); background: #16172a; }
+    .page-btn:disabled { opacity: 0.3; cursor: default; }
+    .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+
+    .page-ellipsis { color: var(--muted2); font-size: 0.78rem; padding: 0 4px; }
+
+    /* Category breakdown */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    .cat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .cat-name { font-size: 0.78rem; font-weight: 600; text-transform: capitalize; margin-bottom: 8px; }
+    .cat-stats { display: flex; gap: 12px; }
+    .cat-stat { font-size: 0.72rem; color: var(--muted); }
+    .cat-stat strong { color: var(--text); font-size: 0.9rem; display: block; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #updated { font-size: 0.75rem; color: var(--muted); }
+    .disclaimer { font-size: 0.72rem; color: var(--muted2); }
+
+    /* Visit Counter */
+    .visit-counter {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      z-index: 100;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .visit-counter:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .visit-counter svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .visit-count { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
+    .visit-label { color: var(--muted); }
+
+    @keyframes countPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .visit-counter.loaded { animation: countPop 0.3s ease; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .header { padding: 12px 16px; }
+      .main { padding: 20px 16px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-value { font-size: 1.6rem; }
+      .table-wrap { overflow-x: auto; }
+      table { min-width: 620px; }
+      .footer { flex-direction: column; align-items: flex-start; }
+      .social-link { padding: 5px 9px; font-size: 0.75rem; }
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="dashboard/">ProbBrain Dashboard</a>...</p>
+
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">Prob<span>Brain</span></div>
+      <div class="live-badge">
+        <div class="pulse-dot"></div>
+        Live
+      </div>
+    </div>
+    <div class="header-center">
+      ⚠ We are still testing and calibrating the system, USE CAUTION
+    </div>
+    <div class="header-right">
+      <a class="social-link" href="https://t.me/ProbBrain" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.062 13.67l-2.948-.924c-.643-.204-.657-.643.136-.953l11.51-4.437c.537-.194 1.006.131.802.892z"/></svg>
+        Telegram
+      </a>
+      <a class="social-link" href="https://x.com/ProbBrain" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
+    </div>
+  </header>
+
+  <div class="ticker-bar">
+    <div class="ticker-track">
+      <div class="ticker-segment">
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+      </div>
+      <div class="ticker-segment">
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-sep">&bull;</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+
+    <div class="section-title">Performance Overview</div>
+    <div class="kpi-grid">
+      <div class="kpi-card accent-blue">
+        <div class="kpi-label">Published</div>
+        <div class="kpi-value blue" id="published">—</div>
+        <div class="kpi-sub">signals total</div>
+      </div>
+      <div class="kpi-card" id="card-resolved">
+        <div class="kpi-label">Resolved</div>
+        <div class="kpi-value muted" id="resolved">—</div>
+        <div class="kpi-sub" id="resolved-sub">of total</div>
+      </div>
+      <div class="kpi-card" id="card-accuracy">
+        <div class="kpi-label">Accuracy</div>
+        <div class="kpi-value muted" id="accuracy">—</div>
+        <div class="kpi-sub" id="accuracy-sub">awaiting resolution</div>
+      </div>
+      <div class="kpi-card" id="card-brier">
+        <div class="kpi-label">Brier Score</div>
+        <div class="kpi-value muted" id="brier">—</div>
+        <div class="kpi-sub">lower = better</div>
+      </div>
+      <div class="kpi-card" id="card-streak">
+        <div class="kpi-label">Streak</div>
+        <div class="kpi-value muted" id="streak">—</div>
+        <div class="kpi-sub" id="streak-sub">no resolved signals</div>
+      </div>
+    </div>
+
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn active" data-filter="all">Signals <span class="filter-count" id="count-all">—</span></button>
+      <button class="filter-btn" data-filter="resolved">Resolved <span class="filter-count" id="count-resolved">—</span></button>
+      <button class="filter-btn" data-filter="pending">Pending <span class="filter-count" id="count-pending">—</span></button>
+    </div>
+
+    <div class="section-title">Signal Log</div>
+    <div class="table-controls">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="signal-search" placeholder="Search signals by market, category, direction..." autocomplete="off">
+      </div>
+      <div class="page-info" id="page-info"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="number">#</th>
+            <th data-sort="market">Market</th>
+            <th data-sort="direction">Direction</th>
+            <th data-sort="market_price">Market vs Ours</th>
+            <th data-sort="gap">Gap</th>
+            <th data-sort="confidence">Confidence</th>
+            <th data-sort="status">Status</th>
+            <th data-sort="close_date">Closes</th>
+          </tr>
+        </thead>
+        <tbody id="signal-body">
+          <tr class="empty-row"><td colspan="8">Loading signals...</td></tr>
+        </tbody>
+      </table>
+      <div class="pagination" id="pagination" style="display:none"></div>
+    </div>
+
+    <div id="cat-section" style="display:none">
+      <div class="section-title">By Category</div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+
+  </main>
+
+  <div class="visit-counter" id="visit-counter" title="Total page visits">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span class="visit-count" id="visit-count">—</span>
+    <span class="visit-label">visits</span>
+  </div>
+
+  <footer class="footer">
+    <div id="updated">Loading...</div>
+    <div class="disclaimer">Not financial advice. All numbers are exact — no rounding up.</div>
+  </footer>
+
+  <script>
+    function dirBadge(dir) {
+      if (dir === 'NO_UNDERPRICED') return '<span class="dir-badge dir-no">&#9660; Bet NO</span>';
+      if (dir === 'YES_UNDERPRICED') return '<span class="dir-badge dir-yes">&#9650; Bet YES</span>';
+      return `<span class="dir-badge">${dir}</span>`;
+    }
+
+    function confBadge(c) {
+      const cls = c === 'HIGH' ? 'conf-high' : c === 'MEDIUM' ? 'conf-medium' : 'conf-low';
+      return `<span class="conf-badge ${cls}">${c}</span>`;
+    }
+
+    function statusBadge(s) {
+      if (s === 'WIN') return '<span class="status-badge status-win">&#10003; WIN</span>';
+      if (s === 'LOSS') return '<span class="status-badge status-loss">&#10007; LOSS</span>';
+      if (s === 'delisted') return '<span class="status-badge status-delisted">⊘ DELISTED</span>';
+      return '<span class="status-badge status-pending">&#9685; PENDING</span>';
+    }
+
+    function gapPill(g) {
+      const cls = g >= 30 ? 'gap-high' : g >= 10 ? 'gap-medium' : 'gap-low';
+      return `<span class="gap-pill ${cls}">${g.toFixed(1)}pp</span>`;
+    }
+
+    function loadData() {
+      var jsonUrl = 'accuracy.json?t=' + Date.now();
+      fetch(jsonUrl)
+        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(d => {
+          document.getElementById('updated').textContent = d.updated_at
+            ? 'Last updated: ' + new Date(d.updated_at).toUTCString() + ' \u00b7 auto-refreshes every 60s'
+            : 'No data yet.';
+
+          // Published
+          document.getElementById('published').textContent = d.signals_published ?? '0';
+
+          // Resolved
+          document.getElementById('resolved').textContent = d.signals_resolved ?? '0';
+          const pctRes = d.signals_published ? Math.round((d.signals_resolved / d.signals_published) * 100) : 0;
+          document.getElementById('resolved-sub').textContent = pctRes + '% of total';
+
+          // Accuracy
+          const accEl = document.getElementById('accuracy');
+          const accSub = document.getElementById('accuracy-sub');
+          const cardAcc = document.getElementById('card-accuracy');
+          if (d.accuracy_pct != null) {
+            const cls = d.accuracy_pct >= 65 ? 'green' : d.accuracy_pct >= 50 ? 'yellow' : 'red';
+            accEl.textContent = d.accuracy_pct.toFixed(1) + '%';
+            accEl.className = 'kpi-value ' + cls;
+            cardAcc.className = 'kpi-card accent-' + cls;
+            const arrow = d.accuracy_pct >= 65 ? '\u25b2' : d.accuracy_pct >= 50 ? '\u25a4' : '\u25bc';
+            accSub.textContent = arrow + ' vs 50% baseline';
+          } else {
+            accEl.textContent = '—';
+            accEl.className = 'kpi-value muted';
+            cardAcc.className = 'kpi-card';
+            accSub.textContent = 'awaiting resolution';
+          }
+
+          // Brier
+          const brierEl = document.getElementById('brier');
+          const cardBrier = document.getElementById('card-brier');
+          if (d.brier_score != null) {
+            const cls = d.brier_score <= 0.2 ? 'green' : d.brier_score <= 0.33 ? 'yellow' : 'red';
+            brierEl.textContent = d.brier_score.toFixed(3);
+            brierEl.className = 'kpi-value ' + cls;
+            cardBrier.className = 'kpi-card accent-' + cls;
+          } else {
+            brierEl.textContent = '—';
+            brierEl.className = 'kpi-value muted';
+            cardBrier.className = 'kpi-card';
+          }
+
+          // Streak
+          const streakEl = document.getElementById('streak');
+          const streakSub = document.getElementById('streak-sub');
+          const cardStreak = document.getElementById('card-streak');
+          if (d.current_streak) {
+            const isWin = d.streak_type === 'win';
+            streakEl.textContent = (isWin ? '+' : '-') + d.current_streak;
+            streakEl.className = 'kpi-value ' + (isWin ? 'green' : 'red');
+            cardStreak.className = 'kpi-card accent-' + (isWin ? 'green' : 'red');
+            streakSub.textContent = isWin ? 'win streak' : 'loss streak';
+          } else {
+            streakEl.textContent = '—';
+            streakEl.className = 'kpi-value muted';
+            cardStreak.className = 'kpi-card';
+            streakSub.textContent = 'no resolved signals';
+          }
+
+          // Signal table — store globally for pagination/search (newest first)
+          window._allSignals = (d.signals || []).slice().sort((a, b) => {
+            const da = a.published_at || '';
+            const db = b.published_at || '';
+            return da < db ? 1 : da > db ? -1 : b.signal_number - a.signal_number;
+          });
+          window._searchQuery = document.getElementById('signal-search').value;
+          if (!window._currentPage) window._currentPage = 1;
+
+          // Update filter counts
+          const all = window._allSignals;
+          const resolvedCount = all.filter(s => s.status === 'WIN' || s.status === 'LOSS' || s.status === 'delisted').length;
+          const pendingCount = all.filter(s => s.status === 'PENDING' || !s.status).length;
+          document.getElementById('count-all').textContent = all.length;
+          document.getElementById('count-resolved').textContent = resolvedCount;
+          document.getElementById('count-pending').textContent = pendingCount;
+
+          renderSignalTable();
+
+          // Category breakdown
+          const cats = d.by_category || {};
+          const catSection = document.getElementById('cat-section');
+          if (Object.keys(cats).length) {
+            catSection.style.display = '';
+            document.getElementById('cat-grid').innerHTML = Object.entries(cats).map(([cat, s]) => `
+              <div class="cat-card">
+                <div class="cat-name">${cat}</div>
+                <div class="cat-stats">
+                  <div class="cat-stat"><strong>${s.resolved}</strong>resolved</div>
+                  <div class="cat-stat"><strong>${s.correct}</strong>correct</div>
+                  <div class="cat-stat"><strong>${s.accuracy_pct != null ? s.accuracy_pct.toFixed(0) + '%' : '—'}</strong>accuracy</div>
+                </div>
+              </div>`).join('');
+          } else {
+            catSection.style.display = 'none';
+          }
+        })
+        .catch(function(err) {
+          console.error('Dashboard load error:', err, 'URL:', jsonUrl);
+          var el = document.getElementById('updated');
+          el.textContent = 'Error loading data: ' + err.message + '. Retrying...';
+          el.style.color = '#ef4444';
+          setTimeout(loadData, 3000);
+        });
+    }
+
+    const PAGE_SIZE = 25;
+
+    // Filter state
+    window._statusFilter = 'all'; // 'all', 'resolved', 'pending'
+
+    // Sort state
+    window._sortCol = null;
+    window._sortDir = null; // 'asc' or 'desc'
+
+    const CONF_ORDER = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+    const STATUS_ORDER = { WIN: 3, LOSS: 2, PENDING: 1 };
+
+    function compareSignals(a, b, col) {
+      switch (col) {
+        case 'number': return a.signal_number - b.signal_number;
+        case 'market': return (a.title || '').localeCompare(b.title || '');
+        case 'direction': return (a.direction || '').localeCompare(b.direction || '');
+        case 'market_price': return (a.market_price || 0) - (b.market_price || 0);
+        case 'gap': return (a.gap_pct || 0) - (b.gap_pct || 0);
+        case 'confidence': return (CONF_ORDER[a.confidence] || 0) - (CONF_ORDER[b.confidence] || 0);
+        case 'status': return (STATUS_ORDER[a.status] || 0) - (STATUS_ORDER[b.status] || 0);
+        case 'close_date': return (a.close_date || '').localeCompare(b.close_date || '');
+        default: return 0;
+      }
+    }
+
+    function getFilteredSignals() {
+      const q = (window._searchQuery || '').toLowerCase().trim();
+      let signals = window._allSignals || [];
+
+      // Status filter
+      const f = window._statusFilter || 'all';
+      if (f === 'resolved') {
+        signals = signals.filter(s => s.status === 'WIN' || s.status === 'LOSS' || s.status === 'delisted');
+      } else if (f === 'pending') {
+        signals = signals.filter(s => s.status === 'PENDING' || !s.status);
+      }
+
+      if (q) {
+        signals = signals.filter(s =>
+          (s.title || '').toLowerCase().includes(q) ||
+          (s.category || '').toLowerCase().includes(q) ||
+          (s.direction || '').toLowerCase().includes(q) ||
+          (s.status || '').toLowerCase().includes(q) ||
+          (s.confidence || '').toLowerCase().includes(q) ||
+          ('#' + s.signal_number).includes(q)
+        );
+      }
+      if (window._sortCol) {
+        const dir = window._sortDir === 'asc' ? 1 : -1;
+        signals = signals.slice().sort((a, b) => dir * compareSignals(a, b, window._sortCol));
+      }
+      return signals;
+    }
+
+    function renderSignalRow(s) {
+      const mkt = s.market_price > 0 ? Math.round(s.market_price * 100) + '%' : '—';
+      const ours = s.our_estimate > 0 ? Math.round(s.our_estimate * 100) + '%' : '—';
+      const href = s.polymarket_slug
+        ? 'https://polymarket.com/' + (s.polymarket_slug.includes('/') ? 'event' : 'market') + '/' + s.polymarket_slug + '?via=0x-slova'
+        : '';
+      return `<tr${href ? ' data-href="' + href + '"' : ''}>
+        <td><span class="signal-num">#${s.signal_number}</span></td>
+        <td>
+          <div class="signal-title">${s.title}</div>
+          <div class="signal-cat">${s.category}</div>
+        </td>
+        <td>${dirBadge(s.direction)}</td>
+        <td><span class="prob-col"><span class="prob-market">${mkt}</span><span class="prob-sep">/</span><span class="prob-ours">${ours}</span></span></td>
+        <td>${gapPill(s.gap_pct)}</td>
+        <td>${confBadge(s.confidence)}</td>
+        <td>${statusBadge(s.status)}</td>
+        <td><span class="close-date">${s.close_date || '—'}</span></td>
+      </tr>`;
+    }
+
+    function buildPageButtons(totalPages, current) {
+      const btns = [];
+      const add = (label, page, disabled, active) => {
+        if (active) btns.push(`<button class="page-btn active" disabled>${label}</button>`);
+        else if (disabled) btns.push(`<button class="page-btn" disabled>${label}</button>`);
+        else btns.push(`<button class="page-btn" data-page="${page}">${label}</button>`);
+      };
+
+      add('‹', current - 1, current === 1, false);
+
+      // Show pages with ellipsis
+      const range = [];
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+          range.push(i);
+        } else if (range[range.length - 1] !== '...') {
+          range.push('...');
+        }
+      }
+
+      range.forEach(p => {
+        if (p === '...') btns.push('<span class="page-ellipsis">…</span>');
+        else add(String(p), p, false, p === current);
+      });
+
+      add('›', current + 1, current === totalPages, false);
+      return btns.join('');
+    }
+
+    function renderSignalTable() {
+      const filtered = getFilteredSignals();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      const page = Math.min(window._currentPage || 1, totalPages);
+      window._currentPage = page;
+
+      const start = (page - 1) * PAGE_SIZE;
+      const pageSignals = filtered.slice(start, start + PAGE_SIZE);
+
+      const tbody = document.getElementById('signal-body');
+      const pagination = document.getElementById('pagination');
+      const pageInfo = document.getElementById('page-info');
+
+      if (!filtered.length) {
+        const msg = window._searchQuery ? 'No signals match your search.' : 'No signals published yet.';
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="8">${msg}</td></tr>`;
+        pagination.style.display = 'none';
+        pageInfo.textContent = '';
+        return;
+      }
+
+      tbody.innerHTML = pageSignals.map(renderSignalRow).join('');
+      tbody.querySelectorAll('tr[data-href]').forEach(row => {
+        row.addEventListener('click', () => window.open(row.dataset.href, '_blank'));
+      });
+
+      // Page info
+      const end = Math.min(start + PAGE_SIZE, filtered.length);
+      const suffix = window._searchQuery ? ` (filtered from ${(window._allSignals || []).length})` : '';
+      pageInfo.textContent = `${start + 1}–${end} of ${filtered.length}${suffix}`;
+
+      // Pagination controls
+      if (totalPages > 1) {
+        pagination.style.display = '';
+        pagination.innerHTML = buildPageButtons(totalPages, page);
+        pagination.querySelectorAll('.page-btn[data-page]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            window._currentPage = parseInt(btn.dataset.page);
+            renderSignalTable();
+          });
+        });
+      } else {
+        pagination.style.display = 'none';
+      }
+    }
+
+    // Search handler
+    document.getElementById('signal-search').addEventListener('input', function () {
+      window._searchQuery = this.value;
+      window._currentPage = 1;
+      renderSignalTable();
+    });
+
+    // Filter handler
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        window._statusFilter = this.dataset.filter;
+        window._currentPage = 1;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderSignalTable();
+      });
+    });
+
+    // Sort handler
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', function () {
+        const col = this.dataset.sort;
+        if (window._sortCol === col) {
+          // Cycle: desc → asc → none
+          if (window._sortDir === 'desc') { window._sortDir = 'asc'; }
+          else { window._sortCol = null; window._sortDir = null; }
+        } else {
+          window._sortCol = col;
+          window._sortDir = 'desc';
+        }
+        // Update header classes
+        document.querySelectorAll('th[data-sort]').forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+        if (window._sortCol) {
+          this.classList.add(window._sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+        }
+        window._currentPage = 1;
+        renderSignalTable();
+      });
+    });
+
+    // Visit counter — uses counterapi.dev (free, no signup)
+    (function() {
+      fetch('https://api.counterapi.dev/v1/probbrain-dashboard/visits/up')
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.count != null) {
+            document.getElementById('visit-count').textContent = d.count.toLocaleString();
+            document.getElementById('visit-counter').classList.add('loaded');
+          }
+        })
+        .catch(() => {});
+    })();
+
+    loadData();
+    setInterval(loadData, 60000);
+  </script>
 </body>
 </html>
