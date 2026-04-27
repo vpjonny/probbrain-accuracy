@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polymarket Kelly Criterion Calculator — ProbBrain</title>
+<meta name="description" content="Free Polymarket Kelly Criterion calculator. Compute the optimal stake size for any prediction-market bet given your edge, bankroll, and risk tolerance. Auto-fills from live ProbBrain signals.">
+<meta name="keywords" content="polymarket kelly calculator, kelly criterion, polymarket bet sizing, prediction market kelly, fractional kelly">
+<meta property="og:title" content="Polymarket Kelly Criterion Calculator">
+<meta property="og:description" content="Free tool to compute optimal stake size for Polymarket bets. Auto-fills from live ProbBrain signals.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vpjonny.github.io/probbrain-accuracy/kelly.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@ProbBrain">
+<link rel="canonical" href="https://vpjonny.github.io/probbrain-accuracy/kelly.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0a; --bg2: #111; --bg3: #1a1a1a;
+  --border: #222; --text: #e8e8e8; --muted: #666;
+  --green: #22c55e; --red: #ef4444; --blue: #3b82f6; --accent: #6366f1; --yellow: #eab308;
+}
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; padding: 24px 16px;
+}
+.mono, input, .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: 'tnum' 1; }
+.wrap { max-width: 880px; margin: 0 auto; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
+.logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+.logo span { color: var(--accent); }
+.back-link { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.back-link:hover { color: var(--text); }
+
+h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+.subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 720px) { .calc-grid { grid-template-columns: 1fr; } }
+
+.panel {
+  background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px;
+}
+.panel h2 { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; font-weight: 600; }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.field input, .field select {
+  width: 100%; padding: 10px 12px; font-size: 15px; font-weight: 600;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+  transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.side-toggle { display: flex; gap: 8px; }
+.side-toggle button {
+  flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--bg3); color: var(--muted); cursor: pointer; font-weight: 600; font-size: 14px;
+  transition: all 0.15s; font-family: inherit;
+}
+.side-toggle button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.kelly-fractions { display: flex; gap: 6px; flex-wrap: wrap; }
+.kelly-fractions button {
+  padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--bg3); color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.kelly-fractions button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.result-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.result-row:last-child { border-bottom: none; }
+.result-label { font-size: 12px; color: var(--muted); }
+.result-value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', monospace; }
+.result-value.green { color: var(--green); }
+.result-value.red { color: var(--red); }
+.result-value.muted { color: var(--muted); }
+
+.headline {
+  margin: 24px 0; padding: 22px; border-radius: 12px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(34,197,94,0.1) 100%);
+  border: 1px solid rgba(99,102,241,0.3);
+  text-align: center;
+}
+.headline.bad { background: linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(115,16,16,0.1) 100%); border-color: rgba(239,68,68,0.4); }
+.headline-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.headline-value { font-size: 2.4rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.headline-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+.cta {
+  margin-top: 32px; padding: 22px; border-radius: 12px;
+  background: rgba(59,130,246,0.08); border: 2px solid rgba(59,130,246,0.5);
+  text-align: center;
+}
+.cta h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--blue); }
+.cta p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+.cta a { display: inline-block; padding: 12px 28px; background: var(--blue); color: #fff;
+  text-decoration: none; font-weight: 700; border-radius: 6px; transition: opacity 0.15s; }
+.cta a:hover { opacity: 0.9; }
+
+.explain { margin-top: 32px; }
+.explain summary { cursor: pointer; padding: 12px 0; color: var(--accent); font-weight: 600; font-size: 14px; }
+.explain summary:hover { color: var(--text); }
+.explain[open] summary { color: var(--text); }
+.explain-body { padding: 12px 0; font-size: 14px; line-height: 1.7; color: #c0c0c0; }
+.explain-body code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green); }
+.explain-body p { margin-bottom: 12px; }
+.explain-body strong { color: var(--text); }
+
+.signal-loader { margin-bottom: 16px; padding: 12px; background: var(--bg2); border: 1px dashed var(--border); border-radius: 8px; }
+.signal-loader label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.signal-loader select { width: 100%; padding: 8px 12px; font-size: 13px; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+
+.footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+.footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">Prob<span>Brain</span></div>
+    <a class="back-link" href="./">← back to dashboard</a>
+  </div>
+
+  <h1>Polymarket Kelly Criterion Calculator</h1>
+  <p class="subtitle">Compute the optimal stake size for any Polymarket bet given your edge, bankroll, and risk tolerance. Full Kelly maximizes long-run growth but is famously aggressive — most pros use ¼ or ½ Kelly to cap variance.</p>
+
+  <div class="signal-loader">
+    <label for="signal-select">Auto-fill from a live ProbBrain signal:</label>
+    <select id="signal-select">
+      <option value="">— pick a signal to copy its market price + calibrated estimate —</option>
+    </select>
+  </div>
+
+  <div class="calc-grid">
+    <div class="panel">
+      <h2>Inputs</h2>
+
+      <div class="field">
+        <label>Bankroll (USD)</label>
+        <input type="number" id="bankroll" value="1000" min="0" step="50">
+      </div>
+
+      <div class="field">
+        <label>Side you're betting</label>
+        <div class="side-toggle">
+          <button id="side-yes" class="active">YES</button>
+          <button id="side-no">NO</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Market YES price (0–1, e.g. 0.20)</label>
+        <input type="number" id="market" value="0.20" min="0.01" max="0.99" step="0.01">
+      </div>
+
+      <div class="field">
+        <label>Your estimate of P(YES) (0–1)</label>
+        <input type="number" id="estimate" value="0.05" min="0" max="1" step="0.01">
+      </div>
+
+      <div class="field">
+        <label>Kelly fraction</label>
+        <div class="kelly-fractions">
+          <button data-frac="0.1">0.1×</button>
+          <button data-frac="0.25" class="active">¼ Kelly</button>
+          <button data-frac="0.5">½ Kelly</button>
+          <button data-frac="1">Full Kelly</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Output</h2>
+
+      <div class="result-row">
+        <span class="result-label">Implied market probability</span>
+        <span class="result-value muted" id="r-implied">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Your edge</span>
+        <span class="result-value" id="r-edge">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Decimal odds offered</span>
+        <span class="result-value" id="r-odds">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Full Kelly fraction</span>
+        <span class="result-value" id="r-kelly-full">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Stake at chosen Kelly</span>
+        <span class="result-value" id="r-stake">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">If you win, payoff</span>
+        <span class="result-value green" id="r-win">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">If you lose</span>
+        <span class="result-value red" id="r-lose">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Expected value</span>
+        <span class="result-value" id="r-ev">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="headline" id="headline">
+    <div class="headline-label">Recommended stake</div>
+    <div class="headline-value mono" id="headline-stake">$—</div>
+    <div class="headline-sub" id="headline-sub">enter your numbers above</div>
+  </div>
+
+  <div class="cta">
+    <h3>Ready to size your bet?</h3>
+    <p>Live trading happens on Polymarket — the world's largest prediction market.</p>
+    <a href="https://dub.sh/pb-x" target="_blank" rel="nofollow sponsored">🔮 Trade on Polymarket →</a>
+  </div>
+
+  <details class="explain">
+    <summary>How Kelly works (and why it matters for Polymarket)</summary>
+    <div class="explain-body">
+      <p><strong>The Kelly Criterion</strong> tells you the bet size that maximizes long-run logarithmic growth of your bankroll. It's the mathematically optimal answer to "how much should I bet?" given a known edge.</p>
+      <p>The formula for a binary bet: <code>f* = (b·p − q) / b</code></p>
+      <p>where <code>b</code> = decimal odds (net profit per unit staked), <code>p</code> = your probability of winning, <code>q = 1 − p</code>.</p>
+      <p><strong>Polymarket specifics:</strong> if you buy YES at $0.20, you risk $0.20 to win $0.80 per share — so <code>b = 0.80 / 0.20 = 4.0</code>. If you genuinely think YES will resolve at 40%, full Kelly says bet ~25% of your bankroll.</p>
+      <p><strong>Why fractional Kelly?</strong> Full Kelly is path-volatile. A 25% Kelly bet that loses 3 times in a row drops your bankroll 50%+. Most professional bettors use <strong>¼ to ½ Kelly</strong> to keep drawdowns survivable. Variance halves; expected growth only drops slightly.</p>
+      <p><strong>Negative edge?</strong> If your estimate doesn't beat the market price after fees, the optimal bet is <code>$0</code> — Kelly explicitly says don't bet. This calculator will show that result.</p>
+      <p><strong>Caveats:</strong> Kelly assumes you know <code>p</code>. Most retail bettors over-estimate their edge. If you're not 70%+ confident your estimate beats the market's, halve your Kelly fraction. Liquidity on Polymarket also caps real-world stake size — check the order book.</p>
+    </div>
+  </details>
+
+  <div class="footer">
+    Powered by <a href="./">ProbBrain</a> · Follow <a href="https://x.com/ProbBrain" target="_blank" rel="noopener">@ProbBrain</a> on X · Not financial advice.
+  </div>
+</div>
+
+<script>
+let side = 'YES';
+let kellyFrac = 0.25;
+
+function $(id) { return document.getElementById(id); }
+function fmt$(n) { if (!isFinite(n)) return '$—'; return '$' + (Math.abs(n) >= 1000 ? n.toFixed(0) : n.toFixed(2)); }
+function fmtPct(n) { if (!isFinite(n)) return '—'; return (n * 100).toFixed(1) + '%'; }
+
+function recalc() {
+  const bankroll = parseFloat($('bankroll').value) || 0;
+  const market = parseFloat($('market').value) || 0;
+  const p = parseFloat($('estimate').value) || 0;
+
+  // Validate inputs.
+  if (!(market > 0 && market < 1) || !(p >= 0 && p <= 1) || bankroll <= 0) {
+    return;
+  }
+
+  // For Polymarket: entry price = market for YES side, (1 - market) for NO side.
+  // P(win) = p for YES, (1 - p) for NO.
+  const entry = side === 'YES' ? market : (1 - market);
+  const pWin = side === 'YES' ? p : (1 - p);
+  const qWin = 1 - pWin;
+  // Decimal odds (net profit per dollar staked) = (1 - entry) / entry, since each share costs `entry` and pays $1 if it wins.
+  const b = (1 - entry) / entry;
+  // Edge = pWin - entry (your prob minus the implied prob of the side you take)
+  const edge = pWin - entry;
+  const fullKelly = (b * pWin - qWin) / b;
+  const fractionUsed = Math.max(0, fullKelly) * kellyFrac;
+  const stake = bankroll * fractionUsed;
+  const winPayoff = stake * b;
+  const losePayoff = -stake;
+  const ev = pWin * winPayoff + qWin * losePayoff;
+
+  $('r-implied').textContent = fmtPct(market) + ' YES · ' + fmtPct(1 - market) + ' NO';
+  $('r-edge').textContent = (edge >= 0 ? '+' : '') + fmtPct(edge);
+  $('r-edge').className = 'result-value ' + (edge > 0.005 ? 'green' : edge < -0.005 ? 'red' : 'muted');
+  $('r-odds').textContent = b.toFixed(2) + 'x';
+  $('r-kelly-full').textContent = fmtPct(fullKelly);
+  $('r-stake').textContent = fmt$(stake);
+  $('r-win').textContent = '+' + fmt$(winPayoff);
+  $('r-lose').textContent = fmt$(losePayoff);
+  $('r-ev').textContent = (ev >= 0 ? '+' : '') + fmt$(ev);
+  $('r-ev').className = 'result-value ' + (ev > 0 ? 'green' : 'red');
+
+  // Headline
+  const head = $('headline');
+  const headStake = $('headline-stake');
+  const headSub = $('headline-sub');
+  if (fullKelly <= 0) {
+    head.classList.add('bad');
+    headStake.textContent = "Don't bet";
+    headSub.textContent = `Negative edge — your ${fmtPct(pWin)} estimate doesn't beat the ${fmtPct(entry)} entry price for ${side}.`;
+  } else {
+    head.classList.remove('bad');
+    headStake.textContent = fmt$(stake);
+    headSub.textContent = `${(kellyFrac * 100).toFixed(0)}% of full Kelly · ${fmtPct(fractionUsed)} of bankroll · expected +${fmtPct(ev / Math.max(1, stake))} per dollar staked`;
+  }
+}
+
+// Bind inputs
+['bankroll', 'market', 'estimate'].forEach(id => $(id).addEventListener('input', recalc));
+
+// Side toggle
+$('side-yes').addEventListener('click', () => {
+  side = 'YES'; $('side-yes').classList.add('active'); $('side-no').classList.remove('active'); recalc();
+});
+$('side-no').addEventListener('click', () => {
+  side = 'NO'; $('side-no').classList.add('active'); $('side-yes').classList.remove('active'); recalc();
+});
+
+// Kelly fraction toggle
+document.querySelectorAll('.kelly-fractions button').forEach(b =>
+  b.addEventListener('click', () => {
+    kellyFrac = parseFloat(b.dataset.frac);
+    document.querySelectorAll('.kelly-fractions button').forEach(o => o.classList.remove('active'));
+    b.classList.add('active');
+    recalc();
+  })
+);
+
+// Auto-fill from live ProbBrain signals
+fetch('./accuracy.json?t=' + Date.now()).then(r => r.json()).then(d => {
+  const open = (d.signals || []).filter(s =>
+    s.status === 'PENDING' && s.market_price > 0 && s.our_estimate > 0
+  ).sort((a, b) => (b.signal_number || 0) - (a.signal_number || 0)).slice(0, 25);
+  const sel = $('signal-select');
+  open.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.dataset.market = s.market_price;
+    opt.dataset.estimate = s.our_estimate;
+    opt.dataset.direction = s.direction;
+    opt.textContent = `${s.id} · ${s.title.slice(0, 60)}`;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => {
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt.value) return;
+    $('market').value = parseFloat(opt.dataset.market).toFixed(2);
+    $('estimate').value = parseFloat(opt.dataset.estimate).toFixed(2);
+    if (opt.dataset.direction === 'NO_UNDERPRICED') $('side-no').click();
+    else $('side-yes').click();
+    recalc();
+  });
+}).catch(() => {});
+
+recalc();
+</script>
+</body>
+</html>
