@@ -391,7 +391,12 @@
       <div id="tab-sim" class="tab-pane space-y-4">
         <div class="bg-white/[.02] border border-ink-600 rounded-xl p-4">
           <div class="section-h mb-2">Monte Carlo bankroll · 10k trajectories</div>
-          <canvas id="sim-chart" height="240"></canvas>
+          <!-- Fixed-height wrapper: with maintainAspectRatio:false the canvas
+               otherwise stretches to fill all available vertical space and
+               keeps growing on every resize tick. -->
+          <div style="position:relative;height:340px">
+            <canvas id="sim-chart"></canvas>
+          </div>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="stat-card"><div class="label">P(reach 2×)</div><div class="val text-ok" id="m-p2x">—</div></div>
