@@ -300,6 +300,7 @@
     opacity: 1; visibility: visible;
   }
 </style>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
@@ -1013,7 +1014,12 @@ function renderChart(mc, n) {
 //     refined). The full pass is cancelled if input resumes before it lands.
 // ─────────────────────────────────────────────────────────────────────────────
 let quickTimer = null, fullTimer = null;
+let _trackedEngaged = false;
 function scheduleRecompute() {
+  if (!_trackedEngaged) {
+    _trackedEngaged = true;
+    try { window.va('event', { name: 'kelly_engaged' }); } catch(_) {}
+  }
   if (quickTimer) clearTimeout(quickTimer);
   if (fullTimer)  clearTimeout(fullTimer);
   quickTimer = setTimeout(() => { quickTimer = null; recompute('quick'); }, 60);
