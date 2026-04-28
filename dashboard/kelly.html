@@ -336,23 +336,25 @@
     </p>
   </div>
 
-  <!-- Auto-fill from live signal or any Polymarket URL -->
-  <div class="mb-6 space-y-2">
-    <div class="flex items-center gap-3 flex-wrap">
-      <span class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold w-44">Auto-fill from a live signal</span>
-      <select id="signal-select" class="bg-ink-700 border border-ink-600 rounded-md px-3 py-1.5 text-sm flex-1 max-w-md">
-        <option value="">— pick a ProbBrain signal to seed inputs —</option>
+  <!-- Auto-fill: ProbBrain signal | Polymarket URL — side-by-side on desktop, stacked on mobile -->
+  <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-[11px] text-fg-muted uppercase tracking-wider font-semibold mb-1.5">From a live ProbBrain signal</label>
+      <select id="signal-select" class="bg-ink-700 border border-ink-600 rounded-md px-3 py-2 text-sm w-full">
+        <option value="">— pick a signal to seed inputs —</option>
       </select>
     </div>
-    <div class="flex items-center gap-3 flex-wrap">
-      <span class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold w-44">or paste a Polymarket URL</span>
-      <input id="poly-url" type="text" placeholder="polymarket.com/event/&lt;slug&gt; or just the slug"
-             class="bg-ink-700 border border-ink-600 rounded-md px-3 py-1.5 text-sm flex-1 max-w-md" />
-      <button id="poly-fetch"
-              class="px-3 py-1.5 rounded-md text-sm font-semibold bg-indigo-500/20 border border-indigo-500/40 text-indigo-200 hover:bg-indigo-500/30 transition">
-        Fetch
-      </button>
-      <span id="poly-status" class="text-[11px] text-fg-muted"></span>
+    <div>
+      <label class="block text-[11px] text-fg-muted uppercase tracking-wider font-semibold mb-1.5">Or paste a Polymarket URL</label>
+      <div class="flex items-stretch gap-2">
+        <input id="poly-url" type="text" placeholder="polymarket.com/event/&lt;slug&gt; or just the slug"
+               class="bg-ink-700 border border-ink-600 rounded-md px-3 py-2 text-sm flex-1 min-w-0" />
+        <button id="poly-fetch"
+                class="px-4 py-2 rounded-md text-sm font-semibold bg-indigo-500/20 border border-indigo-500/40 text-indigo-200 hover:bg-indigo-500/30 transition whitespace-nowrap">
+          Fetch
+        </button>
+      </div>
+      <div id="poly-status" class="text-[11px] text-fg-muted mt-1.5 min-h-[14px]"></div>
     </div>
   </div>
 
