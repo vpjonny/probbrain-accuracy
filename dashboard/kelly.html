@@ -206,6 +206,68 @@
   .tab-pane { display: none; }
   .tab-pane.active { display: block; animation: fade-in .25s ease; }
   @keyframes fade-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Inline contextual tooltips on input labels */
+  .tip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px; height: 14px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.10);
+    color: var(--muted);
+    font-size: 9.5px; font-weight: 700; line-height: 1;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: help;
+    position: relative;
+    transition: color 120ms, background 120ms, border-color 120ms;
+    user-select: none;
+  }
+  .tip-icon:hover, .tip-icon:focus, .tip-icon.tip-open {
+    color: #c7d2fe;
+    background: rgba(99,102,241,.18);
+    border-color: rgba(99,102,241,.45);
+    outline: none;
+  }
+  .tip-icon::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    padding: 9px 11px;
+    background: #0a0a0a;
+    color: #e8e8e8;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.55);
+    font-size: 11.5px; font-weight: 400; line-height: 1.45;
+    letter-spacing: 0;
+    white-space: normal; text-align: left;
+    opacity: 0; visibility: hidden;
+    pointer-events: none;
+    transition: opacity 140ms, visibility 140ms;
+    z-index: 50;
+  }
+  .tip-icon::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #2a2a2a;
+    opacity: 0; visibility: hidden;
+    transition: opacity 140ms, visibility 140ms;
+    z-index: 51;
+  }
+  .tip-icon:hover::after, .tip-icon:focus::after, .tip-icon.tip-open::after,
+  .tip-icon:hover::before, .tip-icon:focus::before, .tip-icon.tip-open::before {
+    opacity: 1; visibility: visible;
+  }
 </style>
 </head>
 <body>
@@ -274,20 +336,20 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div class="input-row">
-              <label class="block mb-1.5">Best YES bid</label>
+              <label class="block mb-1.5">Best YES bid<span class="tip-icon" tabindex="0" data-tip="Highest price a buyer is willing to pay for YES right now. Sets the floor of the spread; we use ASK (next field) as your real entry cost.">?</span></label>
               <input id="bid" type="number" min="0" max="1" step="0.01" value="0.20" class="w-full px-3 py-2 rounded-md text-sm">
             </div>
             <div class="input-row">
-              <label class="block mb-1.5">Best YES ask</label>
+              <label class="block mb-1.5">Best YES ask<span class="tip-icon" tabindex="0" data-tip="Lowest price a seller will sell YES at. This is your entry cost for the first slice of the bet. Calculator uses ask (not bid) as m in the Kelly formula.">?</span></label>
               <input id="ask" type="number" min="0" max="1" step="0.01" value="0.23" class="w-full px-3 py-2 rounded-md text-sm">
             </div>
           </div>
           <div class="input-row">
-            <div class="flex justify-between items-center mb-1.5"><label>Top-of-book size (USD)</label><span class="hint">size you can hit at displayed price</span></div>
+            <div class="flex justify-between items-center mb-1.5"><label>Top-of-book size (USD)<span class="tip-icon" tabindex="0" data-tip="Dollar size you can fill AT the best ask before the price moves. Beyond this you walk the book and pay levels deeper. Check the Polymarket order book for a real number.">?</span></label></div>
             <input id="top-size" type="number" min="0" step="100" value="1000" class="w-full px-3 py-2 rounded-md text-sm">
           </div>
           <div class="input-row">
-            <div class="flex justify-between items-center mb-1.5"><label>Book depth (offset, USD)</label><span class="hint">3 levels past top</span></div>
+            <div class="flex justify-between items-center mb-1.5"><label>Book depth (offset, USD)<span class="tip-icon" tabindex="0" data-tip="3 levels past the top of book: how much higher you'd pay (offset, e.g. 0.005 = +0.5¢) and how many USD lives at that level. The walk-the-book solver uses these to compute your blended fill price.">?</span></label><span class="hint">3 levels past top</span></div>
             <div class="grid grid-cols-2 gap-1.5 text-[12px]">
               <input id="bo1" type="number" step="0.001" value="0.005" class="px-2 py-1.5 rounded-md">
               <input id="bs1" type="number" step="500" value="2000" class="px-2 py-1.5 rounded-md">
@@ -305,11 +367,11 @@
         <div class="section-h">Belief</div>
         <div class="space-y-3">
           <div class="input-row">
-            <div class="flex justify-between items-center mb-1.5"><label>Your P(YES) estimate</label><span class="hint num" id="phat-hint">27%</span></div>
+            <div class="flex justify-between items-center mb-1.5"><label>Your P(YES) estimate<span class="tip-icon" tabindex="0" data-tip="Your raw point estimate of P(YES). The math turns this + confidence into a Beta posterior, then takes a conservative bound (next field) before sizing — so you're never sized against your own optimism.">?</span></label><span class="hint num" id="phat-hint">27%</span></div>
             <input id="phat" type="number" min="0" max="1" step="0.01" value="0.27" class="w-full px-3 py-2 rounded-md text-sm">
           </div>
           <div class="input-row">
-            <label class="block mb-1.5">Confidence (effective sample size)</label>
+            <label class="block mb-1.5">Confidence (effective sample size)<span class="tip-icon" tabindex="0" data-tip="How many past observations does your estimate feel like it's worth? Low n=10 = hunch; High n=100 = thoroughly researched. Higher n = tighter Beta posterior = less shrinkage toward market price.">?</span></label>
             <div class="flex gap-2">
               <button class="pill" data-conf="10">Low · n=10</button>
               <button class="pill active" data-conf="30">Med · n=30</button>
@@ -318,7 +380,7 @@
             <div class="hint mt-1.5 num" id="beta-hint">→ Beta(α=9.10, β=22.90)</div>
           </div>
           <div class="input-row">
-            <div class="flex justify-between items-center mb-1.5"><label>Credible level</label><span class="hint num" id="cl-hint">75%</span></div>
+            <div class="flex justify-between items-center mb-1.5"><label>Credible level<span class="tip-icon" tabindex="0" data-tip="One-sided lower bound from the Beta posterior. 75% means: 'I'm 75% sure the true P(YES) is at least this value.' Higher level = more conservative bet. The conservative p_cons is what gets fed into Kelly, not p_hat.">?</span></label><span class="hint num" id="cl-hint">75%</span></div>
             <input id="credible" type="range" min="0.5" max="0.95" step="0.05" value="0.75" class="w-full">
           </div>
         </div>
@@ -329,16 +391,16 @@
         <div class="section-h">Sizing</div>
         <div class="space-y-3">
           <div class="input-row">
-            <div class="flex justify-between items-center mb-1.5"><label>Kelly fraction</label><span class="hint num" id="kf-hint">0.25</span></div>
+            <div class="flex justify-between items-center mb-1.5"><label>Kelly fraction<span class="tip-icon" tabindex="0" data-tip="Fraction of full Kelly to bet. Full Kelly (1.0) is mathematically optimal but extremely volatile in real life — drawdowns of 50%+ are common. Quarter Kelly (0.25) is the conventional safety margin.">?</span></label><span class="hint num" id="kf-hint">0.25</span></div>
             <input id="kelly-frac" type="range" min="0.05" max="1" step="0.05" value="0.25" class="w-full">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div class="input-row">
-              <label class="block mb-1.5">Days to resolution</label>
+              <label class="block mb-1.5">Days to resolution<span class="tip-icon" tabindex="0" data-tip="Calendar days until the market resolves. Shown for context — the math sizes per-bet, not per-day. Useful for thinking about opportunity cost of locked capital.">?</span></label>
               <input id="days" type="number" min="1" step="1" value="30" class="w-full px-3 py-2 rounded-md text-sm">
             </div>
             <div class="input-row">
-              <label class="block mb-1.5">Bet horizon (n)</label>
+              <label class="block mb-1.5">Bet horizon (n)<span class="tip-icon" tabindex="0" data-tip="Number of independent bets simulated in the Monte Carlo. Higher n = longer bankroll trajectory in the chart. 100 is roughly a year of edge-bets at scale.">?</span></label>
               <input id="horizon" type="number" min="10" step="10" value="100" class="w-full px-3 py-2 rounded-md text-sm">
             </div>
           </div>
@@ -968,6 +1030,21 @@ fetch('./accuracy.json?t=' + Date.now()).then(r => r.json()).then(d => {
 }).catch(() => {});
 
 recompute();
+
+// Tooltip click-toggle for touch devices (CSS :hover doesn't fire on tap).
+// Tapping any tip-icon opens it; tapping outside closes any open tip.
+document.querySelectorAll('.tip-icon').forEach(el => {
+  el.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.tip-icon.tip-open').forEach(o => {
+      if (o !== el) o.classList.remove('tip-open');
+    });
+    el.classList.toggle('tip-open');
+  });
+});
+document.addEventListener('click', () => {
+  document.querySelectorAll('.tip-icon.tip-open').forEach(o => o.classList.remove('tip-open'));
+});
 </script>
 </body>
 </html>
