@@ -336,12 +336,24 @@
     </p>
   </div>
 
-  <!-- Auto-fill from live signal -->
-  <div class="mb-6 flex items-center gap-3 flex-wrap">
-    <span class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold">Auto-fill from a live signal</span>
-    <select id="signal-select" class="bg-ink-700 border border-ink-600 rounded-md px-3 py-1.5 text-sm flex-1 max-w-md">
-      <option value="">— pick a ProbBrain signal to seed inputs —</option>
-    </select>
+  <!-- Auto-fill from live signal or any Polymarket URL -->
+  <div class="mb-6 space-y-2">
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold w-44">Auto-fill from a live signal</span>
+      <select id="signal-select" class="bg-ink-700 border border-ink-600 rounded-md px-3 py-1.5 text-sm flex-1 max-w-md">
+        <option value="">— pick a ProbBrain signal to seed inputs —</option>
+      </select>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold w-44">or paste a Polymarket URL</span>
+      <input id="poly-url" type="text" placeholder="polymarket.com/event/&lt;slug&gt; or just the slug"
+             class="bg-ink-700 border border-ink-600 rounded-md px-3 py-1.5 text-sm flex-1 max-w-md" />
+      <button id="poly-fetch"
+              class="px-3 py-1.5 rounded-md text-sm font-semibold bg-indigo-500/20 border border-indigo-500/40 text-indigo-200 hover:bg-indigo-500/30 transition">
+        Fetch
+      </button>
+      <span id="poly-status" class="text-[11px] text-fg-muted"></span>
+    </div>
   </div>
 
   <!-- Main grid -->
@@ -1061,6 +1073,97 @@ fetch('./accuracy.json?t=' + Date.now()).then(r => r.json()).then(d => {
 }).catch(() => {});
 
 recompute();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Auto-fill from any Polymarket URL via gamma-api
+// ─────────────────────────────────────────────────────────────────────────────
+// gamma-api.polymarket.com doesn't send CORS headers, so cross-origin browser
+// fetches are blocked. Route through codetabs.com (free, has ACAO:*).
+// allorigins.win is a fallback in case codetabs is rate-limited/down.
+async function _gammaGet(path) {
+  const target = `https://gamma-api.polymarket.com${path}`;
+  // 1) codetabs — clean passthrough, supports CORS preflight
+  try {
+    const r = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(target)}`);
+    if (r.ok) return await r.json();
+  } catch (_) { /* try fallback */ }
+  // 2) allorigins — wraps the response in {contents: "..."}
+  const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target)}`);
+  if (!r.ok) throw new Error(`proxy unreachable (HTTP ${r.status})`);
+  const wrapped = await r.json();
+  if (!wrapped.contents) throw new Error('proxy returned empty body');
+  return JSON.parse(wrapped.contents);
+}
+
+async function fetchPolymarketMarket(slugOrUrl) {
+  // Accept full URL, /event/slug, /market/slug, or bare slug.
+  let slug = (slugOrUrl || '').trim();
+  const m = slug.match(/polymarket\.com\/(?:event|market)\/([^/?#]+)/i);
+  if (m) slug = m[1];
+  slug = slug.replace(/^\/+|\/+$/g, '');
+  if (!slug) throw new Error('paste a Polymarket URL or slug');
+
+  const enc = encodeURIComponent(slug);
+  // 1) try as a single market
+  let data = null;
+  try { data = await _gammaGet(`/markets?slug=${enc}`); } catch (_) {}
+  if (Array.isArray(data) && data.length) return data[0];
+
+  // 2) fall back to event lookup (multi-outcome) → first market in the event
+  try { data = await _gammaGet(`/events?slug=${enc}`); } catch (_) {}
+  if (Array.isArray(data) && data.length) {
+    const ev = data[0];
+    if (Array.isArray(ev.markets) && ev.markets.length) return ev.markets[0];
+  }
+  throw new Error('not found — slug may have rotated or market is private');
+}
+
+function _parseOutcomePrices(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw); } catch (_) { return null; }
+  }
+  return null;
+}
+
+document.getElementById('poly-fetch').addEventListener('click', async () => {
+  const status = document.getElementById('poly-status');
+  const input = document.getElementById('poly-url');
+  status.textContent = 'fetching…';
+  status.style.color = '#a0a0a0';
+  try {
+    const m = await fetchPolymarketMarket(input.value);
+    const bid = parseFloat(m.bestBid);
+    const ask = parseFloat(m.bestAsk);
+    // p_hat (your belief) defaults to the bid/ask mid — a zero-edge starting
+    // point that the user is expected to override with their own estimate.
+    // Falls back to YES last price if bid/ask are unavailable.
+    const prices = _parseOutcomePrices(m.outcomePrices);
+    const yesMid = (isFinite(bid) && isFinite(ask))
+      ? (bid + ask) / 2
+      : (prices && prices.length >= 1 ? parseFloat(prices[0]) : NaN);
+
+    if (isFinite(bid)) $('bid').value = Math.max(0.01, bid).toFixed(3);
+    if (isFinite(ask)) $('ask').value = Math.min(0.99, ask).toFixed(3);
+    if (isFinite(yesMid)) $('phat').value = Math.max(0.01, Math.min(0.99, yesMid)).toFixed(3);
+
+    // Default to YES direction; user can flip if their belief disagrees with market.
+    $('dir-yes').click();
+    recompute('full');
+
+    const q = (m.question || m.slug || 'market').slice(0, 80);
+    status.textContent = `✓ filled: ${q}`;
+    status.style.color = '#86efac';
+  } catch (e) {
+    status.textContent = `✗ ${e.message}`;
+    status.style.color = '#fca5a5';
+  }
+});
+
+// Enter key in the URL field triggers Fetch
+document.getElementById('poly-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); document.getElementById('poly-fetch').click(); }
+});
 
 // Tooltip click-toggle for touch devices (CSS :hover doesn't fire on tap).
 // Tapping any tip-icon opens it; tapping outside closes any open tip.
