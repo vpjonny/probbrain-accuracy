@@ -1,11 +1,27 @@
-# Environment — never commit secrets
-.env
+# probbrain-accuracy is a PUBLIC dashboard repo.
+# Only the live site files belong here. Everything else stays private.
+#
+# Allow-list (commit these):
+#   /accuracy.json
+#   /index.html
+#   /kelly.html
+#   /vercel.json
+#   /dashboard/{accuracy.json,index.html,kelly.html}
+#   /data/{published_signals.json,resolved.json}
+#
+# Anything not in that list should be ignored. The patterns below catch the
+# common leak vectors that bit us before.
 
-# Python
-__pycache__/
+# Never commit secrets
+.env
+.env.*
+
+# Python source / artifacts (whole categories — we don't ship Python here)
+*.py
 *.pyc
 *.pyo
 *.pyd
+__pycache__/
 *.egg-info/
 .eggs/
 dist/
@@ -13,18 +29,67 @@ build/
 .venv/
 venv/
 env/
+requirements*.txt
+pyproject.toml
+poetry.lock
+
+# Internal source trees
+agents/
+bot/
+pipeline/
+scanner/
+scripts/
+signals/
+plans/
+content/
+config/
+tools/
+
+# Internal docs
+CLAUDE.md
+ORG.md
+AGENTS.md
+HEARTBEAT*.md
+SOUL.md
+TOOLS.md
+.claude/
+.cursor/
+.openviking/
+
+# Dead CI (Vercel + local cron handle deploy now)
+.github/workflows/
+
+# Internal data — only published_signals.json and resolved.json belong public
+data/_system/
+data/scans/
+data/signals.json
+data/pending_signals*.json
+data/messages_log.json
+data/comment_scan_*.json
+data/published_eod.json
+data/weekly_report.json
+data/subscribers*.json
+data/polymarket_slugs.json
+data/polymarket_links.json
+data/markets_*.json
+data/vectordb/
+
+# Junk / accidental commits
+tempfile
+*.tmp
+market_card_*.jpg
+market_card_*.jpeg
+market_card_*.png
+*_screenshot.png
+*.db
+*.db-wal
+*.db-shm
+
+# Don't ship the example env either — reveals var names
+.env.example
 
 # Runtime logs
 logs/
-
-# Ephemeral scan outputs (large market snapshots)
-data/scans/
-data/markets_*.json
-
-# OpenViking artifacts (deprecated)
-data/vectordb/
-.openviking/
-ov.conf
 
 # Agent memory (session-specific)
 memory/
