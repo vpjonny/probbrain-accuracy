@@ -5,41 +5,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>404 — Market resolved NO · ProbBrain</title>
   <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://probbrain.com/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { color-scheme: dark; --bg:#0a0b14; --fg:#e8e8e8; --muted:#888; --accent:#6c8ef5; }
     * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
     body {
-      margin: 0; min-height: 100vh; display: grid; place-items: center;
-      background: var(--bg); color: var(--fg);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      padding: 24px;
+      min-height: 100vh; background: #0a0a0a; color: #e8e8e8;
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'cv11' 1, 'ss01' 1;
+      display: grid; place-items: center; padding: 24px;
+      position: relative; overflow-x: hidden;
     }
-    .card { max-width: 520px; text-align: center; }
-    .code { font-size: 92px; font-weight: 200; letter-spacing: -2px; color: var(--accent); margin: 0; line-height: 1; }
-    h1 { font-size: 22px; font-weight: 500; margin: 16px 0 8px; }
-    p { color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
-    p.tagline { color: var(--fg); font-size: 16px; margin: 12px 0 8px; }
-    p.fineprint { font-size: 12.5px; color: #5a5e72; margin: 0 0 24px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
-    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    a {
-      color: var(--fg); text-decoration: none; padding: 9px 16px;
-      border: 1px solid #2a2c3e; border-radius: 8px; font-size: 14px;
-      transition: border-color .15s, background .15s;
+
+    /* ─── Animated gradient blobs (mirrors dashboard) ─── */
+    .bg-blobs { position: fixed; inset: 0; z-index: -2; overflow: hidden;
+                pointer-events: none; filter: blur(80px) saturate(1.3); opacity: .32; }
+    .bg-blob { position: absolute; border-radius: 50%; will-change: transform; }
+    .bg-blob.b1 { width: 32vmin; height: 32vmin; top: -12vmin; left: -12vmin;
+                  background: radial-gradient(circle, rgba(34,197,94,1) 0%, rgba(34,197,94,0) 65%);
+                  animation: drift-a 24s ease-in-out infinite alternate; }
+    .bg-blob.b2 { width: 32vmin; height: 32vmin; top: -12vmin; right: -12vmin;
+                  background: radial-gradient(circle, rgba(99,102,241,1) 0%, rgba(99,102,241,0) 65%);
+                  animation: drift-b 28s ease-in-out infinite alternate; }
+    .bg-blob.b3 { width: 36vmin; height: 36vmin; bottom: -12vmin; left: -12vmin;
+                  background: radial-gradient(circle, rgba(239,68,68,1) 0%, rgba(239,68,68,0) 65%);
+                  animation: drift-c 26s ease-in-out infinite alternate; }
+    .bg-blob.b4 { width: 28vmin; height: 28vmin; bottom: -12vmin; right: -12vmin;
+                  background: radial-gradient(circle, rgba(167,139,250,1) 0%, rgba(167,139,250,0) 65%);
+                  animation: drift-d 30s ease-in-out infinite alternate; }
+    @keyframes drift-a { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40vw,28vh) scale(1.15); } 100% { transform: translate(62vw,52vh) scale(.88); } }
+    @keyframes drift-b { 0% { transform: translate(0,0) scale(.92); } 50% { transform: translate(-50vw,36vh) scale(1.18); } 100% { transform: translate(-26vw,60vh) scale(1.02); } }
+    @keyframes drift-c { 0% { transform: translate(0,0) scale(1.08); } 50% { transform: translate(46vw,-32vh) scale(.92); } 100% { transform: translate(22vw,-56vh) scale(1.15); } }
+    @keyframes drift-d { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-42vw,-26vh) scale(.86); } 100% { transform: translate(-66vw,-46vh) scale(1.12); } }
+
+    /* ─── $ glyphs (mirrors dashboard) ─── */
+    .bg-money { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; user-select: none; }
+    .glyph { position: absolute; font-family: 'JetBrains Mono', monospace; font-weight: 800;
+             letter-spacing: -.06em; line-height: 1; white-space: nowrap; text-shadow: 0 0 60px currentColor; }
+    .glyph.g1 { top: 8vh;  left: 4vw;   font-size: clamp(140px,18vw,280px); transform: rotate(-12deg); color: #22c55e; opacity: .055; }
+    .glyph.g2 { top: 18vh; right: 10vw; font-size: clamp(80px,10vw,160px);  transform: rotate(8deg);   color: #6366f1; opacity: .04; }
+    .glyph.g3 { bottom: 12vh; left: 14vw; font-size: clamp(110px,13vw,220px); transform: rotate(-20deg); color: #ef4444; opacity: .05; }
+    .glyph.g4 { bottom: 20vh; right: 6vw; font-size: clamp(160px,20vw,300px); transform: rotate(14deg); color: #a78bfa; opacity: .045; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bg-blob { animation: none !important; }
+      .bg-blobs { opacity: .2; }
     }
-    a:hover { border-color: var(--accent); background: #16172a; }
-    a.primary { background: var(--accent); border-color: var(--accent); color: #0a0b14; font-weight: 500; }
-    a.primary:hover { background: #5a7be8; }
+
+    /* ─── Card ─── */
+    .card { max-width: 560px; text-align: center; position: relative; z-index: 1; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 11px; border-radius: 999px;
+      background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.32);
+      color: #ef4444; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; }
+
+    .code {
+      font-family: 'JetBrains Mono', monospace; font-weight: 800;
+      font-size: clamp(110px, 18vw, 200px); line-height: 1;
+      letter-spacing: -0.04em; margin: 0;
+      background: linear-gradient(135deg, #6366f1 0%, #ef4444 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h1 {
+      font-size: clamp(22px, 3vw, 28px); font-weight: 600;
+      margin: 18px 0 6px; color: #e8e8e8; letter-spacing: -0.01em;
+    }
+    .tagline { color: #a0a0a0; font-size: 16px; line-height: 1.5; margin: 0 0 18px; }
+    .stats {
+      display: inline-flex; gap: 20px; padding: 10px 16px;
+      background: rgba(255,255,255,.03); border: 1px solid #222;
+      border-radius: 10px; margin: 0 0 28px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      font-feature-settings: 'tnum' 1, 'zero' 1;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .stat-label { color: #666; text-transform: uppercase; letter-spacing: .08em; font-size: 10px; display: block; margin-bottom: 3px; }
+    .stat-val { color: #e8e8e8; font-weight: 700; }
+    .stat-val.bad { color: #ef4444; }
+
+    .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: all .15s; cursor: pointer;
+      font-family: inherit; border: 1px solid transparent;
+    }
+    .btn.primary {
+      background: #6366f1; color: #fff;
+      box-shadow: 0 0 0 0 rgba(99,102,241,.5);
+    }
+    .btn.primary:hover { background: #5558e8; box-shadow: 0 0 24px rgba(99,102,241,.4); }
+    .btn.secondary { background: #1a1a1a; color: #e8e8e8; border-color: #2a2a2a; }
+    .btn.secondary:hover { border-color: #6366f1; background: #16172a; }
+
+    @media (max-width: 480px) {
+      .stats { gap: 14px; padding: 9px 12px; }
+      .actions { width: 100%; }
+      .btn { flex: 1; justify-content: center; }
+    }
   </style>
 </head>
 <body>
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="bg-blob b1"></div>
+    <div class="bg-blob b2"></div>
+    <div class="bg-blob b3"></div>
+    <div class="bg-blob b4"></div>
+  </div>
+  <div class="bg-money" aria-hidden="true">
+    <span class="glyph g1">$</span>
+    <span class="glyph g2">$</span>
+    <span class="glyph g3">$</span>
+    <span class="glyph g4">$</span>
+  </div>
+
   <main class="card">
+    <span class="badge"><span class="badge-dot"></span> Market resolved NO</span>
     <p class="code">404</p>
-    <h1>Market resolved NO.</h1>
-    <p class="tagline">We sized this page at full Kelly. Should've used quarter.</p>
-    <p class="fineprint">our_estimate: 0.99 · actual: 0.00 · brier: 0.98</p>
+    <h1>This page didn't make it.</h1>
+    <p class="tagline">We sized this URL at full Kelly. Should've used quarter.</p>
+
+    <div class="stats" role="group" aria-label="Signal calibration">
+      <div><span class="stat-label">Our estimate</span><span class="stat-val">0.99</span></div>
+      <div><span class="stat-label">Actual</span><span class="stat-val bad">0.00</span></div>
+      <div><span class="stat-label">Brier</span><span class="stat-val bad">0.98</span></div>
+    </div>
+
     <div class="actions">
-      <a class="primary" href="/">← Dashboard</a>
-      <a href="/kelly">Kelly Calculator</a>
+      <a class="btn primary" href="/">← Back to dashboard</a>
+      <a class="btn secondary" href="/kelly">🧮 Kelly Calculator</a>
     </div>
   </main>
 </body>
