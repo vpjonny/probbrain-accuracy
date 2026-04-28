@@ -646,8 +646,11 @@ function readInputs() {
   return { bankroll, dir, bid, ask, phat, conf, cl, kf, days, horizon, topSize, depth };
 }
 
-function recompute() {
+function recompute(quality = 'full') {
   const I = readInputs();
+  // 'quick' = 2k MC trials for snappy feedback while user is dragging sliders.
+  // 'full'  = 10k MC trials, scheduled to run after the user stops touching inputs.
+  const mcTrials = quality === 'quick' ? 2000 : 10000;
 
   // Hint labels
   $('bankroll-hint').textContent = '$' + Math.round(I.bankroll).toLocaleString();
@@ -749,7 +752,7 @@ function recompute() {
   // Monte Carlo (uses point estimate p_hat for fairness — not the conservative bound)
   const pWinSim = I.dir === 'YES' ? I.phat : (1 - I.phat);
   const bEff = (1 - mEff) / Math.max(1e-9, mEff);
-  const mc = monteCarlo(fFinal, pWinSim, bEff, I.horizon, 10000);
+  const mc = monteCarlo(fFinal, pWinSim, bEff, I.horizon, mcTrials);
   $('m-p2x').textContent   = fmtPct(mc.pReach2);
   $('m-pdraw').textContent = fmtPct(mc.pDrawTo05);
   $('m-medfin').textContent = mc.medianFinal.toFixed(2) + '×';
@@ -824,8 +827,24 @@ function renderCascade(c) {
 function renderChart(mc, n) {
   const ctx = document.getElementById('sim-chart');
   if (!ctx) return;
-  if (chart) chart.destroy();
   const labels = Array.from({ length: n + 1 }, (_, i) => i);
+  const seriesData = [
+    Array.from(mc.q05),
+    Array.from(mc.q95),
+    Array.from(mc.q25),
+    Array.from(mc.q75),
+    Array.from(mc.median),
+    Array(n + 1).fill(1.0),
+  ];
+  // Fast path: chart already exists — just swap data in place. Avoids the
+  // destroy/recreate cost on every recompute (~3-5ms per call).
+  if (chart && chart.data.datasets.length === seriesData.length) {
+    chart.data.labels = labels;
+    chart.data.datasets.forEach((d, i) => { d.data = seriesData[i]; });
+    chart.update('none');
+    return;
+  }
+  if (chart) chart.destroy();
   const ds = (label, data, color, fill, dash) => ({
     label, data, borderColor: color, borderWidth: dash ? 1 : 1.6, borderDash: dash || [],
     fill, backgroundColor: fill ? color : 'transparent',
@@ -874,22 +893,34 @@ function renderChart(mc, n) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Wiring
+// Wiring — debounced two-stage recompute
+//   • While the user interacts: a 'quick' recompute fires after 60ms idle
+//     (2k MC trials, snappy).
+//   • Once they stop: a 'full' recompute fires after 280ms idle (10k trials,
+//     refined). The full pass is cancelled if input resumes before it lands.
 // ─────────────────────────────────────────────────────────────────────────────
+let quickTimer = null, fullTimer = null;
+function scheduleRecompute() {
+  if (quickTimer) clearTimeout(quickTimer);
+  if (fullTimer)  clearTimeout(fullTimer);
+  quickTimer = setTimeout(() => { quickTimer = null; recompute('quick'); }, 60);
+  fullTimer  = setTimeout(() => { fullTimer  = null; recompute('full');  }, 280);
+}
+
 ['bankroll','bid','ask','top-size','bo1','bs1','bo2','bs2','bo3','bs3',
  'phat','credible','kelly-frac','days','horizon'].forEach(id => {
-  $(id).addEventListener('input', recompute);
+  $(id).addEventListener('input', scheduleRecompute);
 });
 
 document.querySelectorAll('[data-dir]').forEach(b => b.addEventListener('click', () => {
   state.dir = b.dataset.dir;
   document.querySelectorAll('[data-dir]').forEach(o => o.classList.toggle('active', o === b));
-  recompute();
+  scheduleRecompute();
 }));
 document.querySelectorAll('[data-conf]').forEach(b => b.addEventListener('click', () => {
   state.conf = parseInt(b.dataset.conf);
   document.querySelectorAll('[data-conf]').forEach(o => o.classList.toggle('active', o === b));
-  recompute();
+  scheduleRecompute();
 }));
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.tab').forEach(o => o.classList.toggle('active', o === t));
