@@ -416,6 +416,17 @@
     .status-win { background: var(--green-dim); color: #86efac; border: 1px solid #166534; }
     .status-loss { background: var(--red-dim); color: #fca5a5; border: 1px solid #991b1b; }
     .status-delisted { background: #2a1a1a; color: #999; border: 1px solid #4a2a2a; }
+    .status-awaiting {
+      background: #2a2410;
+      color: #fcd34d;
+      border: 1px solid #78350f;
+      animation: awaitingPulse 2.4s ease-in-out infinite;
+    }
+    .status-notpub { background: #1a1a1a; color: #777; border: 1px solid #333; }
+    @keyframes awaitingPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(252,211,77,0.0); }
+      50%      { box-shadow: 0 0 0 4px rgba(252,211,77,0.18); }
+    }
 
     .prob-col { font-variant-numeric: tabular-nums; white-space: nowrap; }
     .prob-market { color: var(--muted); }
@@ -1153,10 +1164,13 @@
       return `<span class="conf-badge ${cls}">${c}</span>`;
     }
 
-    function statusBadge(s) {
+    function statusBadge(s, sig) {
       if (s === 'WIN') return '<span class="status-badge status-win">&#10003; WIN</span>';
       if (s === 'LOSS') return '<span class="status-badge status-loss">&#10007; LOSS</span>';
       if (s === 'delisted') return '<span class="status-badge status-delisted">⊘ DELISTED</span>';
+      if (s === 'NOT_PUBLISHED') return '<span class="status-badge status-notpub">— NOT PUBLISHED</span>';
+      if (s === 'SHADOW') return '<span class="status-badge status-pending">&#9728; SHADOW</span>';
+      if (sig && sig.awaiting_resolution) return '<span class="status-badge status-awaiting" title="Trading window closed; Polymarket has not called UMA yet.">&#9203; AWAITING RESOLUTION</span>';
       return '<span class="status-badge status-pending">&#9685; PENDING</span>';
     }
 
@@ -1393,7 +1407,7 @@
           <div class="modal-stat"><div class="modal-stat-label">Our calibrated</div><div class="modal-stat-value">${ourCal}</div></div>
           <div class="modal-stat"><div class="modal-stat-label">Gap</div><div class="modal-stat-value">${sig.gap_pct != null ? sig.gap_pct.toFixed(1) + 'pp' : '—'}</div></div>
           <div class="modal-stat"><div class="modal-stat-label">Cal. gap</div><div class="modal-stat-value">${sig.calibrated_gap_pct != null ? sig.calibrated_gap_pct.toFixed(1) + 'pp' : '—'}</div></div>
-          <div class="modal-stat"><div class="modal-stat-label">Status</div><div class="modal-stat-value">${statusBadge(sig.status)}</div></div>
+          <div class="modal-stat"><div class="modal-stat-label">Status</div><div class="modal-stat-value">${statusBadge(sig.status, sig)}</div></div>
           <div class="modal-stat"><div class="modal-stat-label">Closes</div><div class="modal-stat-value">${sig.close_date || '—'}</div></div>
           <div class="modal-stat"><div class="modal-stat-label">Calibration</div><div class="modal-stat-value" style="font-size:12px">${calLine}</div></div>
         </div>
@@ -1729,7 +1743,7 @@
         <td>${renderSparkline(s.price_history)}</td>
         <td>${gapPill(s.gap_pct)}</td>
         <td>${confBadge(s.confidence)}</td>
-        <td>${statusBadge(s.status)}</td>
+        <td>${statusBadge(s.status, s)}</td>
         <td><span class="close-date">${s.close_date || '—'}</span></td>
       </tr>`;
     }
