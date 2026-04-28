@@ -1389,7 +1389,12 @@
       const market = sig.market_price != null ? (sig.market_price * 100).toFixed(1) + '%' : '—';
       const ourCal = sig.our_estimate != null ? (sig.our_estimate * 100).toFixed(1) + '%' : '—';
       const ourRaw = sig.our_estimate_raw != null ? (sig.our_estimate_raw * 100).toFixed(1) + '%' : ourCal;
-      const slugUrl = sig.polymarket_slug ? `https://polymarket.com/event/${sig.polymarket_slug}` : null;
+      // Prefer the resolver-checked URL (handles parent-event redirects + dead links).
+      // Fall back to a direct slug URL only if the link cache doesn't have an entry yet.
+      const slugUrl = sig.polymarket_url
+        || (sig.polymarket_url === null
+              ? null
+              : (sig.polymarket_slug ? `https://polymarket.com/event/${sig.polymarket_slug}` : null));
       const evidence = (sig.evidence || []).map(e => `<li>${e}</li>`).join('');
       const counter = sig.counter_evidence || '';
       const calLine = sig.calibration_weight != null
@@ -1413,7 +1418,11 @@
         </div>
         ${evidence ? `<div class="modal-section-title">Evidence</div><ol class="modal-evidence">${evidence}</ol>` : ''}
         ${counter ? `<div class="modal-section-title">Counter-evidence</div><div class="modal-counter">${counter}</div>` : ''}
-        ${slugUrl ? `<div class="modal-section-title">Source</div><a class="modal-link" href="${slugUrl}" target="_blank" rel="noopener">View market on Polymarket →</a>` : ''}
+        ${slugUrl
+          ? `<div class="modal-section-title">Source</div><a class="modal-link" href="${slugUrl}" target="_blank" rel="noopener">View market on Polymarket &rarr;</a>`
+          : (sig.polymarket_url === null
+              ? `<div class="modal-section-title">Source</div><div class="modal-link" style="color:var(--muted2);cursor:default" title="Polymarket has archived this market's event page after resolution.">Market archived on Polymarket &mdash; no public link</div>`
+              : '')}
       `;
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
