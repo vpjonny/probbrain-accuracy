@@ -207,6 +207,37 @@
   .tab-pane.active { display: block; animation: fade-in .25s ease; }
   @keyframes fade-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
 
+  /* ─── Mobile responsive ─────────────────────────────────────────────────── */
+  /* The .tip-icon::after popover is positioned via translateX(-50%) which
+     overflows the viewport when the icon is near the right edge of a phone.
+     Cap the popover at viewport-minus-padding and let it visually drift to
+     stay on-screen via a CSS-only trick (max-width clamps it). */
+  @media (max-width: 600px) {
+    .tip-icon::after { width: min(250px, calc(100vw - 32px)); }
+    /* For touch users the cascade row tooltips also need to constrain. */
+    [data-tip]:hover::after { max-width: calc(100vw - 48px); }
+  }
+
+  @media (max-width: 480px) {
+    /* Hero number — text-5xl (3rem) is too big for phones. */
+    .hero { padding: 18px 16px; }
+    #hero-num.text-5xl { font-size: 2.25rem !important; }
+    /* Cascade rows: shrink the right two columns and pad less. */
+    .cascade-row { grid-template-columns: 1fr 100px 64px; padding: 8px 12px; gap: 6px; font-size: 12px; }
+    .cascade-row.delta { padding-left: 20px; }
+    .cascade-row .pct { font-size: 10.5px; }
+    /* Section heads + buttons tighter. */
+    .section-h { font-size: 10px; margin-bottom: 8px; }
+    .pill { padding: 6px 12px; font-size: 11px; }
+    .tab { padding: 6px 10px; font-size: 11px; letter-spacing: 0.05em; }
+    /* Stat-card density */
+    .stat-card { padding: 9px 11px; }
+    .stat-card .val { font-size: 14px; }
+    .stat-card .label { font-size: 10px; }
+    /* CTA button: full-width on small phones is the expected pattern */
+    .cta-btn { width: 100%; justify-content: center; padding: 12px 16px; }
+  }
+
   /* Inline contextual tooltips on input labels */
   .tip-icon {
     display: inline-flex;
