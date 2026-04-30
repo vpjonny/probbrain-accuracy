@@ -119,6 +119,44 @@
   .tier-tile.t2 .count { color: #f59e0b; }
   .tier-tile.t3 .count { color: #a0a0a0; }
 
+  /* ─── Sticky filter bar ─── */
+  .sticky-filter {
+    position: sticky; top: 0;
+    z-index: 30;
+    padding: 10px 0 12px;
+    background: linear-gradient(180deg, rgba(10,10,10,.95) 75%, rgba(10,10,10,0));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1a1a1a;
+    margin-left: -8px; padding-left: 8px;
+    margin-right: -8px; padding-right: 8px;
+  }
+
+  .search-input {
+    flex: 1; min-width: 0;
+    background: #111; color: #e8e8e8;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    transition: border-color .12s;
+  }
+  .search-input:focus { outline: none; border-color: #6366f1; background: #131313; }
+  .search-input::placeholder { color: #555; }
+
+  .search-clear {
+    width: 32px; height: 32px;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    background: #111; color: #888;
+    font-size: 18px; line-height: 1;
+    cursor: pointer; transition: all .12s;
+    display: none;
+  }
+  .search-clear:hover { color: #e8e8e8; border-color: #2a2a2a; }
+  .search-clear.visible { display: inline-flex; align-items: center; justify-content: center; }
+
   /* ─── Filter chips ─── */
   .chip {
     padding: 5px 12px; border-radius: 999px; background: transparent;
@@ -328,6 +366,35 @@
   @media (max-width: 640px) {
     .section-h { font-size: 10px; margin-bottom: 8px; }
     .tier-tile .count { font-size: 26px; }
+    .tier-tile .label { font-size: 10px; }
+    .tier-tile .sub { font-size: 9.5px; }
+    /* Touch targets — Apple HIG suggests 44px min. Bump chips + search +
+       clear button without making them visually huge on desktop. */
+    .chip { padding: 8px 14px; font-size: 12px; min-height: 36px; }
+    .search-input { padding: 10px 12px; font-size: 14px; min-height: 40px; }
+    .search-clear { width: 40px; height: 40px; font-size: 22px; }
+    /* Sticky bar gets tighter padding on mobile so it doesn't dominate */
+    .sticky-filter { padding: 8px 0 10px; }
+    /* Card header pills wrap aggressively — smaller gap */
+    .opp-card { padding: 12px 12px; }
+    .pill-type, .pill-underlying { font-size: 10px; padding: 2px 6px; }
+    .pill-persistence { font-size: 9.5px; padding: 2px 6px; }
+    .badge-flag { font-size: 9px; padding: 2px 6px; }
+    .edge-row { gap: 8px 14px; padding: 6px 10px; font-size: 11.5px; }
+    .edge-row .label { font-size: 9.5px; }
+    .leg-row { font-size: 11.5px; grid-template-columns: 64px 1fr; }
+    .weakest { font-size: 11.5px; padding: 7px 10px; }
+    .open-link { padding: 6px 12px; font-size: 11px; min-height: 32px; }
+    /* Track-record panel — shrink to fit narrow viewports */
+    .track-record-card { padding: 10px 12px; }
+    .track-record-totals { font-size: 11px; gap: 4px; }
+    .track-record-legend { font-size: 10px; gap: 6px; }
+    .track-record-leftfeed { font-size: 10px; }
+    .track-record-caveat { font-size: 10px; }
+  }
+  /* Hide blob blur on small screens — gradient + blob = big mobile paint hit */
+  @media (max-width: 640px) {
+    .bg-blobs { filter: blur(40px) saturate(1); opacity: .2; }
   }
 </style>
 </head>
@@ -463,11 +530,27 @@
     </div>
   </section>
 
-  <!-- Underlying filter (applies to all tiers) -->
-  <div class="mb-6 flex items-center flex-wrap gap-2">
-    <span class="text-[11px] uppercase tracking-wide text-fg-muted">Underlying:</span>
-    <div id="underlying-filters" class="flex flex-wrap gap-1.5">
-      <button class="chip active" data-underlying="all">All</button>
+  <!-- Sticky filter bar (applies to all tiers). Sits below the page-scroll
+       fold so the filter chips and search remain reachable while scrolling
+       a long opportunities list. -->
+  <div id="filter-bar" class="sticky-filter mb-6">
+    <div class="flex items-center flex-wrap gap-2 mb-2">
+      <span class="text-[11px] uppercase tracking-wide text-fg-muted">Underlying:</span>
+      <div id="underlying-filters" class="flex flex-wrap gap-1.5">
+        <button class="chip active" data-underlying="all">All</button>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <input
+        id="search"
+        type="search"
+        placeholder="Search ID, summary, strike, ticker…"
+        class="search-input"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="search-clear" class="search-clear" title="Clear search" aria-label="Clear search">×</button>
+      <span id="filter-count" class="text-[11px] text-fg-muted num"></span>
     </div>
   </div>
 
@@ -537,7 +620,51 @@ const STATE = {
   bankroll: 1000,
   t2Filter: "all",
   underlying: "all",
+  search: "",
 };
+
+// ── URL hash persistence ────────────────────────────────────────────────────
+// Format: #u=BTC&t2=cross&q=150k&b=2500
+// Parsed once on load, written on every filter mutation. popstate hook lets
+// browser back/forward navigate filter history. Empty values stay out of the
+// URL so the bare /arbitrage URL is the "no filters" default.
+const HASH_KEYS = { u: "underlying", t2: "t2Filter", q: "search", b: "bankroll" };
+
+function parseHash() {
+  const h = (window.location.hash || "").replace(/^#/, "");
+  if (!h) return {};
+  const out = {};
+  for (const part of h.split("&")) {
+    const [k, v] = part.split("=").map(decodeURIComponent);
+    if (k && v != null) out[k] = v;
+  }
+  return out;
+}
+
+function readHashIntoState() {
+  const h = parseHash();
+  if (h.u) STATE.underlying = h.u;
+  if (h.t2 && ["all", "poly", "kalshi", "cross"].includes(h.t2)) STATE.t2Filter = h.t2;
+  if (h.q) STATE.search = h.q;
+  if (h.b) {
+    const n = parseInt(h.b, 10);
+    if (Number.isFinite(n) && n >= 100 && n <= 50000) STATE.bankroll = n;
+  }
+}
+
+function writeStateToHash() {
+  const parts = [];
+  if (STATE.underlying && STATE.underlying !== "all") parts.push(`u=${encodeURIComponent(STATE.underlying)}`);
+  if (STATE.t2Filter && STATE.t2Filter !== "all") parts.push(`t2=${encodeURIComponent(STATE.t2Filter)}`);
+  if (STATE.search) parts.push(`q=${encodeURIComponent(STATE.search)}`);
+  if (STATE.bankroll && STATE.bankroll !== 1000) parts.push(`b=${STATE.bankroll}`);
+  const next = parts.length ? "#" + parts.join("&") : "";
+  // Use replaceState so filter changes don't pile up in history; popstate
+  // still fires for explicit hash navigation (back/forward).
+  if (next !== window.location.hash) {
+    history.replaceState(null, "", window.location.pathname + window.location.search + next);
+  }
+}
 
 const TREND_COLOR = {
   widening: "#34d399",
@@ -772,6 +899,22 @@ function tier2MatchesFilter(opp, filter) {
   return true;
 }
 
+// Substring filter over a few stable fields. Case-insensitive. Used by the
+// search box; called per-render so the filter is "live" as the user types.
+function searchMatches(opp, q) {
+  if (!q) return true;
+  const needle = q.toLowerCase();
+  if ((opp.id || "").toLowerCase().includes(needle)) return true;
+  if ((opp.summary || "").toLowerCase().includes(needle)) return true;
+  if ((opp.underlying || "").toLowerCase().includes(needle)) return true;
+  if ((opp.resolution_date || "").toLowerCase().includes(needle)) return true;
+  for (const l of (opp.legs || [])) {
+    if ((l.market_id || "").toLowerCase().includes(needle)) return true;
+    if ((l.platform || "").toLowerCase().includes(needle)) return true;
+  }
+  return false;
+}
+
 function renderAll() {
   if (!STATE.data) return;
   const allOpps = (STATE.data.opportunities || []).slice();
@@ -780,9 +923,20 @@ function renderAll() {
   // about narrowing the card lists, not hiding the headline numbers.
   renderHero(allOpps);
 
-  const opps = STATE.underlying === "all"
+  let opps = STATE.underlying === "all"
     ? allOpps
     : allOpps.filter(o => (o.underlying || "") === STATE.underlying);
+  if (STATE.search) {
+    opps = opps.filter(o => searchMatches(o, STATE.search));
+  }
+  const filterCountEl = document.getElementById("filter-count");
+  if (filterCountEl) {
+    if (opps.length === allOpps.length) {
+      filterCountEl.textContent = `${allOpps.length} cards`;
+    } else {
+      filterCountEl.textContent = `${opps.length} / ${allOpps.length} cards`;
+    }
+  }
 
   // sort by executable profit desc (live), tie-break time-to-resolution asc
   opps.sort((a, b) => {
@@ -810,9 +964,12 @@ function renderAll() {
 function wireBankroll() {
   const input = document.getElementById("bankroll");
   const out = document.getElementById("bankroll-out");
+  // If hash already set bankroll, reflect into slider before initial render.
+  if (STATE.bankroll != null) input.value = STATE.bankroll;
   const update = () => {
     STATE.bankroll = +input.value || 0;
     out.textContent = "$" + STATE.bankroll.toLocaleString();
+    writeStateToHash();
     renderAll();
   };
   input.addEventListener("input", update);
@@ -824,8 +981,72 @@ function wireFilters() {
       document.querySelectorAll("#t2-filters .chip").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       STATE.t2Filter = btn.dataset.filter;
+      writeStateToHash();
       renderAll();
     });
+  });
+  // Reflect hash-restored t2Filter onto the chip set after DOM is ready.
+  const t2Active = document.querySelector(`#t2-filters .chip[data-filter="${STATE.t2Filter}"]`);
+  if (t2Active) {
+    document.querySelectorAll("#t2-filters .chip").forEach(b => b.classList.remove("active"));
+    t2Active.classList.add("active");
+  }
+}
+
+// Search input — debounced 120ms so typing doesn't thrash render. Clear
+// button shows iff there's a query.
+function wireSearch() {
+  const input = document.getElementById("search");
+  const clear = document.getElementById("search-clear");
+  if (!input) return;
+  if (STATE.search) input.value = STATE.search;
+  let t;
+  const update = () => {
+    clearTimeout(t);
+    t = setTimeout(() => {
+      STATE.search = input.value.trim();
+      clear.classList.toggle("visible", !!STATE.search);
+      writeStateToHash();
+      renderAll();
+    }, 120);
+  };
+  input.addEventListener("input", update);
+  clear.addEventListener("click", () => {
+    input.value = "";
+    STATE.search = "";
+    clear.classList.remove("visible");
+    writeStateToHash();
+    renderAll();
+    input.focus();
+  });
+  // Escape clears search.
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { e.preventDefault(); clear.click(); }
+  });
+  clear.classList.toggle("visible", !!STATE.search);
+}
+
+// Browser back/forward navigates the filter history.
+function wirePopstate() {
+  window.addEventListener("popstate", () => {
+    readHashIntoState();
+    // Re-sync UI elements from STATE
+    const sInput = document.getElementById("search");
+    if (sInput) sInput.value = STATE.search;
+    const bInput = document.getElementById("bankroll");
+    if (bInput && STATE.bankroll) {
+      bInput.value = STATE.bankroll;
+      const bOut = document.getElementById("bankroll-out");
+      if (bOut) bOut.textContent = "$" + STATE.bankroll.toLocaleString();
+    }
+    populateUnderlyingFilter();
+    // t2 chip active class
+    const t2Active = document.querySelector(`#t2-filters .chip[data-filter="${STATE.t2Filter}"]`);
+    if (t2Active) {
+      document.querySelectorAll("#t2-filters .chip").forEach(b => b.classList.remove("active"));
+      t2Active.classList.add("active");
+    }
+    renderAll();
   });
 }
 
@@ -853,6 +1074,7 @@ function populateUnderlyingFilter() {
       wrap.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       STATE.underlying = btn.dataset.underlying;
+      writeStateToHash();
       renderAll();
     });
   });
@@ -960,9 +1182,44 @@ async function load() {
   }
 }
 
+// Boot order:
+//   1. Read URL hash → STATE before any UI is wired (so chips render in
+//      the right active state and the search box pre-populates).
+//   2. Wire UI handlers (each writes back to hash on change).
+//   3. Initial fetch.
+//   4. Auto-refresh every 5min while the tab is visible.
+readHashIntoState();
 wireBankroll();
 wireFilters();
+wireSearch();
+wirePopstate();
 load();
+
+// ── Auto-refresh ────────────────────────────────────────────────────────────
+// Cron writes opportunities.json every 15 min. Polling more often than that
+// is wasteful but the cache headers (s-maxage=300) align well with a 5min
+// poll. We pause when the tab is hidden and re-fetch immediately on return.
+const REFRESH_MS = 5 * 60 * 1000;
+let refreshTimer = null;
+
+function startRefresh() {
+  stopRefresh();
+  refreshTimer = setInterval(() => {
+    if (!document.hidden) load();
+  }, REFRESH_MS);
+}
+function stopRefresh() {
+  if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    stopRefresh();
+  } else {
+    load();         // fresh data the moment the tab comes back
+    startRefresh();
+  }
+});
+startRefresh();
 </script>
 
 </body>
