@@ -183,6 +183,11 @@
   .pill-persistence.stable { color: #a0a0a0; border-color: #2a2a2a; }
   .pill-persistence .arrow { font-size: 11px; line-height: 1; }
 
+  .sparkline {
+    display: inline-block; vertical-align: middle;
+    margin-left: -2px;
+  }
+
   .leg-row {
     display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: baseline;
     padding: 6px 0; font-size: 12.5px;
@@ -348,7 +353,7 @@
   </section>
 
   <!-- Hero counts -->
-  <div class="grid grid-cols-3 gap-3 mb-8">
+  <div class="grid grid-cols-3 gap-3 mb-6">
     <div class="tier-tile t1">
       <div class="label">Tier 1 — risk-free</div>
       <div id="hero-t1" class="count">0</div>
@@ -363,6 +368,14 @@
       <div class="label">Tier 3 — signal</div>
       <div id="hero-t3" class="count">0</div>
       <div class="sub">stale or low-volume</div>
+    </div>
+  </div>
+
+  <!-- Underlying filter (applies to all tiers) -->
+  <div class="mb-6 flex items-center flex-wrap gap-2">
+    <span class="text-[11px] uppercase tracking-wide text-fg-muted">Underlying:</span>
+    <div id="underlying-filters" class="flex flex-wrap gap-1.5">
+      <button class="chip active" data-underlying="all">All</button>
     </div>
   </div>
 
@@ -429,6 +442,14 @@ const STATE = {
   data: null,
   bankroll: 1000,
   t2Filter: "all",
+  underlying: "all",
+};
+
+const TREND_COLOR = {
+  widening: "#34d399",
+  tightening: "#f87171",
+  stable: "#a0a0a0",
+  new: "#93c5fd",
 };
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -559,6 +580,26 @@ function openLinksHtml(legs) {
     }).join(" ");
 }
 
+// Inline SVG sparkline for gross_pct_history. Renders only with 3+ points —
+// less than that is just noise. Color tracks the trend so it reads quickly:
+// green widening, red tightening, gray stable.
+function sparklineSvg(values, trend) {
+  if (!Array.isArray(values) || values.length < 3) return "";
+  const W = 56, H = 14, PAD = 2;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const step = (W - PAD * 2) / (values.length - 1);
+  const pts = values.map((v, i) => {
+    const x = PAD + i * step;
+    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const color = TREND_COLOR[trend] || TREND_COLOR.stable;
+  const tip = `gross_pct over last ${values.length} scans: min ${min.toFixed(2)}% → max ${max.toFixed(2)}%`;
+  return `<svg class="sparkline" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="none" aria-label="${escapeHtml(tip)}"><title>${escapeHtml(tip)}</title><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
 // Persistence pill. Shows how long this opportunity has been around and
 // whether the spread is widening, tightening, or stable. "new" if first scan.
 function persistencePillHtml(p) {
@@ -601,6 +642,7 @@ function cardHtml(opp, bankroll) {
         <span class="pill-underlying">${escapeHtml(opp.underlying || '—')}</span>
         <span class="text-[11px] text-fg-muted num">${reso}</span>
         ${persistencePillHtml(opp.persistence)}
+        ${sparklineSvg(opp.persistence?.gross_pct_history, opp.persistence?.trend)}
         <span class="ml-auto flex flex-wrap gap-1.5">${flagsHtml(opp.confidence_flags)}</span>
       </div>
       <div class="text-sm sm:text-[15px] font-semibold leading-snug mb-2">${escapeHtml(opp.summary || '')}</div>
@@ -638,7 +680,16 @@ function tier2MatchesFilter(opp, filter) {
 
 function renderAll() {
   if (!STATE.data) return;
-  const opps = (STATE.data.opportunities || []).slice();
+  const allOpps = (STATE.data.opportunities || []).slice();
+
+  // Hero counts always reflect the FULL dataset — the underlying filter is
+  // about narrowing the card lists, not hiding the headline numbers.
+  renderHero(allOpps);
+
+  const opps = STATE.underlying === "all"
+    ? allOpps
+    : allOpps.filter(o => (o.underlying || "") === STATE.underlying);
+
   // sort by executable profit desc (live), tie-break time-to-resolution asc
   opps.sort((a, b) => {
     const da = executableProfit(a, STATE.bankroll);
@@ -648,8 +699,6 @@ function renderAll() {
     const tb = b.resolution_date || "9999-12-31";
     return ta.localeCompare(tb);
   });
-
-  renderHero(opps);
 
   const t1 = opps.filter(o => o.tier === 1);
   const t2 = opps.filter(o => o.tier === 2 && tier2MatchesFilter(o, STATE.t2Filter));
@@ -686,6 +735,35 @@ function wireFilters() {
   });
 }
 
+// Build the underlying chip strip from whatever underlyings appear in this
+// scan. Stable order (alphabetic). "All" is always first. Counts in
+// parentheses give a quick read on where the action is.
+function populateUnderlyingFilter() {
+  const wrap = document.getElementById("underlying-filters");
+  if (!wrap || !STATE.data) return;
+  const counts = new Map();
+  for (const o of (STATE.data.opportunities || [])) {
+    const u = o.underlying || "—";
+    counts.set(u, (counts.get(u) || 0) + 1);
+  }
+  const total = (STATE.data.opportunities || []).length;
+  const chips = [`<button class="chip ${STATE.underlying === 'all' ? 'active' : ''}" data-underlying="all">All <span class="text-fg-muted ml-1">${total}</span></button>`];
+  const keys = [...counts.keys()].sort();
+  for (const u of keys) {
+    const active = STATE.underlying === u ? 'active' : '';
+    chips.push(`<button class="chip ${active}" data-underlying="${escapeHtml(u)}">${escapeHtml(u)} <span class="text-fg-muted ml-1">${counts.get(u)}</span></button>`);
+  }
+  wrap.innerHTML = chips.join("");
+  wrap.querySelectorAll(".chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      wrap.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      STATE.underlying = btn.dataset.underlying;
+      renderAll();
+    });
+  });
+}
+
 // ── load ─────────────────────────────────────────────────────────────────────
 function showSchemaError(msg) {
   const el = document.getElementById("schema-err");
@@ -705,6 +783,7 @@ async function load() {
     }
     STATE.data = data;
     renderStatus(data);
+    populateUnderlyingFilter();
     renderAll();
   } catch (e) {
     showSchemaError("Could not load opportunities.json — " + (e.message || e));
