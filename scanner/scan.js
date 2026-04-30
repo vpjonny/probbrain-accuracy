@@ -24,13 +24,14 @@ import { UNDERLYINGS } from './dicts/underlyings.js';
 import { runPass1 } from './passes/pass1-poly-sum.js';
 import { runPass2 } from './passes/pass2-poly-monotonicity.js';
 import { runPass3 } from './passes/pass3-kalshi-monotonicity.js';
+import { runPass5 } from './passes/pass5-cross-platform.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const OUTPUT_PATH = resolve(REPO_ROOT, 'opportunities.json');
 
 function parseArgs(argv) {
-  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3] };
+  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3, 5] };
   for (const a of argv.slice(2)) {
     if (a === '--dry-run') flags.dryRun = true;
     else if (a === '--no-push') flags.noPush = true;
@@ -93,8 +94,8 @@ async function main() {
   log.info(`scanner: start passes=${flags.passes.join(',')} dry-run=${flags.dryRun} no-push=${flags.noPush}`);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
-  const needsPoly = flags.passes.some(p => p === 1 || p === 2);
-  const needsKalshi = flags.passes.includes(3);
+  const needsPoly = flags.passes.some(p => p === 1 || p === 2 || p === 5);
+  const needsKalshi = flags.passes.some(p => p === 3 || p === 5);
 
   let polyEvents = [];
   if (needsPoly) {
@@ -172,7 +173,15 @@ async function main() {
     stats.candidates_pre_filter += r3.stats.candidates_pre_filter || 0;
     log.info(`pass3: ${r3.opportunities.length} opportunities (${r3.stats.candidates_pre_filter} candidates, ${r3.stats.kalshi_normalized} normalized)`);
   }
-  // pass 5 (cross-platform matching) wired in next step
+
+  if (flags.passes.includes(5) && polyEvents.length && kalshiMarkets.length) {
+    const r5 = await runPass5(polyEvents, kalshiMarkets, log);
+    opportunities.push(...r5.opportunities);
+    stats.candidates_pre_filter += r5.stats.candidates_pre_filter || 0;
+    log.info(`pass5: ${r5.opportunities.length} opportunities (${r5.stats.candidates_pre_filter} candidates, ${r5.stats.shared_canonical_keys} shared keys; poly_norm=${r5.stats.poly_normalized_for_match}, kalshi_norm=${r5.stats.kalshi_normalized_for_match})`);
+  } else if (flags.passes.includes(5)) {
+    log.warn('pass5: skipped — needs both polymarket + kalshi data');
+  }
 
   // ── Validate ───────────────────────────────────────────────────────────────
   const valid = [];
