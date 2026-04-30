@@ -22,6 +22,7 @@ import { fetchPolymarketEvents, fetchKalshiMarketsBySeries } from './lib/fetch.j
 import { SCHEMA_VERSION, emptyOutput, tallyTiers, validateOpportunity } from './lib/schema.js';
 import { appendHistory, loadHistory, pruneHistory } from './lib/history.js';
 import { computePersistence } from './lib/persistence.js';
+import { computeTrackRecord } from './lib/track-record.js';
 import { UNDERLYINGS } from './dicts/underlyings.js';
 import { runPass1 } from './passes/pass1-poly-sum.js';
 import { runPass2 } from './passes/pass2-poly-monotonicity.js';
@@ -77,6 +78,7 @@ function nonTrivialDiff(prev, next) {
     const c = JSON.parse(JSON.stringify(o));
     delete c.generated_at;
     delete c.scan_duration_ms;
+    delete c.track_record;
     if (Array.isArray(c.opportunities)) {
       for (const opp of c.opportunities) delete opp.persistence;
     }
@@ -268,6 +270,31 @@ async function main() {
     per_tier_cap: PER_TIER_CAP,
     history_lookback_days: HISTORY_LOOKBACK_DAYS,
   };
+
+  // Track record — aggregate of "what happened to flagged opps" computed off
+  // the same history. Frontend renders this above the tier sections.
+  // Note: priorHistory only contains samples from BEFORE this scan; for the
+  // track-record rollup we want today's samples included too, otherwise opps
+  // appearing for the first time would inflate "left_feed" on next scan. So
+  // we materialize a combined Map.
+  const liveIds = new Set(capped.map(o => o.id));
+  const combinedHistory = new Map();
+  for (const [id, samples] of priorHistory.entries()) {
+    combinedHistory.set(id, samples.slice());
+  }
+  for (const o of capped) {
+    const arr = combinedHistory.get(o.id) || [];
+    arr.push({
+      ts: generatedAtIso,
+      id: o.id,
+      tier: o.tier,
+      edge_gross_pct: o.edge_gross_pct ?? null,
+    });
+    combinedHistory.set(o.id, arr);
+  }
+  out.track_record = computeTrackRecord(combinedHistory, liveIds, {
+    lookbackDays: HISTORY_LOOKBACK_DAYS,
+  });
 
   // Append today's samples to local JSONL + prune old day files. Done after
   // assembly so a write failure mid-pipeline doesn't leave a half-baked file.

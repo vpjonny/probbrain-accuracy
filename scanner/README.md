@@ -22,6 +22,7 @@ node scanner/test-pass2-pass3.js          # 29 assertions — within-platform mo
 node scanner/test-pass4.js                # 26 assertions — curated cross-platform pairs
 node scanner/test-pass5.js                # 17 assertions — cross-platform matching
 node scanner/test-history-persistence.js  # 36 assertions — history + persistence rollup
+node scanner/test-track-record.js         # 50 assertions — track-record aggregate
 ```
 
 Audit (debug normalizer output for a given underlying):
@@ -100,6 +101,36 @@ On each run, the scanner loads the last 14 days of history, groups by opportunit
 The frontend renders this as a pill on each card (e.g. `2.3h ↘ tightening`). Persistence ticks every scan but is stripped from the no-op detector — the scanner still skips git pushes when only persistence + timestamps changed.
 
 History retention: 30 days (older daily files are auto-pruned each scan).
+
+### Track record (P&L proxy)
+
+Each scan also rolls history into a top-level `track_record` field on `opportunities.json`:
+
+```json
+"track_record": {
+  "lookback_days": 14,
+  "total_observed": 141,
+  "active": 100,        // still in latest scan
+  "left_feed": 41,      // gone from latest scan
+  "among_active": { "closed_substantially": 0, "tightened": 5, "stable": 88, "widened": 7 },
+  "among_active_pct": { "closed_substantially": 0.0, "tightened": 5.0, "stable": 88.0, "widened": 7.0 },
+  "median_lifetime_hours": 0.24,
+  "by_tier": { "1": {...}, "2": {...}, "3": {...} }
+}
+```
+
+For each opportunity in the lookback window: if it's still in the latest scan, classify the spread evolution from `first_gross` → `last_gross`:
+
+| Ratio (last/first) | State |
+|--------------------|-------|
+| < 0.5 | `closed_substantially` |
+| 0.5 – 0.8 | `tightened` |
+| 0.8 – 1.2 | `stable` |
+| > 1.2 | `widened` |
+
+If the opp is *not* in the latest scan, it's classified as `left_feed` — could mean resolved, leg delisted, or spread fell below the 2pp emit threshold. We do **not** call it "closed" because that would conflate observation with reality. Realized P&L (cross-referencing settled markets) is a separate v1.5 layer.
+
+The frontend renders this above the tier sections as a horizontal distribution bar.
 
 ### Tier assignment
 
@@ -259,6 +290,7 @@ scanner/
   test-pass4.js                        # 26 unit tests
   test-pass5.js                        # 17 unit tests
   test-history-persistence.js          # 36 unit tests
+  test-track-record.js                 # 50 unit tests
   audit-canonical.js                   # debug tool: dump canonical keys per asset
   dicts/
     underlyings.js                     # hardcoded BTC/ETH/SOL/FED_RATE/CPI/NFP
@@ -271,6 +303,7 @@ scanner/
     tiering.js                         # fee model + recency + tier assignment
     history.js                         # local JSONL: append/load/prune per-scan samples
     persistence.js                     # rollup → first_seen, hours_persisted, trend
+    track-record.js                    # aggregate → spread evolution + lifetime stats
   normalize/
     polymarket.js                      # field hierarchy: underlying → ... → resolution_type
     kalshi.js                          # series_ticker prefix + subtitle parser
