@@ -1,10 +1,10 @@
 // scanner/scan.js — entrypoint.
 //
 // Flags:
-//   --dry-run     no file write, no git, prints summary
-//   --no-push     write opportunities.json but skip commit/push
-//   --pass=1,2,3  comma-separated pass IDs to run (default: 1)
-//   --verbose     full skip-reason logging
+//   --dry-run         no file write, no git, prints summary
+//   --no-push         write opportunities.json but skip commit/push
+//   --pass=1,2,3,4,5  comma-separated pass IDs to run (default: 1,2,3,4,5)
+//   --verbose         full skip-reason logging
 //
 // Output: ../opportunities.json (one level up — repo root, served by Vercel/Pages)
 //
@@ -24,6 +24,7 @@ import { UNDERLYINGS } from './dicts/underlyings.js';
 import { runPass1 } from './passes/pass1-poly-sum.js';
 import { runPass2 } from './passes/pass2-poly-monotonicity.js';
 import { runPass3 } from './passes/pass3-kalshi-monotonicity.js';
+import { runPass4 } from './passes/pass4-curated-cross.js';
 import { runPass5 } from './passes/pass5-cross-platform.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -31,7 +32,7 @@ const REPO_ROOT = resolve(__dirname, '..');
 const OUTPUT_PATH = resolve(REPO_ROOT, 'opportunities.json');
 
 function parseArgs(argv) {
-  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3, 5] };
+  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3, 4, 5] };
   for (const a of argv.slice(2)) {
     if (a === '--dry-run') flags.dryRun = true;
     else if (a === '--no-push') flags.noPush = true;
@@ -94,8 +95,8 @@ async function main() {
   log.info(`scanner: start passes=${flags.passes.join(',')} dry-run=${flags.dryRun} no-push=${flags.noPush}`);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
-  const needsPoly = flags.passes.some(p => p === 1 || p === 2 || p === 5);
-  const needsKalshi = flags.passes.some(p => p === 3 || p === 5);
+  const needsPoly = flags.passes.some(p => p === 1 || p === 2 || p === 4 || p === 5);
+  const needsKalshi = flags.passes.some(p => p === 3 || p === 4 || p === 5);
 
   let polyEvents = [];
   if (needsPoly) {
@@ -174,11 +175,25 @@ async function main() {
     log.info(`pass3: ${r3.opportunities.length} opportunities (${r3.stats.candidates_pre_filter} candidates, ${r3.stats.kalshi_normalized} normalized)`);
   }
 
+  // Pass 4 runs before Pass 5 so its coveredPairs set can suppress duplicate
+  // emissions in Pass 5. When the same physical (poly_market, kalshi_ticker)
+  // pair would surface from both, Pass 4's curated context wins.
+  let coveredPairs = new Set();
+  if (flags.passes.includes(4) && polyEvents.length && kalshiMarkets.length) {
+    const r4 = await runPass4(polyEvents, kalshiMarkets, log);
+    opportunities.push(...r4.opportunities);
+    coveredPairs = r4.coveredPairs || new Set();
+    stats.candidates_pre_filter += r4.stats.candidates_pre_filter || 0;
+    log.info(`pass4: ${r4.opportunities.length} opportunities (${r4.stats.candidates_pre_filter} candidates, ${r4.stats.curated_pairs_evaluated} curated pairs; poly_norm=${r4.stats.poly_normalized_for_match}, kalshi_norm=${r4.stats.kalshi_normalized_for_match})`);
+  } else if (flags.passes.includes(4)) {
+    log.warn('pass4: skipped — needs both polymarket + kalshi data');
+  }
+
   if (flags.passes.includes(5) && polyEvents.length && kalshiMarkets.length) {
-    const r5 = await runPass5(polyEvents, kalshiMarkets, log);
+    const r5 = await runPass5(polyEvents, kalshiMarkets, log, { coveredPairs });
     opportunities.push(...r5.opportunities);
     stats.candidates_pre_filter += r5.stats.candidates_pre_filter || 0;
-    log.info(`pass5: ${r5.opportunities.length} opportunities (${r5.stats.candidates_pre_filter} candidates, ${r5.stats.shared_canonical_keys} shared keys; poly_norm=${r5.stats.poly_normalized_for_match}, kalshi_norm=${r5.stats.kalshi_normalized_for_match})`);
+    log.info(`pass5: ${r5.opportunities.length} opportunities (${r5.stats.candidates_pre_filter} candidates, ${r5.stats.shared_canonical_keys} shared keys, ${r5.stats.curated_dedup_skipped || 0} curated-dedup skipped; poly_norm=${r5.stats.poly_normalized_for_match}, kalshi_norm=${r5.stats.kalshi_normalized_for_match})`);
   } else if (flags.passes.includes(5)) {
     log.warn('pass5: skipped — needs both polymarket + kalshi data');
   }

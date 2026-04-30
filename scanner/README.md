@@ -19,6 +19,7 @@ Tests:
 ```bash
 node scanner/test-pass1.js        # 18 assertions — Pass 1 (Poly sum violations)
 node scanner/test-pass2-pass3.js  # 29 assertions — within-platform monotonicity
+node scanner/test-pass4.js        # 26 assertions — curated cross-platform pairs
 node scanner/test-pass5.js        # 17 assertions — cross-platform matching
 ```
 
@@ -44,9 +45,31 @@ No backend hosting. No CORS issues (server-side `fetch` in Node). No live pollin
 | 1 | `poly_sum_violation` | Polymarket negRisk events whose YES prices sum to anything other than 1.0 (within 1.5pp). Buy-all-YES if sum < 1, buy-all-NO if sum > 1. |
 | 2 | `poly_monotonicity` | Within a Polymarket event with multiple strikes, "above" prices should drop as strike rises (and vice versa for "below"). Adjacent-strike pairs only. |
 | 3 | `kalshi_monotonicity` | Same drill on Kalshi using `yes_bid_dollars` / `yes_ask_dollars` mid. |
+| 4 | `cross_platform` (curated) | Hand-validated (Poly bucket, Kalshi bucket) entries from `dicts/curated-pairs.js`. Bridges the calendar mismatch Pass 5 misses (Poly uses round strikes + endDate-1, Kalshi uses $X,XXX.99 strikes + month-after expiry). Tagged with `curated_pair` flag and `curated_pair_id` field. Runs before Pass 5; emitted pairs are deduped from Pass 5. |
 | 5 | `cross_platform` | Same canonical key (underlying, direction, strike, date, type) on both venues priced differently. Buy YES on the cheaper venue, NO on the more expensive. |
 
-Passes 4, 6, 7 are deferred to v1.5+.
+Passes 6, 7 are deferred to v1.5+.
+
+#### Adding a curated pair (Pass 4)
+
+Edit `scanner/dicts/curated-pairs.js`. Each entry asserts: "this Polymarket bucket and this Kalshi bucket ask the same question." Read both venues' market pages, confirm the resolution rules describe the same observable event, then write the entry. Schema:
+
+```js
+{
+  id: 'btc-year-end-2026',                              // stable, used in opportunity ID
+  underlying: 'BTC',                                    // sanity check
+  polyFilter: (event, market) => /* predicate */,       // returns true for Poly markets in the bucket
+  kalshiFilter: (market) => /* predicate */,            // returns true for Kalshi markets in the bucket
+  match: {
+    strikeTolerancePct: 0.5,                            // relative tolerance ($150k vs $149,999.99 → 0.0007%)
+    requireSameDirection: true,                         // almost always true
+  },
+  sameResolutionWindow: true,                           // operator-asserted: settlement windows resolve identically
+  notes: 'why these two buckets are equivalent — date verified',
+}
+```
+
+When `sameResolutionWindow: true`, the offset filter and `resolution_mismatch` flag are skipped — the curator is taking responsibility for the match. When `false`, behaves like Pass 5's strike-only fallback (capped at Tier 2 with `resolution_mismatch`).
 
 ### Tier assignment
 
@@ -182,7 +205,7 @@ Use this only if you want the LLM to apply judgment on whether to push (e.g., su
 
 ## Troubleshooting
 
-**Scanner runs but Pass 5 finds 0 cross-platform matches.** Expected, much of the time. Polymarket and Kalshi schedule their BTC ladders on different calendars — they offer the same strikes but rarely on the same exact date. Run `node scanner/audit-canonical.js BTC` to see which canonical keys each venue is producing; near-misses (same strike, different date) tell you what's almost matching. Real cross-platform arbs surface only when both venues happen to list the same question.
+**Scanner runs but Pass 5 finds 0 cross-platform matches.** Expected, much of the time. Polymarket and Kalshi schedule their BTC ladders on different calendars — they offer the same strikes but rarely on the same exact date. Run `node scanner/audit-canonical.js BTC` to see which canonical keys each venue is producing; near-misses (same strike, different date) tell you what's almost matching. Real cross-platform arbs surface only when both venues happen to list the same question. **For known equivalent buckets that don't match by canonical key, add a Pass 4 curated entry** (see "Adding a curated pair" above).
 
 **Tons of `pass2_underlying_not_in_dict` skips in `--verbose`.** Working as intended. The underlying dict is intentionally narrow — it covers BTC/ETH/SOL/FED_RATE/CPI/NFP. The scanner skips everything else loudly with that reason. To support more underlyings, see "Adding a new underlying" above.
 
@@ -203,10 +226,12 @@ scanner/
   install-systemd.sh                   # idempotent systemd user-timer installer (Arch)
   test-pass1.js                        # 18 unit tests
   test-pass2-pass3.js                  # 29 unit tests
+  test-pass4.js                        # 26 unit tests
   test-pass5.js                        # 17 unit tests
   audit-canonical.js                   # debug tool: dump canonical keys per asset
   dicts/
     underlyings.js                     # hardcoded BTC/ETH/SOL/FED_RATE/CPI/NFP
+    curated-pairs.js                   # hand-validated cross-platform buckets (Pass 4)
   lib/
     fetch.js                           # built-in fetch + retries + paginators
     log.js                             # skip-with-reason tracker
@@ -220,12 +245,12 @@ scanner/
     pass1-poly-sum.js                  # negRisk sum violations
     pass2-poly-monotonicity.js         # within-Polymarket strike monotonicity
     pass3-kalshi-monotonicity.js       # within-Kalshi strike monotonicity
+    pass4-curated-cross.js             # operator-curated cross-platform pairs
     pass5-cross-platform.js            # canonical-key matching across venues
 ```
 
 ## Out of scope (deliberate)
 
-- Pass 4 curated cross-platform pairs (Pass 5 covers the high-volume contracts; curated pairs only worth it for niche markets that schematic match never catches)
 - Pass 6 bracket arbs across mismatched strike granularities
 - Pass 7 conditional consistency within Polymarket
 - Auto-execution of any kind

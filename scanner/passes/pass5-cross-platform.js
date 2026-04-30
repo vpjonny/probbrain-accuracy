@@ -147,8 +147,13 @@ function weakestLink({ minDepth, netEdgePct, offsetMin, resolutionType, daysToRe
 }
 
 // ── main ────────────────────────────────────────────────────────────────────
-export async function runPass5(polyEvents, kalshiMarkets, log) {
+// opts.coveredPairs: optional Set<"poly_market_id|kalshi_ticker"> populated by
+//   Pass 4. Any (p, k) pair already emitted as a curated cross is skipped here
+//   to avoid duplicate cards on the dashboard. Pass 4's context wins.
+export async function runPass5(polyEvents, kalshiMarkets, log, opts = {}) {
   const nowMs = Date.now();
+  const coveredPairs = opts.coveredPairs instanceof Set ? opts.coveredPairs : new Set();
+  let curatedDedupSkipped = 0;
 
   // 1. Normalize Polymarket child markets.
   const polyItems = [];
@@ -243,6 +248,13 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
 
     for (const p of polyArr) {
       for (const k of kalshiArr) {
+        // Skip pairs already emitted by Pass 4 (curated). Their dashboard
+        // card has more context — emitting an unflagged Pass 5 duplicate would
+        // be noise.
+        if (coveredPairs.has(`${p.market.id}|${k.market.ticker}`)) {
+          curatedDedupSkipped++;
+          continue;
+        }
         const strictMatch = serializeCanonicalKey(p.canonical) === serializeCanonicalKey(k.canonical);
         const polyYes = p.yes;
         const kalshiYes = k.yes;
@@ -387,6 +399,7 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
       kalshi_normalized_for_match: kalshiItems.length,
       shared_canonical_keys: [...polyByKey.keys()].filter(k => kalshiByKey.has(k)).length,
       shared_strike_keys: [...polyByStrike.keys()].filter(k => kalshiByStrike.has(k)).length,
+      curated_dedup_skipped: curatedDedupSkipped,
     },
   };
 }
