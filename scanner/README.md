@@ -151,6 +151,18 @@ bash scanner/install-cron.sh
 
 It detects the repo root from its own location, so it works regardless of where the repo lives.
 
+### systemd alternative (Arch / cron-less systems)
+
+If `crontab` isn't installed (Arch's default — uses systemd timers natively), use the equivalent installer that creates a user-level systemd timer:
+
+```bash
+bash scanner/install-systemd.sh           # install + enable + start
+bash scanner/install-systemd.sh --status  # show next/last run + recent logs
+bash scanner/install-systemd.sh --remove  # disable + remove
+```
+
+Same 15-minute cadence, output goes to the journal (`journalctl --user -fu probbrain-arb-scanner.service`). For the timer to keep firing after logout, run `sudo loginctl enable-linger $USER` once.
+
 ### Spec-style alternative (Claude-orchestrated)
 
 The original build spec proposed running scans through `claude -p` to get LLM-summarized commit messages. Direct `node scan.js` is cheaper, deterministic, and equivalent — the script already produces a stat-summarized commit message (`scan: <ts>, T1=N T2=N T3=N`).
@@ -188,6 +200,7 @@ scanner/
   package.json
   README.md                            # this file
   install-cron.sh                      # idempotent crontab installer
+  install-systemd.sh                   # idempotent systemd user-timer installer (Arch)
   test-pass1.js                        # 18 unit tests
   test-pass2-pass3.js                  # 29 unit tests
   test-pass5.js                        # 17 unit tests
