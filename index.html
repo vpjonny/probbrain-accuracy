@@ -1188,6 +1188,15 @@
       return `<span class="conf-badge ${cls}">${c}</span>`;
     }
 
+    // When a calibrated gap is available, derive the displayed confidence from it
+    // so the badge reconciles with the calibrated edge shown in the row.
+    // Source `confidence` is set upstream from the raw (uncalibrated) gap.
+    function effectiveConfidence(s) {
+      if (s.calibrated_gap_pct == null) return s.confidence;
+      const g = s.calibrated_gap_pct;
+      return g >= 10 ? 'HIGH' : g >= 5 ? 'MEDIUM' : 'LOW';
+    }
+
     function statusBadge(s, sig) {
       if (s === 'WIN') return '<span class="status-badge status-win">&#10003; WIN</span>';
       if (s === 'LOSS') return '<span class="status-badge status-loss">&#10007; LOSS</span>';
@@ -1428,7 +1437,7 @@
 
       content.innerHTML = `
         <button class="modal-close" aria-label="Close">×</button>
-        <h3>${sig.id} · ${dirBadge(sig.direction)} ${confBadge(sig.confidence)} ${shadowFlag}</h3>
+        <h3>${sig.id} · ${dirBadge(sig.direction)} ${confBadge(effectiveConfidence(sig))} ${shadowFlag}</h3>
         <div class="modal-q">${sig.title || ''}</div>
         <div class="modal-grid">
           <div class="modal-stat"><div class="modal-stat-label">Market YES</div><div class="modal-stat-value">${market}</div></div>
@@ -1717,7 +1726,7 @@
         case 'direction': return (a.direction || '').localeCompare(b.direction || '');
         case 'market_price': return (a.market_price || 0) - (b.market_price || 0);
         case 'gap': return (a.calibrated_gap_pct ?? a.gap_pct ?? 0) - (b.calibrated_gap_pct ?? b.gap_pct ?? 0);
-        case 'confidence': return (CONF_ORDER[a.confidence] || 0) - (CONF_ORDER[b.confidence] || 0);
+        case 'confidence': return (CONF_ORDER[effectiveConfidence(a)] || 0) - (CONF_ORDER[effectiveConfidence(b)] || 0);
         case 'status': return (STATUS_ORDER[a.status] || 0) - (STATUS_ORDER[b.status] || 0);
         case 'close_date': return (a.close_date || '').localeCompare(b.close_date || '');
         default: return 0;
@@ -1775,7 +1784,7 @@
         <td><span class="prob-col"><span class="prob-market">${mkt}</span><span class="prob-sep">/</span><span class="prob-ours">${ours}</span></span></td>
         <td>${renderSparkline(s.price_history)}</td>
         <td>${gapPill(s.calibrated_gap_pct ?? s.gap_pct)}</td>
-        <td>${confBadge(s.confidence)}</td>
+        <td>${confBadge(effectiveConfidence(s))}</td>
         <td>${statusBadge(s.status, s)}</td>
         <td><span class="close-date">${s.close_date || '—'}</span></td>
       </tr>`;
