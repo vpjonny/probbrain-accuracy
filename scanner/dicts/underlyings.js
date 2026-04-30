@@ -11,39 +11,64 @@
 //   category_hints: Polymarket event.category / event.tags labels that lock
 //                   the underlying when present (preferred over slug parsing).
 //   kalshi_series:  Kalshi series_ticker prefixes that map to this underlying.
+//   strike_range:   [min, max] sanity bounds. Strikes outside the range are
+//                   rejected with reason "strike_out_of_plausible_range".
+//                   Catches cross-asset slips: a "MegaETH market cap $800M"
+//                   market shouldn't match BTC just because the event slug
+//                   mentioned bitcoin tangentially. Rate ranges are decimal
+//                   (0.05 = 5%).
 
 export const UNDERLYINGS = {
   BTC: {
     aliases: ['bitcoin', 'btc', '₿'],
     category_hints: ['crypto', 'bitcoin'],
     kalshi_series: ['KXBTC', 'KXBTCD', 'KXBTCMAXY'],
+    strike_range: [1_000, 5_000_000],
   },
   ETH: {
     aliases: ['ethereum', 'eth'],
     category_hints: ['crypto', 'ethereum'],
     kalshi_series: ['KXETH', 'KXETHD'],
+    strike_range: [50, 50_000],
   },
   SOL: {
     aliases: ['solana', 'sol'],
     category_hints: ['crypto', 'solana'],
     kalshi_series: ['KXSOL', 'KXSOLD'],
+    strike_range: [1, 5_000],
   },
   FED_RATE: {
     aliases: ['federal funds rate', 'fed funds', 'fomc', 'fed rate', 'interest rate decision'],
     category_hints: ['economics', 'fed', 'interest rates'],
     kalshi_series: ['KXFED', 'FED'],
+    strike_range: [0, 0.20],
   },
   CPI: {
     aliases: ['cpi', 'consumer price index', 'inflation print'],
     category_hints: ['economics', 'inflation'],
     kalshi_series: ['KXCPI', 'CPI'],
+    strike_range: [-0.05, 0.30],
   },
   NFP: {
     aliases: ['nfp', 'nonfarm payrolls', 'non-farm payrolls', 'jobs report'],
     category_hints: ['economics', 'jobs'],
     kalshi_series: ['KXNFP', 'NFP'],
+    strike_range: [-1_000_000, 5_000_000],
   },
 };
+
+// Sanity-check a parsed strike against the underlying's plausible range.
+// Returns null if in range, else a string reason for the skip log.
+export function strikeOutOfRange(underlying, strike) {
+  const entry = UNDERLYINGS[underlying];
+  if (!entry || !entry.strike_range) return null;
+  const [lo, hi] = entry.strike_range;
+  if (!Number.isFinite(strike)) return 'strike_not_finite';
+  if (strike < lo || strike > hi) {
+    return `strike_${strike}_outside_${underlying}_range_[${lo},${hi}]`;
+  }
+  return null;
+}
 
 const ALIAS_REGEX_CACHE = new Map();
 function aliasRegex(alias) {

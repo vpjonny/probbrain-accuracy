@@ -14,7 +14,9 @@
 import {
   matchUnderlyingByText,
   matchUnderlyingByCategory,
+  strikeOutOfRange,
 } from '../dicts/underlyings.js';
+import { parseStrike } from '../lib/strike.js';
 
 // ── Step 2: direction detection ──────────────────────────────────────────────
 const ABOVE_PATTERNS = /(\babove\b|\bover\b|≥|>=|>|reach(es)?|hit(s)?|exceed(s)?|\bgreater than\b|\bat least\b)/i;
@@ -28,24 +30,7 @@ function detectDirection(text) {
   return null;
 }
 
-// ── Step 3: strike extraction ────────────────────────────────────────────────
-// Capture a number with optional thousands separators and optional decoration:
-//   $100,000 / $100k / $1m / 100,000 / 3.5% / 200K / 250 bps
-const STRIKE_REGEX = /\$?\s*(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(k|m|bn|%)?\b/i;
-
-function parseStrike(text) {
-  if (!text) return null;
-  const m = text.match(STRIKE_REGEX);
-  if (!m) return null;
-  let n = parseFloat(m[1].replace(/,/g, ''));
-  if (!Number.isFinite(n)) return null;
-  const suffix = (m[2] || '').toLowerCase();
-  if (suffix === 'k') n *= 1_000;
-  else if (suffix === 'm') n *= 1_000_000;
-  else if (suffix === 'bn') n *= 1_000_000_000;
-  else if (suffix === '%') n /= 100;  // rates / inflation expressed as decimal
-  return n;
-}
+// Step 3: strike extraction lives in lib/strike.js (shared with Kalshi).
 
 // ── Step 4 & 5: resolution date + type ──────────────────────────────────────
 const TYPE_PATTERNS = [
@@ -126,6 +111,14 @@ export function normalizePolymarket(market, event = {}) {
   if (strike == null) strike = parseStrike(marketQuestion);
   if (strike == null) {
     return { skip: true, reason: 'strike_unparseable', context: { market_id: market.id, group: market.groupItemTitle, q: marketQuestion.slice(0, 60) } };
+  }
+  // Sanity check: strike must be in the underlying's plausible range. Catches
+  // cross-asset slips where Bitcoin alias matched but the actual market is
+  // about something else priced in different units (e.g. a $800M market cap
+  // matched as BTC because the event mentioned BTC tangentially).
+  const rangeErr = strikeOutOfRange(underlying, strike);
+  if (rangeErr) {
+    return { skip: true, reason: 'strike_out_of_plausible_range', context: { market_id: market.id, underlying, strike, detail: rangeErr } };
   }
 
   // Step 5: resolution_type (need it before formatting date)

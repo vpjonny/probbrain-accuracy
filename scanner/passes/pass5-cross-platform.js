@@ -183,18 +183,33 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
     kalshiItems.push({ market: m, yes, canonical: norm, rawDate: m.expiration_time || m.close_time, platform: 'kalshi' });
   }
 
-  // 3. Per-platform canonical-key index.
+  // 3. Per-platform indices. Two levels:
+  //   strict_key  = full canonical (underlying|direction|strike|date|type)
+  //                 → Tier 1 candidate (true risk-free arb territory)
+  //   strike_key  = (underlying|direction|strike) only
+  //                 → near-match; the venues schedule different dates so
+  //                   strict equality finds 0 in practice. Settlement-time
+  //                   offset filter downstream handles tiering honestly.
   const polyByKey = new Map();
   const kalshiByKey = new Map();
+  const polyByStrike = new Map();
+  const kalshiByStrike = new Map();
+  const strikeKey = (c) => `${c.underlying}|${c.direction}|${c.strike}`;
   for (const item of polyItems) {
     const k = serializeCanonicalKey(item.canonical);
+    const sk = strikeKey(item.canonical);
     if (!polyByKey.has(k)) polyByKey.set(k, []);
     polyByKey.get(k).push(item);
+    if (!polyByStrike.has(sk)) polyByStrike.set(sk, []);
+    polyByStrike.get(sk).push(item);
   }
   for (const item of kalshiItems) {
     const k = serializeCanonicalKey(item.canonical);
+    const sk = strikeKey(item.canonical);
     if (!kalshiByKey.has(k)) kalshiByKey.set(k, []);
     kalshiByKey.get(k).push(item);
+    if (!kalshiByStrike.has(sk)) kalshiByStrike.set(sk, []);
+    kalshiByStrike.get(sk).push(item);
   }
 
   // Collision detection — same canonical key from two markets of the same
@@ -213,16 +228,22 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
   logCollisions(allByKey, 'polymarket', log);
   logCollisions(allByKey, 'kalshi', log);
 
-  // 4. Find canonical-key matches (key present on both venues).
+  // 4. Find matches. Iterate strike-key (underlying|direction|strike) — looser
+  // than strict canonical. We then check the full canonical for a strict
+  // match to gate Tier 1; non-strict matches are capped at Tier 2 with a
+  // resolution_mismatch flag. Settlement-time-offset filter downstream is
+  // the real honesty backstop — wide offsets get skipped or downgraded
+  // regardless of how clean the match looks.
   const opportunities = [];
   let candidatesPreFilter = 0;
 
-  for (const [key, polyArr] of polyByKey.entries()) {
-    if (!kalshiByKey.has(key)) continue;
-    const kalshiArr = kalshiByKey.get(key);
+  for (const [skey, polyArr] of polyByStrike.entries()) {
+    if (!kalshiByStrike.has(skey)) continue;
+    const kalshiArr = kalshiByStrike.get(skey);
 
     for (const p of polyArr) {
       for (const k of kalshiArr) {
+        const strictMatch = serializeCanonicalKey(p.canonical) === serializeCanonicalKey(k.canonical);
         const polyYes = p.yes;
         const kalshiYes = k.yes;
         const spread = Math.abs(polyYes - kalshiYes);
@@ -241,7 +262,7 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
         const tol = offsetTolerance(p.canonical.resolution_type);
         if (offsetMin > tol * 4) {
           log.skip('pass5_offset_too_large', {
-            offset_min: Math.round(offsetMin), tolerance_min: tol, key,
+            offset_min: Math.round(offsetMin), tolerance_min: tol, key: skey,
           });
           continue;
         }
@@ -252,13 +273,13 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
         const kalshiV24 = Number(k.market.volume_24h_fp || 0);
         if (polyV24 === 0 || kalshiV24 === 0) {
           log.skip('pass5_pair_dead_leg', {
-            key, poly_v24: polyV24, kalshi_v24: kalshiV24,
+            key: skey, poly_v24: polyV24, kalshi_v24: kalshiV24,
           });
           continue;
         }
         if (polyV24 < 100 && kalshiV24 < 100) {
           log.skip('pass5_pair_low_volume', {
-            key, poly_v24: polyV24, kalshi_v24: kalshiV24,
+            key: skey, poly_v24: polyV24, kalshi_v24: kalshiV24,
           });
           continue;
         }
@@ -318,6 +339,15 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
         if (depthSeverelyCapped && !flags.includes('depth_limited')) flags.push('depth_limited');
         if (netEdgePct <= 0) tier = Math.max(tier, 2);
 
+        // Honesty: a non-strict match (same strike but different date or
+        // resolution_type on the two venues) isn't the same question. Cap at
+        // Tier 2 with resolution_mismatch flag — useful informational signal
+        // about cross-venue disagreement, but never claimed as risk-free.
+        if (!strictMatch) {
+          tier = Math.max(tier, 2);
+          if (!flags.includes('resolution_mismatch')) flags.push('resolution_mismatch');
+        }
+
         opportunities.push({
           id: stableId({
             canonical: p.canonical,
@@ -356,6 +386,7 @@ export async function runPass5(polyEvents, kalshiMarkets, log) {
       poly_normalized_for_match: polyItems.length,
       kalshi_normalized_for_match: kalshiItems.length,
       shared_canonical_keys: [...polyByKey.keys()].filter(k => kalshiByKey.has(k)).length,
+      shared_strike_keys: [...polyByStrike.keys()].filter(k => kalshiByStrike.has(k)).length,
     },
   };
 }

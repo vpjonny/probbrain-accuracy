@@ -7,7 +7,8 @@
 // Returns canonical key {underlying, direction, strike, resolution_date,
 // resolution_type} or {skip: true, reason: "..."}.
 
-import { matchUnderlyingByKalshiSeries } from '../dicts/underlyings.js';
+import { matchUnderlyingByKalshiSeries, strikeOutOfRange } from '../dicts/underlyings.js';
+import { parseStrike } from '../lib/strike.js';
 
 const ABOVE_PATTERNS = /\bor above\b|\babove\b|\bover\b|≥|>=|>|\bat or above\b|\bgreater than\b|\bat least\b/i;
 const BELOW_PATTERNS = /\bor below\b|\bbelow\b|\bunder\b|≤|<=|<|\bat or below\b|\bless than\b|\bat most\b/i;
@@ -20,20 +21,7 @@ function detectDirection(text) {
   return null;
 }
 
-const STRIKE_REGEX = /\$?\s*(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*(k|m|bn|%)?\b/i;
-function parseStrike(text) {
-  if (!text) return null;
-  const m = text.match(STRIKE_REGEX);
-  if (!m) return null;
-  let n = parseFloat(m[1].replace(/,/g, ''));
-  if (!Number.isFinite(n)) return null;
-  const suffix = (m[2] || '').toLowerCase();
-  if (suffix === 'k') n *= 1_000;
-  else if (suffix === 'm') n *= 1_000_000;
-  else if (suffix === 'bn') n *= 1_000_000_000;
-  else if (suffix === '%') n /= 100;
-  return n;
-}
+// Strike extraction lives in lib/strike.js (shared with Polymarket).
 
 // Kalshi sometimes labels series explicitly as DAILY / WEEKLY in the ticker
 // or close cadence. Detect with explicit hints first, then infer from the
@@ -119,6 +107,10 @@ export function normalizeKalshi(market) {
   }
   if (strike == null || !Number.isFinite(strike)) {
     return { skip: true, reason: 'kalshi_strike_unparseable', context: { ticker: market.ticker, sub: subtitle.slice(0, 60) } };
+  }
+  const rangeErr = strikeOutOfRange(underlying, strike);
+  if (rangeErr) {
+    return { skip: true, reason: 'kalshi_strike_out_of_plausible_range', context: { ticker: market.ticker, underlying, strike, detail: rangeErr } };
   }
 
   // Step 5: resolution_type
