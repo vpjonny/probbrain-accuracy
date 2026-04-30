@@ -18,16 +18,19 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
 import { createLogger } from './lib/log.js';
-import { fetchPolymarketEvents } from './lib/fetch.js';
+import { fetchPolymarketEvents, fetchKalshiMarketsBySeries } from './lib/fetch.js';
 import { SCHEMA_VERSION, emptyOutput, tallyTiers, validateOpportunity } from './lib/schema.js';
+import { UNDERLYINGS } from './dicts/underlyings.js';
 import { runPass1 } from './passes/pass1-poly-sum.js';
+import { runPass2 } from './passes/pass2-poly-monotonicity.js';
+import { runPass3 } from './passes/pass3-kalshi-monotonicity.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const OUTPUT_PATH = resolve(REPO_ROOT, 'opportunities.json');
 
 function parseArgs(argv) {
-  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1] };
+  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3] };
   for (const a of argv.slice(2)) {
     if (a === '--dry-run') flags.dryRun = true;
     else if (a === '--no-push') flags.noPush = true;
@@ -37,6 +40,14 @@ function parseArgs(argv) {
     }
   }
   return flags;
+}
+
+function uniqueKalshiSeries() {
+  const seen = new Set();
+  for (const entry of Object.values(UNDERLYINGS)) {
+    for (const s of (entry.kalshi_series || [])) seen.add(s);
+  }
+  return [...seen];
 }
 
 function loadPrevious() {
@@ -82,17 +93,36 @@ async function main() {
   log.info(`scanner: start passes=${flags.passes.join(',')} dry-run=${flags.dryRun} no-push=${flags.noPush}`);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
+  const needsPoly = flags.passes.some(p => p === 1 || p === 2);
+  const needsKalshi = flags.passes.includes(3);
+
   let polyEvents = [];
-  try {
-    polyEvents = await fetchPolymarketEvents({ log });
-    log.info(`scanner: fetched ${polyEvents.length} polymarket events`);
-  } catch (e) {
-    log.error(`scanner: polymarket fetch failed: ${e.message || e}`);
-    errors.push({ source: 'polymarket', msg: `fetch failed: ${e.message || e}` });
+  if (needsPoly) {
+    try {
+      polyEvents = await fetchPolymarketEvents({ log });
+      log.info(`scanner: fetched ${polyEvents.length} polymarket events`);
+    } catch (e) {
+      log.error(`scanner: polymarket fetch failed: ${e.message || e}`);
+      errors.push({ source: 'polymarket', msg: `fetch failed: ${e.message || e}` });
+    }
   }
 
-  // If everything failed and we have a previous file, mark its legs stale and surface errors.
-  if (polyEvents.length === 0 && errors.length > 0) {
+  let kalshiMarkets = [];
+  if (needsKalshi) {
+    try {
+      kalshiMarkets = await fetchKalshiMarketsBySeries(uniqueKalshiSeries(), { log });
+      log.info(`scanner: fetched ${kalshiMarkets.length} kalshi markets`);
+    } catch (e) {
+      log.error(`scanner: kalshi fetch failed: ${e.message || e}`);
+      errors.push({ source: 'kalshi', msg: `fetch failed: ${e.message || e}` });
+    }
+  }
+
+  // If both APIs failed entirely and we have a previous file, mark its legs
+  // stale and surface errors. Page never goes blank because of a transient
+  // outage at one or both venues.
+  const totalFetched = polyEvents.length + kalshiMarkets.length;
+  if (totalFetched === 0 && errors.length > 0 && (needsPoly || needsKalshi)) {
     const prev = loadPrevious();
     if (prev && Array.isArray(prev.opportunities)) {
       for (const o of prev.opportunities) {
@@ -119,14 +149,30 @@ async function main() {
   const opportunities = [];
   let stats = { poly_markets_scanned: 0, kalshi_markets_scanned: 0, candidates_pre_filter: 0 };
 
-  if (flags.passes.includes(1)) {
+  if (flags.passes.includes(1) && polyEvents.length) {
     const r1 = await runPass1(polyEvents, log);
     opportunities.push(...r1.opportunities);
-    stats.poly_markets_scanned += r1.stats.poly_markets_scanned || 0;
+    stats.poly_markets_scanned = Math.max(stats.poly_markets_scanned, r1.stats.poly_markets_scanned || 0);
     stats.candidates_pre_filter += r1.stats.candidates_pre_filter || 0;
     log.info(`pass1: ${r1.opportunities.length} opportunities (${r1.stats.candidates_pre_filter} candidates pre-filter)`);
   }
-  // passes 2/3/5 wired in subsequent steps
+
+  if (flags.passes.includes(2) && polyEvents.length) {
+    const r2 = await runPass2(polyEvents, log);
+    opportunities.push(...r2.opportunities);
+    stats.poly_markets_scanned = Math.max(stats.poly_markets_scanned, r2.stats.poly_markets_scanned || 0);
+    stats.candidates_pre_filter += r2.stats.candidates_pre_filter || 0;
+    log.info(`pass2: ${r2.opportunities.length} opportunities (${r2.stats.candidates_pre_filter} candidates, ${r2.stats.poly_normalized} normalized)`);
+  }
+
+  if (flags.passes.includes(3) && kalshiMarkets.length) {
+    const r3 = await runPass3(kalshiMarkets, log);
+    opportunities.push(...r3.opportunities);
+    stats.kalshi_markets_scanned += r3.stats.kalshi_markets_scanned || 0;
+    stats.candidates_pre_filter += r3.stats.candidates_pre_filter || 0;
+    log.info(`pass3: ${r3.opportunities.length} opportunities (${r3.stats.candidates_pre_filter} candidates, ${r3.stats.kalshi_normalized} normalized)`);
+  }
+  // pass 5 (cross-platform matching) wired in next step
 
   // ── Validate ───────────────────────────────────────────────────────────────
   const valid = [];

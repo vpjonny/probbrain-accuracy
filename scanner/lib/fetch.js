@@ -28,6 +28,7 @@ export async function fetchJson(url, { timeoutMs = DEFAULT_TIMEOUT_MS, headers =
 }
 
 const GAMMA = 'https://gamma-api.polymarket.com';
+const KALSHI = 'https://api.elections.kalshi.com/trade-api/v2';
 
 // Polymarket Gamma API — paginate active, non-closed events with their markets.
 // Each event includes negRisk flag and a markets[] array.
@@ -44,4 +45,57 @@ export async function fetchPolymarketEvents({ pageLimit = 500, log } = {}) {
     offset += pageLimit;
   }
   return events;
+}
+
+// Kalshi public markets endpoint — cursor-paginated. Filtering by series_ticker
+// pulls just the markets belonging to that underlying (BTC/ETH/SOL/etc.),
+// which is dramatically cheaper than fetching all open markets and filtering.
+async function fetchKalshiPaginated(url, { log, label }) {
+  const all = [];
+  let cursor = null;
+  let pages = 0;
+  while (true) {
+    const next = cursor ? `${url}&cursor=${encodeURIComponent(cursor)}` : url;
+    const data = await fetchJson(next);
+    const page = data.markets || [];
+    all.push(...page);
+    pages++;
+    if (log) log.info(`[fetch] kalshi ${label} page=${pages} got=${page.length} total=${all.length}`);
+    cursor = data.cursor || null;
+    if (!cursor || page.length === 0) break;
+    // Safety stop — Kalshi's open universe per series should never exceed
+    // a few thousand markets. Hard cap so a misbehaving cursor can't loop.
+    if (pages > 25) {
+      if (log) log.warn(`[fetch] kalshi ${label} hit page cap (${pages})`);
+      break;
+    }
+  }
+  return all;
+}
+
+// Fetch all open Kalshi markets for the given series_ticker prefixes. We
+// query each series separately because the bulk markets endpoint without
+// a series filter doesn't include series_ticker on every record.
+export async function fetchKalshiMarketsBySeries(seriesTickers, { pageLimit = 200, log } = {}) {
+  const all = [];
+  const seenTickers = new Set();
+  for (const series of seriesTickers) {
+    const url = `${KALSHI}/markets?status=open&limit=${pageLimit}&series_ticker=${encodeURIComponent(series)}`;
+    let page;
+    try {
+      page = await fetchKalshiPaginated(url, { log, label: series });
+    } catch (e) {
+      if (log) log.warn(`[fetch] kalshi ${series} failed: ${e.message || e}`);
+      continue;
+    }
+    for (const m of page) {
+      if (!m || !m.ticker || seenTickers.has(m.ticker)) continue;
+      seenTickers.add(m.ticker);
+      // Annotate with the series we queried under so normalization has a
+      // stable hint even if the record itself doesn't carry series_ticker.
+      m._series_ticker_hint = series;
+      all.push(m);
+    }
+  }
+  return all;
 }
