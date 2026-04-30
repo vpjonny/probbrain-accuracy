@@ -1,10 +1,10 @@
 // scanner/scan.js — entrypoint.
 //
 // Flags:
-//   --dry-run         no file write, no git, prints summary
-//   --no-push         write opportunities.json but skip commit/push
-//   --pass=1,2,3,4,5  comma-separated pass IDs to run (default: 1,2,3,4,5)
-//   --verbose         full skip-reason logging
+//   --dry-run             no file write, no git, prints summary
+//   --no-push             write opportunities.json but skip commit/push
+//   --pass=1,2,3,4,5,6    comma-separated pass IDs to run (default: 1,2,3,4,5,6)
+//   --verbose             full skip-reason logging
 //
 // Output: ../opportunities.json (one level up — repo root, served by Vercel/Pages)
 //
@@ -29,6 +29,7 @@ import { runPass2 } from './passes/pass2-poly-monotonicity.js';
 import { runPass3 } from './passes/pass3-kalshi-monotonicity.js';
 import { runPass4 } from './passes/pass4-curated-cross.js';
 import { runPass5 } from './passes/pass5-cross-platform.js';
+import { runPass6 } from './passes/pass6-cross-bracket.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
@@ -38,7 +39,7 @@ const HISTORY_LOOKBACK_DAYS = 14;
 const HISTORY_RETENTION_DAYS = 30;
 
 function parseArgs(argv) {
-  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3, 4, 5] };
+  const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3, 4, 5, 6] };
   for (const a of argv.slice(2)) {
     if (a === '--dry-run') flags.dryRun = true;
     else if (a === '--no-push') flags.noPush = true;
@@ -108,8 +109,8 @@ async function main() {
   log.info(`scanner: start passes=${flags.passes.join(',')} dry-run=${flags.dryRun} no-push=${flags.noPush}`);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
-  const needsPoly = flags.passes.some(p => p === 1 || p === 2 || p === 4 || p === 5);
-  const needsKalshi = flags.passes.some(p => p === 3 || p === 4 || p === 5);
+  const needsPoly = flags.passes.some(p => p === 1 || p === 2 || p === 4 || p === 5 || p === 6);
+  const needsKalshi = flags.passes.some(p => p === 3 || p === 4 || p === 5 || p === 6);
 
   let polyEvents = [];
   if (needsPoly) {
@@ -188,18 +189,29 @@ async function main() {
     log.info(`pass3: ${r3.opportunities.length} opportunities (${r3.stats.candidates_pre_filter} candidates, ${r3.stats.kalshi_normalized} normalized)`);
   }
 
-  // Pass 4 runs before Pass 5 so its coveredPairs set can suppress duplicate
-  // emissions in Pass 5. When the same physical (poly_market, kalshi_ticker)
-  // pair would surface from both, Pass 4's curated context wins.
+  // Pass 4 + 6 run before Pass 5; their coveredPairs sets are merged so Pass
+  // 5 can dedupe. Pass 4 covers same-strike (within tolerance), Pass 6 covers
+  // different-strike monotonicity violations. They never overlap with each
+  // other (the strike-tolerance check is mutually exclusive).
   let coveredPairs = new Set();
   if (flags.passes.includes(4) && polyEvents.length && kalshiMarkets.length) {
     const r4 = await runPass4(polyEvents, kalshiMarkets, log);
     opportunities.push(...r4.opportunities);
-    coveredPairs = r4.coveredPairs || new Set();
+    for (const k of (r4.coveredPairs || [])) coveredPairs.add(k);
     stats.candidates_pre_filter += r4.stats.candidates_pre_filter || 0;
     log.info(`pass4: ${r4.opportunities.length} opportunities (${r4.stats.candidates_pre_filter} candidates, ${r4.stats.curated_pairs_evaluated} curated pairs; poly_norm=${r4.stats.poly_normalized_for_match}, kalshi_norm=${r4.stats.kalshi_normalized_for_match})`);
   } else if (flags.passes.includes(4)) {
     log.warn('pass4: skipped — needs both polymarket + kalshi data');
+  }
+
+  if (flags.passes.includes(6) && polyEvents.length && kalshiMarkets.length) {
+    const r6 = await runPass6(polyEvents, kalshiMarkets, log);
+    opportunities.push(...r6.opportunities);
+    for (const k of (r6.coveredPairs || [])) coveredPairs.add(k);
+    stats.candidates_pre_filter += r6.stats.candidates_pre_filter || 0;
+    log.info(`pass6: ${r6.opportunities.length} opportunities (${r6.stats.candidates_pre_filter} candidates, ${r6.stats.curated_pairs_evaluated} curated pairs; poly_norm=${r6.stats.poly_normalized_for_match}, kalshi_norm=${r6.stats.kalshi_normalized_for_match})`);
+  } else if (flags.passes.includes(6)) {
+    log.warn('pass6: skipped — needs both polymarket + kalshi data');
   }
 
   if (flags.passes.includes(5) && polyEvents.length && kalshiMarkets.length) {

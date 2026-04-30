@@ -21,8 +21,9 @@ node scanner/test-pass1.js                # 18 assertions — Pass 1 (Poly sum v
 node scanner/test-pass2-pass3.js          # 29 assertions — within-platform monotonicity
 node scanner/test-pass4.js                # 26 assertions — curated cross-platform pairs
 node scanner/test-pass5.js                # 17 assertions — cross-platform matching
+node scanner/test-pass6.js                # 22 assertions — cross-platform bracket arbs
 node scanner/test-history-persistence.js  # 36 assertions — history + persistence rollup
-node scanner/test-track-record.js         # 50 assertions — track-record aggregate
+node scanner/test-track-record.js         # 66 assertions — track-record aggregate
 ```
 
 Audit (debug normalizer output for a given underlying):
@@ -49,8 +50,9 @@ No backend hosting. No CORS issues (server-side `fetch` in Node). No live pollin
 | 3 | `kalshi_monotonicity` | Same drill on Kalshi using `yes_bid_dollars` / `yes_ask_dollars` mid. |
 | 4 | `cross_platform` (curated) | Hand-validated (Poly bucket, Kalshi bucket) entries from `dicts/curated-pairs.js`. Bridges the calendar mismatch Pass 5 misses (Poly uses round strikes + endDate-1, Kalshi uses $X,XXX.99 strikes + month-after expiry). Tagged with `curated_pair` flag and `curated_pair_id` field. Runs before Pass 5; emitted pairs are deduped from Pass 5. |
 | 5 | `cross_platform` | Same canonical key (underlying, direction, strike, date, type) on both venues priced differently. Buy YES on the cheaper venue, NO on the more expensive. |
+| 6 | `cross_platform_bracket` | Bracket arbs across mismatched strike granularities WITHIN a curated bucket. For "above" markets, stricter (higher) strike must have ≤ probability than looser (lower) strike on the equivalent venue. When that monotonicity is violated cross-venue (e.g. Poly@$140k YES > Kalshi@$150k YES under "above"), buy YES on the looser side + NO on the stricter side for guaranteed $1 minimum payout. Strike pairs INSIDE Pass 4's tolerance are skipped (Pass 4's territory). Tagged with `curated_pair` + `bracket_arb` flags. |
 
-Passes 6, 7 are deferred to v1.5+.
+Pass 7 is deferred to v1.5+.
 
 #### Adding a curated pair (Pass 4)
 
@@ -298,8 +300,9 @@ scanner/
   test-pass2-pass3.js                  # 29 unit tests
   test-pass4.js                        # 26 unit tests
   test-pass5.js                        # 17 unit tests
+  test-pass6.js                        # 22 unit tests
   test-history-persistence.js          # 36 unit tests
-  test-track-record.js                 # 50 unit tests
+  test-track-record.js                 # 66 unit tests
   audit-canonical.js                   # debug tool: dump canonical keys per asset
   dicts/
     underlyings.js                     # hardcoded BTC/ETH/SOL/FED_RATE/CPI/NFP
@@ -322,11 +325,11 @@ scanner/
     pass3-kalshi-monotonicity.js       # within-Kalshi strike monotonicity
     pass4-curated-cross.js             # operator-curated cross-platform pairs
     pass5-cross-platform.js            # canonical-key matching across venues
+    pass6-cross-bracket.js             # cross-venue monotonicity violations (bracket arbs)
 ```
 
 ## Out of scope (deliberate)
 
-- Pass 6 bracket arbs across mismatched strike granularities
 - Pass 7 conditional consistency within Polymarket
 - Auto-execution of any kind
 - P&L / track-record of detected arbs
