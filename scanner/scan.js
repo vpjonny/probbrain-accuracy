@@ -292,8 +292,23 @@ async function main() {
     });
     combinedHistory.set(o.id, arr);
   }
+  // Cross-reference left_feed opps against the current fetch so track-record
+  // can label why each one is gone (leg_expired / leg_delisted / spread_closed
+  // / unknown). Without these sets, classifier falls back to "unknown".
+  const polyMarketIds = new Set();
+  for (const ev of polyEvents) {
+    for (const m of (ev.markets || [])) {
+      if (m && m.id != null) polyMarketIds.add(String(m.id));
+    }
+  }
+  const kalshiTickers = new Set();
+  for (const m of kalshiMarkets) {
+    if (m && m.ticker) kalshiTickers.add(String(m.ticker));
+  }
+
   out.track_record = computeTrackRecord(combinedHistory, liveIds, {
     lookbackDays: HISTORY_LOOKBACK_DAYS,
+    currentMarketIds: { poly: polyMarketIds, kalshi: kalshiTickers },
   });
 
   // Append today's samples to local JSONL + prune old day files. Done after

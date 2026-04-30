@@ -128,7 +128,16 @@ For each opportunity in the lookback window: if it's still in the latest scan, c
 | 0.8 – 1.2 | `stable` |
 | > 1.2 | `widened` |
 
-If the opp is *not* in the latest scan, it's classified as `left_feed` — could mean resolved, leg delisted, or spread fell below the 2pp emit threshold. We do **not** call it "closed" because that would conflate observation with reality. Realized P&L (cross-referencing settled markets) is a separate v1.5 layer.
+If the opp is *not* in the latest scan, it's classified as `left_feed` — and we further label *why* by cross-referencing the last seen sample's `leg_ids` + `resolution_date` against the current scan's full set of fetched market IDs:
+
+| Reason | Detection |
+|--------|-----------|
+| `leg_expired` | `resolution_date` is in the past |
+| `leg_delisted` | one or more legs missing from the current Poly/Kalshi fetch |
+| `spread_closed` | all legs still alive in fetch — opp gone means spread fell below the 2pp emit threshold |
+| `unknown` | no leg info on the sample (legacy history) and `resolution_date` didn't disqualify |
+
+None of these confirm a fill happened — that requires settlement P&L (v1.5+). The point of the breakdown is to stop conflating "left our feed" with "closed/resolved."
 
 The frontend renders this above the tier sections as a horizontal distribution bar.
 

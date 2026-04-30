@@ -23,9 +23,15 @@ function todayDayKey() {
 }
 
 // Compact projection — full opportunities are heavy, we only need the
-// changing fields to reconstruct trend. Keep this stable; persistence.js
-// reads what's written here.
+// changing fields to reconstruct trend + the bare minimum to diagnose why an
+// opp left the feed (leg_ids + resolution_date). Keep this stable; both
+// persistence.js and track-record.js read what's written here. Old samples
+// missing leg_ids/resolution_date stay loadable — downstream classifiers
+// fall back to "unknown" rather than crashing.
 function compactSample(generatedAtIso, opp) {
+  const legIds = Array.isArray(opp.legs)
+    ? opp.legs.map(l => ({ platform: l.platform, market_id: String(l.market_id ?? '') }))
+    : [];
   return {
     ts: generatedAtIso,
     id: opp.id,
@@ -34,6 +40,8 @@ function compactSample(generatedAtIso, opp) {
     edge_net_estimate_pct: opp.edge_net_estimate_pct ?? null,
     max_size: opp.max_executable_size_per_leg_usd ?? null,
     flags: Array.isArray(opp.confidence_flags) ? opp.confidence_flags : [],
+    leg_ids: legIds,
+    resolution_date: opp.resolution_date || null,
   };
 }
 

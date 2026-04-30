@@ -235,10 +235,22 @@
   .track-record-legend .swatch.tightened { background: #f87171; }
   .track-record-legend .swatch.stable { background: #555; }
   .track-record-legend .swatch.widened { background: #34d399; }
+  .track-record-leftfeed {
+    font-size: 11px; color: #a0a0a0;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .track-record-leftfeed .label { color: #888; margin-right: 6px; }
+  .track-record-leftfeed strong { color: #d8d8d8; font-weight: 600; }
+  .track-record-leftfeed .reason-spread_closed { color: #555; }
+  .track-record-leftfeed .reason-leg_expired { color: #888; }
+  .track-record-leftfeed .reason-leg_delisted { color: #888; }
+  .track-record-leftfeed .reason-unknown { color: #6e6e6e; font-style: italic; }
   .track-record-caveat {
     font-size: 10.5px; color: #6e6e6e; font-style: italic;
     line-height: 1.4;
   }
+  .track-record-caveat strong { color: #888; font-style: normal; font-weight: 600; }
 
   .leg-row {
     display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: baseline;
@@ -441,9 +453,9 @@
       </div>
       <div id="tr-bar" class="track-record-bar"></div>
       <div id="tr-legend" class="track-record-legend"></div>
+      <div id="tr-leftfeed" class="track-record-leftfeed" style="display:none"></div>
       <div class="track-record-caveat">
-        Spread evolution only — “left feed” may mean resolved, delisted, or fell below our 2pp emit threshold.
-        Realized P&amp;L (settlement) is the v1.5 layer.
+        Spread evolution from our own scan history — not realized P&amp;L. <strong>spread_closed</strong> means the legs are still on both venues but the spread fell under our 2pp emit threshold; <strong>leg_expired</strong> / <strong>leg_delisted</strong> mean the underlying market is gone. None of these confirm a fill happened.
       </div>
     </div>
   </section>
@@ -893,6 +905,31 @@ function renderTrackRecord(tr) {
     const p = +pcts[s] || 0;
     return `<span><span class="swatch ${s}"></span>${escapeHtml(labels[s])}: <strong>${c}</strong> (${p.toFixed(1)}%)</span>`;
   }).join("");
+
+  // Left-feed reason breakdown — hidden if no opps have left the feed yet, or
+  // if the field is missing (older opportunities.json).
+  const lf = document.getElementById("tr-leftfeed");
+  const reasons = tr.left_feed_reasons;
+  if (!reasons || (tr.left_feed ?? 0) === 0) {
+    lf.style.display = "none";
+  } else {
+    const reasonLabels = {
+      spread_closed: "spread closed",
+      leg_expired: "leg expired",
+      leg_delisted: "leg delisted",
+      unknown: "unknown",
+    };
+    const order = ["spread_closed", "leg_expired", "leg_delisted", "unknown"];
+    const parts = order
+      .filter(r => (reasons[r] || 0) > 0)
+      .map(r => `<span class="reason-${r}"><strong>${reasons[r]}</strong> ${escapeHtml(reasonLabels[r])}</span>`);
+    if (parts.length === 0) {
+      lf.style.display = "none";
+    } else {
+      lf.style.display = "";
+      lf.innerHTML = `<span class="label">Of ${tr.left_feed} left feed:</span>${parts.join(' · ')}`;
+    }
+  }
 }
 
 async function load() {
