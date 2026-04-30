@@ -20,6 +20,8 @@ import { execFileSync } from 'node:child_process';
 import { createLogger } from './lib/log.js';
 import { fetchPolymarketEvents, fetchKalshiMarketsBySeries } from './lib/fetch.js';
 import { SCHEMA_VERSION, emptyOutput, tallyTiers, validateOpportunity } from './lib/schema.js';
+import { appendHistory, loadHistory, pruneHistory } from './lib/history.js';
+import { computePersistence } from './lib/persistence.js';
 import { UNDERLYINGS } from './dicts/underlyings.js';
 import { runPass1 } from './passes/pass1-poly-sum.js';
 import { runPass2 } from './passes/pass2-poly-monotonicity.js';
@@ -30,6 +32,9 @@ import { runPass5 } from './passes/pass5-cross-platform.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const OUTPUT_PATH = resolve(REPO_ROOT, 'opportunities.json');
+const HISTORY_DIR = resolve(REPO_ROOT, 'history');
+const HISTORY_LOOKBACK_DAYS = 14;
+const HISTORY_RETENTION_DAYS = 30;
 
 function parseArgs(argv) {
   const flags = { dryRun: false, noPush: false, verbose: false, passes: [1, 2, 3, 4, 5] };
@@ -62,13 +67,19 @@ function loadPrevious() {
 }
 
 // If the only thing that changed between two runs is the timestamps and
-// duration, skip the git push to avoid a noisy commit history.
+// duration, skip the git push to avoid a noisy commit history. Persistence
+// summaries also tick every scan (scans_seen, hours_persisted, the rolling
+// history window) — strip those too. We still push when a NEW opportunity
+// appears, an old one disappears, or any tier/price/size field changes.
 function nonTrivialDiff(prev, next) {
   if (!prev) return true;
   const stripVolatile = (o) => {
     const c = JSON.parse(JSON.stringify(o));
     delete c.generated_at;
     delete c.scan_duration_ms;
+    if (Array.isArray(c.opportunities)) {
+      for (const opp of c.opportunities) delete opp.persistence;
+    }
     return c;
   };
   return JSON.stringify(stripVolatile(prev)) !== JSON.stringify(stripVolatile(next));
@@ -223,7 +234,28 @@ async function main() {
   }
 
   // ── Assemble ───────────────────────────────────────────────────────────────
-  const out = emptyOutput({ generatedAt: new Date().toISOString(), scanDurationMs: Date.now() - t0 });
+  const generatedAtIso = new Date().toISOString();
+  const out = emptyOutput({ generatedAt: generatedAtIso, scanDurationMs: Date.now() - t0 });
+
+  // ── Persistence: roll up prior scan samples into per-opp summaries ────────
+  // History is local-only (gitignored) — opportunities.json carries the
+  // computed summary, which is what the dashboard renders.
+  const priorHistory = loadHistory(HISTORY_DIR, HISTORY_LOOKBACK_DAYS);
+  for (const o of capped) {
+    const prior = priorHistory.get(o.id) || [];
+    const currentSample = {
+      ts: generatedAtIso,
+      id: o.id,
+      tier: o.tier,
+      edge_gross_pct: o.edge_gross_pct ?? null,
+      edge_net_estimate_pct: o.edge_net_estimate_pct ?? null,
+      max_size: o.max_executable_size_per_leg_usd ?? null,
+      flags: o.confidence_flags || [],
+    };
+    const summary = computePersistence(prior, currentSample);
+    if (summary) o.persistence = summary;
+  }
+
   out.opportunities = capped;
   out.errors = errors;
   out.stats = {
@@ -234,7 +266,27 @@ async function main() {
     pre_cap_tier2: preCapTallies.tier2_count,
     pre_cap_tier3: preCapTallies.tier3_count,
     per_tier_cap: PER_TIER_CAP,
+    history_lookback_days: HISTORY_LOOKBACK_DAYS,
   };
+
+  // Append today's samples to local JSONL + prune old day files. Done after
+  // assembly so a write failure mid-pipeline doesn't leave a half-baked file.
+  // Honor --dry-run (no fs side effects). --no-push still appends (history is
+  // local; no-push only suppresses git).
+  if (!flags.dryRun) {
+    try {
+      const r = appendHistory(HISTORY_DIR, generatedAtIso, capped);
+      log.info(`history: appended ${r.written} samples → ${r.path}`);
+    } catch (e) {
+      log.warn(`history: append failed: ${e.message}`);
+    }
+    try {
+      const p = pruneHistory(HISTORY_DIR, HISTORY_RETENTION_DAYS, log);
+      if (p.deleted > 0) log.info(`history: pruned ${p.deleted} day files older than ${HISTORY_RETENTION_DAYS}d`);
+    } catch (e) {
+      log.warn(`history: prune failed: ${e.message}`);
+    }
+  }
 
   // ── Skip log summary (always, since it's the debugging surface) ────────────
   const skipSummary = log.skipSummary();

@@ -170,6 +170,19 @@
   .badge-flag.resolution_mismatch { color: #ef4444; border-color: rgba(239,68,68,.35); }
   .badge-flag.curated_pair { color: #34d399; border-color: rgba(52,211,153,.35); background: rgba(52,211,153,.08); }
 
+  .pill-persistence {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px; border-radius: 4px;
+    font-size: 10px; font-weight: 600; letter-spacing: .04em;
+    background: #131313; color: #a0a0a0; border: 1px solid #1f1f1f;
+    font-variant-numeric: tabular-nums;
+  }
+  .pill-persistence.new { color: #93c5fd; border-color: rgba(147,197,253,.3); }
+  .pill-persistence.widening { color: #34d399; border-color: rgba(52,211,153,.35); }
+  .pill-persistence.tightening { color: #f87171; border-color: rgba(248,113,113,.35); }
+  .pill-persistence.stable { color: #a0a0a0; border-color: #2a2a2a; }
+  .pill-persistence .arrow { font-size: 11px; line-height: 1; }
+
   .leg-row {
     display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: baseline;
     padding: 6px 0; font-size: 12.5px;
@@ -546,6 +559,26 @@ function openLinksHtml(legs) {
     }).join(" ");
 }
 
+// Persistence pill. Shows how long this opportunity has been around and
+// whether the spread is widening, tightening, or stable. "new" if first scan.
+function persistencePillHtml(p) {
+  if (!p) return "";
+  const trend = p.trend || "new";
+  let label, arrow;
+  if (trend === "new" || (p.scans_seen ?? 0) < 3) {
+    label = "new";
+    arrow = "•";
+  } else {
+    const h = Number(p.hours_persisted || 0);
+    const dur = h < 1 ? `${Math.round(h * 60)}m` : h < 24 ? `${h.toFixed(1)}h` : `${Math.round(h / 24)}d`;
+    if (trend === "widening")        { label = `${dur} widening`;   arrow = "↗"; }
+    else if (trend === "tightening") { label = `${dur} tightening`; arrow = "↘"; }
+    else                              { label = `${dur} stable`;     arrow = "→"; }
+  }
+  const tip = `first seen ${escapeHtml((p.first_seen_at || "").slice(0, 16).replace("T", " "))} · ${p.scans_seen || 0} scans`;
+  return `<span class="pill-persistence ${trend}" title="${tip}"><span class="arrow">${arrow}</span>${escapeHtml(label)}</span>`;
+}
+
 function cardHtml(opp, bankroll) {
   const exec = executableProfit(opp, bankroll);
   const tierClass = "t" + opp.tier;
@@ -567,6 +600,7 @@ function cardHtml(opp, bankroll) {
         <span class="pill-type ${escapeHtml(opp.type || '')}">${escapeHtml(TYPE_LABELS[opp.type] || opp.type || 'unknown')}</span>
         <span class="pill-underlying">${escapeHtml(opp.underlying || '—')}</span>
         <span class="text-[11px] text-fg-muted num">${reso}</span>
+        ${persistencePillHtml(opp.persistence)}
         <span class="ml-auto flex flex-wrap gap-1.5">${flagsHtml(opp.confidence_flags)}</span>
       </div>
       <div class="text-sm sm:text-[15px] font-semibold leading-snug mb-2">${escapeHtml(opp.summary || '')}</div>

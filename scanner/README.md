@@ -17,10 +17,11 @@ node scanner/scan.js --verbose    # full skip-reason logging
 
 Tests:
 ```bash
-node scanner/test-pass1.js        # 18 assertions — Pass 1 (Poly sum violations)
-node scanner/test-pass2-pass3.js  # 29 assertions — within-platform monotonicity
-node scanner/test-pass4.js        # 26 assertions — curated cross-platform pairs
-node scanner/test-pass5.js        # 17 assertions — cross-platform matching
+node scanner/test-pass1.js                # 18 assertions — Pass 1 (Poly sum violations)
+node scanner/test-pass2-pass3.js          # 29 assertions — within-platform monotonicity
+node scanner/test-pass4.js                # 26 assertions — curated cross-platform pairs
+node scanner/test-pass5.js                # 17 assertions — cross-platform matching
+node scanner/test-history-persistence.js  # 36 assertions — history + persistence rollup
 ```
 
 Audit (debug normalizer output for a given underlying):
@@ -70,6 +71,35 @@ Edit `scanner/dicts/curated-pairs.js`. Each entry asserts: "this Polymarket buck
 ```
 
 When `sameResolutionWindow: true`, the offset filter and `resolution_mismatch` flag are skipped — the curator is taking responsibility for the match. When `false`, behaves like Pass 5's strike-only fallback (capped at Tier 2 with `resolution_mismatch`).
+
+### Persistence (spread history)
+
+Every scan appends a compact sample (`tier`, `edge_gross_pct`, `edge_net_estimate_pct`, `max_size`, `flags`) for each emitted opportunity to a daily JSONL file under `history/YYYY-MM-DD.jsonl`. `history/` is **gitignored** — it's the scanner's own per-machine memory, not a public artifact.
+
+On each run, the scanner loads the last 14 days of history, groups by opportunity ID, and embeds a rolled-up summary on each opportunity:
+
+```json
+"persistence": {
+  "first_seen_at": "2026-04-30T12:15:00Z",
+  "scans_seen": 24,
+  "hours_persisted": 6.0,
+  "gross_pct_history": [5.0, 4.8, 5.2, 5.0, 5.0],
+  "trend": "stable"
+}
+```
+
+`trend` comes from a least-squares slope over the last 10 samples of `edge_gross_pct`:
+
+| Slope | Classification |
+|-------|---------------|
+| ≥ +0.3pp/scan | `widening` |
+| ≤ -0.3pp/scan | `tightening` |
+| `\|slope\| < 0.3` | `stable` |
+| <3 samples | `new` |
+
+The frontend renders this as a pill on each card (e.g. `2.3h ↘ tightening`). Persistence ticks every scan but is stripped from the no-op detector — the scanner still skips git pushes when only persistence + timestamps changed.
+
+History retention: 30 days (older daily files are auto-pruned each scan).
 
 ### Tier assignment
 
@@ -228,6 +258,7 @@ scanner/
   test-pass2-pass3.js                  # 29 unit tests
   test-pass4.js                        # 26 unit tests
   test-pass5.js                        # 17 unit tests
+  test-history-persistence.js          # 36 unit tests
   audit-canonical.js                   # debug tool: dump canonical keys per asset
   dicts/
     underlyings.js                     # hardcoded BTC/ETH/SOL/FED_RATE/CPI/NFP
@@ -238,6 +269,8 @@ scanner/
     schema.js                          # SCHEMA_VERSION + validators
     canonical.js                       # canonical key serialization + grouping
     tiering.js                         # fee model + recency + tier assignment
+    history.js                         # local JSONL: append/load/prune per-scan samples
+    persistence.js                     # rollup → first_seen, hours_persisted, trend
   normalize/
     polymarket.js                      # field hierarchy: underlying → ... → resolution_type
     kalshi.js                          # series_ticker prefix + subtitle parser
