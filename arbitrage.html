@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polymarket × Kalshi Arbitrage Scanner — ProbBrain</title>
+<meta name="description" content="Live cross-platform arbitrage scanner across Polymarket and Kalshi: tiered opportunities, weakest-link transparency, executable-size and net-edge estimates. Updates on a schedule.">
+<meta name="keywords" content="polymarket kalshi arbitrage, prediction market arbitrage scanner, cross-platform arb, polymarket sum violation, kalshi monotonicity, prediction market mispricing">
+<meta property="og:title" content="Polymarket × Kalshi Arbitrage Scanner — ProbBrain">
+<meta property="og:description" content="Tiered prediction-market arbitrage opportunities across Polymarket and Kalshi. Honest weakest-link summaries on every card.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://probbrain.com/arbitrage">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@ProbBrain">
+<link rel="canonical" href="https://probbrain.com/arbitrage">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          ink:    { 950: '#0a0a0a', 900: '#111111', 800: '#171717', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a' },
+          fg:     { DEFAULT: '#e8e8e8', dim: '#a0a0a0', muted: '#666666' },
+          ok:     '#22c55e',
+          warn:   '#f59e0b',
+          bad:    '#ef4444',
+          accent: '#6366f1',
+          info:   '#3b82f6',
+          poly:   '#a78bfa',
+          kalshi: '#22d3ee',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0a0a0a; color: #e8e8e8;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11' 1, 'ss01' 1;
+  }
+  .num, input[type="number"], select {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+  }
+
+  /* ─── Atmospheric blobs (mirrors kelly.html) ─── */
+  .bg-blobs { position: fixed; inset: 0; z-index: -1; overflow: hidden;
+              pointer-events: none; filter: blur(80px) saturate(1.3); opacity: 0.32; }
+  .bg-blob { position: absolute; border-radius: 50%; will-change: transform; }
+  .bg-blob.b1 { width: 32vmin; height: 32vmin; top: -12vmin; left: -12vmin;
+                background: radial-gradient(circle, rgba(34,197,94,1) 0%, rgba(34,197,94,0) 65%);
+                animation: drift-a 24s ease-in-out infinite alternate; }
+  .bg-blob.b2 { width: 32vmin; height: 32vmin; top: -12vmin; right: -12vmin;
+                background: radial-gradient(circle, rgba(99,102,241,1) 0%, rgba(99,102,241,0) 65%);
+                animation: drift-b 28s ease-in-out infinite alternate; }
+  .bg-blob.b3 { width: 36vmin; height: 36vmin; bottom: -12vmin; left: -12vmin;
+                background: radial-gradient(circle, rgba(34,211,238,1) 0%, rgba(34,211,238,0) 65%);
+                animation: drift-c 26s ease-in-out infinite alternate; }
+  .bg-blob.b4 { width: 28vmin; height: 28vmin; bottom: -12vmin; right: -12vmin;
+                background: radial-gradient(circle, rgba(167,139,250,1) 0%, rgba(167,139,250,0) 65%);
+                animation: drift-d 30s ease-in-out infinite alternate; }
+  @keyframes drift-a { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40vw,28vh) scale(1.15); } 100% { transform: translate(62vw,52vh) scale(0.88); } }
+  @keyframes drift-b { 0% { transform: translate(0,0) scale(0.92); } 50% { transform: translate(-50vw,36vh) scale(1.18); } 100% { transform: translate(-26vw,60vh) scale(1.02); } }
+  @keyframes drift-c { 0% { transform: translate(0,0) scale(1.08); } 50% { transform: translate(46vw,-32vh) scale(0.92); } 100% { transform: translate(22vw,-56vh) scale(1.15); } }
+  @keyframes drift-d { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-42vw,-26vh) scale(0.86); } 100% { transform: translate(-66vw,-46vh) scale(1.12); } }
+
+  .bg-money { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; user-select: none; }
+  .glyph { position: absolute; font-family: 'JetBrains Mono', monospace; font-weight: 800;
+           letter-spacing: -0.06em; line-height: 1; white-space: nowrap; text-shadow: 0 0 60px currentColor; }
+  .glyph.g1 { top: 6vh;  left: 4vw;  font-size: clamp(140px,18vw,280px); transform: rotate(-12deg); color: #22c55e; opacity: .055; }
+  .glyph.g2 { top: 16vh; right: 10vw; font-size: clamp(80px,10vw,160px);  transform: rotate(8deg);   color: #6366f1; opacity: .04; }
+  .glyph.g3 { top: 50vh; left: 26vw;  font-size: clamp(60px,8vw,130px);   transform: rotate(-6deg);  color: #22d3ee; opacity: .055; }
+  .glyph.g4 { top: 60vh; right: 6vw;  font-size: clamp(200px,24vw,380px); transform: rotate(14deg);  color: #3b82f6; opacity: .045; }
+  .glyph.g5 { bottom: 6vh; left: 12vw; font-size: clamp(110px,13vw,220px); transform: rotate(-20deg); color: #a78bfa; opacity: .05; }
+  @media (prefers-reduced-motion: reduce) { .bg-blob { animation: none !important; } .bg-blobs { opacity: .2; } }
+
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,.7);
+    animation: pulse 2.4s cubic-bezier(.4,0,.6,1) infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); transform: scale(1); }
+    70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); transform: scale(1); }
+  }
+
+  /* ─── Marquee (matches dashboard ticker) ─── */
+  .marquee { overflow: hidden; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a;
+             background: rgba(255,255,255,.015); }
+  .marquee-track { display: flex; gap: 48px; padding: 9px 0; white-space: nowrap;
+                   animation: marquee 50s linear infinite; }
+  .marquee-track span { color: #666; font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: .04em; }
+  .marquee-track span.dot { color: #2a2a2a; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ─── Section header ─── */
+  .section-h { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; margin-bottom: 12px; }
+
+  /* ─── Tier hero counts ─── */
+  .tier-tile { background: rgba(255,255,255,.02); border: 1px solid #222; border-radius: 12px; padding: 14px 16px; }
+  .tier-tile .label { font-size: 10.5px; color: #666; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+  .tier-tile .count { font-family: 'JetBrains Mono', monospace; font-size: 32px; font-weight: 700; line-height: 1.05; margin-top: 6px; }
+  .tier-tile .sub   { font-size: 11.5px; color: #a0a0a0; margin-top: 4px; }
+  .tier-tile.t1 { border-color: rgba(34,197,94,.45); background: linear-gradient(135deg, rgba(34,197,94,.10) 0%, rgba(34,197,94,.02) 100%); }
+  .tier-tile.t1 .count { color: #22c55e; }
+  .tier-tile.t2 { border-color: rgba(245,158,11,.35); }
+  .tier-tile.t2 .count { color: #f59e0b; }
+  .tier-tile.t3 .count { color: #a0a0a0; }
+
+  /* ─── Filter chips ─── */
+  .chip {
+    padding: 5px 12px; border-radius: 999px; background: transparent;
+    color: #a0a0a0; font-weight: 600; font-size: 11.5px;
+    cursor: pointer; transition: all .12s; border: 1px solid #222;
+    font-family: inherit; text-transform: uppercase; letter-spacing: .06em;
+  }
+  .chip:hover { color: #e8e8e8; border-color: #2a2a2a; }
+  .chip.active { background: #1a1a1a; color: #e8e8e8; border-color: #6366f1; }
+
+  /* ─── Opportunity card ─── */
+  .opp-card {
+    background: rgba(255,255,255,.02); border: 1px solid #222; border-radius: 12px;
+    padding: 14px 16px; transition: border-color .12s;
+  }
+  .opp-card:hover { border-color: #2a2a2a; }
+  .opp-card.t1 { border-color: rgba(34,197,94,.4); }
+  .opp-card.t1:hover { border-color: rgba(34,197,94,.6); }
+  .opp-card.t2 { border-color: rgba(245,158,11,.3); }
+  .opp-card.t3 { opacity: .85; }
+
+  .pill-type {
+    display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    background: #1a1a1a; color: #a0a0a0; border: 1px solid #222;
+  }
+  .pill-type.cross_platform { color: #a78bfa; border-color: rgba(167,139,250,.35); }
+  .pill-type.poly_sum_violation { color: #a78bfa; border-color: rgba(167,139,250,.35); }
+  .pill-type.poly_monotonicity { color: #a78bfa; border-color: rgba(167,139,250,.35); }
+  .pill-type.kalshi_monotonicity { color: #22d3ee; border-color: rgba(34,211,238,.35); }
+
+  .pill-underlying {
+    display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+    background: rgba(99,102,241,.12); color: #c7d2fe; border: 1px solid rgba(99,102,241,.32);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .badge-flag {
+    display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 4px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+    background: #1a1a1a; color: #a0a0a0; border: 1px solid #222;
+  }
+  .badge-flag.stale_price { color: #f59e0b; border-color: rgba(245,158,11,.35); }
+  .badge-flag.fee_tight { color: #f59e0b; border-color: rgba(245,158,11,.35); }
+  .badge-flag.depth_limited { color: #f59e0b; border-color: rgba(245,158,11,.35); }
+  .badge-flag.offset_warning { color: #f59e0b; border-color: rgba(245,158,11,.35); }
+  .badge-flag.low_volume { color: #a0a0a0; border-color: #2a2a2a; }
+  .badge-flag.resolution_mismatch { color: #ef4444; border-color: rgba(239,68,68,.35); }
+
+  .leg-row {
+    display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: baseline;
+    padding: 6px 0; font-size: 12.5px;
+  }
+  .leg-row + .leg-row { border-top: 1px dashed #1a1a1a; }
+  .leg-platform { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+  .leg-platform.polymarket { color: #a78bfa; }
+  .leg-platform.kalshi { color: #22d3ee; }
+  .leg-data { color: #a0a0a0; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .leg-data .side { color: #e8e8e8; font-weight: 600; }
+  .leg-data .price { color: #e8e8e8; }
+
+  .edge-row {
+    display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: baseline;
+    padding: 8px 12px; margin-top: 10px; border-radius: 8px;
+    background: rgba(255,255,255,.025); border: 1px solid #1a1a1a;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+  }
+  .edge-row .label { color: #666; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; margin-right: 4px; }
+  .edge-row .v.pos { color: #22c55e; }
+  .edge-row .v.neg { color: #ef4444; }
+  .edge-row .v.amber { color: #f59e0b; }
+  .edge-row .v.muted { color: #a0a0a0; }
+
+  .weakest {
+    margin-top: 10px; padding: 8px 12px; border-radius: 8px;
+    background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.22);
+    font-size: 12.5px; color: #fcd9a3; line-height: 1.45;
+  }
+  .weakest::before { content: "⚠ Weakest link: "; color: #f59e0b; font-weight: 700; }
+
+  .open-link {
+    display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px;
+    font-size: 11.5px; font-weight: 600; border: 1px solid #222; color: #a0a0a0;
+    transition: all .12s;
+  }
+  .open-link:hover { border-color: #6366f1; color: #e8e8e8; }
+  .open-link.polymarket:hover { border-color: rgba(167,139,250,.5); color: #c7d2fe; }
+  .open-link.kalshi:hover { border-color: rgba(34,211,238,.5); color: #a5f3fc; }
+
+  /* ─── Range slider (matches kelly.html) ─── */
+  input[type="range"] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px;
+                        background: linear-gradient(90deg, #6366f1, #3b82f6); border: none; }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; cursor: pointer; box-shadow: 0 0 0 1px #6366f1;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%; background: #fff; border: none; box-shadow: 0 0 0 1px #6366f1;
+  }
+
+  /* ─── Empty state ─── */
+  .empty-state {
+    border: 1px dashed #2a2a2a; border-radius: 12px; padding: 28px 20px;
+    color: #a0a0a0; text-align: center; font-size: 13.5px; line-height: 1.55;
+    background: rgba(255,255,255,.012);
+  }
+  .empty-state strong { color: #e8e8e8; }
+
+  /* ─── Schema error banner ─── */
+  .schema-err {
+    border: 1px solid rgba(239,68,68,.5); background: rgba(239,68,68,.08);
+    border-radius: 12px; padding: 16px 18px; color: #fca5a5; font-size: 13.5px;
+  }
+
+  /* ─── Tier 3 collapsed ─── */
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::after { content: " ▾"; color: #666; font-size: 11px; }
+  details[open] > summary::after { content: " ▴"; }
+
+  @media (max-width: 640px) {
+    .section-h { font-size: 10px; margin-bottom: 8px; }
+    .tier-tile .count { font-size: 26px; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="bg-blobs" aria-hidden="true">
+  <div class="bg-blob b1"></div><div class="bg-blob b2"></div>
+  <div class="bg-blob b3"></div><div class="bg-blob b4"></div>
+</div>
+<div class="bg-money" aria-hidden="true">
+  <div class="glyph g1">$</div><div class="glyph g2">$</div><div class="glyph g3">$</div>
+  <div class="glyph g4">$</div><div class="glyph g5">$</div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-ink-600">
+    <div class="flex items-center gap-3">
+      <div class="text-xl font-extrabold tracking-tight">Prob<span class="text-accent">Brain</span></div>
+      <div class="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/40 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-accent">⚖ Tool</div>
+      <div class="inline-flex items-center gap-1.5 bg-[#0f2010] border border-[#1a4020] rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-ok">
+        <span class="pulse-dot"></span>Live
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="./kelly" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">🧮 Kelly</a>
+      <a href="./" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">← back to dashboard</a>
+    </div>
+  </header>
+
+  <!-- Title -->
+  <div class="my-6">
+    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Polymarket × Kalshi Arbitrage Scanner</h1>
+    <p class="text-sm text-fg-dim mt-1 max-w-3xl">
+      Cross-platform mispricings with honest weakest-link summaries. Tier 1 (true risk-free arbs) is rare — that's correct.
+      Numbers are gross, with a conservative net estimate after fees, depth, and capital cost.
+    </p>
+  </div>
+</div>
+
+<!-- Marquee -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>Tier 1 = risk-free arb · Tier 2 = inconsistency / fee-thin · Tier 3 = signal only</span><span class="dot">·</span>
+    <span>weakest_link_summary on every card — if we can't write one, it's not Tier 1</span><span class="dot">·</span>
+    <span>fees model: Poly dynamic taker + Kalshi 0.07·C·P·(1−P) + 1–3% spread + capital cost</span><span class="dot">·</span>
+    <span>not financial advice · scanner runs on a schedule</span><span class="dot">·</span>
+    <span>Tier 1 = risk-free arb · Tier 2 = inconsistency / fee-thin · Tier 3 = signal only</span><span class="dot">·</span>
+    <span>weakest_link_summary on every card — if we can't write one, it's not Tier 1</span><span class="dot">·</span>
+    <span>fees model: Poly dynamic taker + Kalshi 0.07·C·P·(1−P) + 1–3% spread + capital cost</span><span class="dot">·</span>
+    <span>not financial advice · scanner runs on a schedule</span><span class="dot">·</span>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- Schema error placeholder -->
+  <div id="schema-err" class="schema-err mb-6" style="display:none"></div>
+
+  <!-- Status bar -->
+  <section class="bg-white/[.02] border border-ink-600 rounded-xl p-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+      <div class="md:col-span-3">
+        <div class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold mb-1">Last scan</div>
+        <div id="status-last-scan" class="num text-sm">—</div>
+      </div>
+      <div class="md:col-span-3">
+        <div class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold mb-1">Markets scanned</div>
+        <div id="status-markets" class="num text-sm">—</div>
+      </div>
+      <div class="md:col-span-2">
+        <div class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold mb-1">Errors</div>
+        <div id="status-errors" class="num text-sm text-ok">none</div>
+      </div>
+      <div class="md:col-span-4">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-[11px] text-fg-muted uppercase tracking-wider font-semibold">Bankroll (USD)</span>
+          <span id="bankroll-out" class="hint num text-sm text-fg-dim">$1,000</span>
+        </div>
+        <input id="bankroll" type="range" min="100" max="50000" step="100" value="1000" class="w-full">
+        <div class="flex justify-between text-[10.5px] text-fg-muted mt-1 num">
+          <span>$100</span><span>$50,000</span>
+        </div>
+      </div>
+    </div>
+    <div id="errors-detail" class="mt-3 text-[11.5px] text-warn font-mono" style="display:none"></div>
+  </section>
+
+  <!-- Hero counts -->
+  <div class="grid grid-cols-3 gap-3 mb-8">
+    <div class="tier-tile t1">
+      <div class="label">Tier 1 — risk-free</div>
+      <div id="hero-t1" class="count">0</div>
+      <div class="sub">deep, fresh, fees survive</div>
+    </div>
+    <div class="tier-tile t2">
+      <div class="label">Tier 2 — inconsistency</div>
+      <div id="hero-t2" class="count">0</div>
+      <div class="sub">edge thin after fees / depth</div>
+    </div>
+    <div class="tier-tile t3">
+      <div class="label">Tier 3 — signal</div>
+      <div id="hero-t3" class="count">0</div>
+      <div class="sub">stale or low-volume</div>
+    </div>
+  </div>
+
+  <!-- Tier 1 -->
+  <section class="mb-8">
+    <div class="section-h">Tier 1 — Actionable</div>
+    <div id="tier1-list" class="space-y-3"></div>
+  </section>
+
+  <!-- Tier 2 -->
+  <section class="mb-8">
+    <div class="flex items-center justify-between mb-3">
+      <div class="section-h" style="margin-bottom:0">Tier 2 — Inconsistencies</div>
+      <div id="t2-filters" class="flex flex-wrap gap-1.5">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="poly">Within-Poly</button>
+        <button class="chip" data-filter="kalshi">Within-Kalshi</button>
+        <button class="chip" data-filter="cross">Cross-platform</button>
+      </div>
+    </div>
+    <div id="tier2-list" class="space-y-3"></div>
+  </section>
+
+  <!-- Tier 3 (collapsed) -->
+  <section class="mb-8">
+    <details>
+      <summary class="section-h">Tier 3 — Signals (collapsed)</summary>
+      <div id="tier3-list" class="space-y-3 mt-3"></div>
+    </details>
+  </section>
+
+  <footer class="mt-12 pt-6 border-t border-ink-600 text-xs text-fg-muted text-center">
+    Powered by <a href="./" class="text-info hover:underline">ProbBrain</a> ·
+    Follow <a href="https://x.com/ProbBrain" class="text-info hover:underline" target="_blank" rel="noopener">@ProbBrain</a> on X ·
+    Not financial advice. Trade at your own risk.
+  </footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// Arbitrage scanner — frontend
+// Schema contract: opportunities.json schema_version === EXPECTED_SCHEMA_VERSION
+// ─────────────────────────────────────────────────────────────────────────────
+const EXPECTED_SCHEMA_VERSION = 1;
+
+const FLAG_LABELS = {
+  stale_price: "stale price",
+  fee_tight: "fee tight",
+  depth_limited: "depth limited",
+  offset_warning: "offset warning",
+  low_volume: "low volume",
+  resolution_mismatch: "resolution mismatch",
+};
+
+const TYPE_LABELS = {
+  cross_platform: "cross-platform",
+  poly_sum_violation: "poly sum",
+  poly_monotonicity: "poly monotonicity",
+  kalshi_monotonicity: "kalshi monotonicity",
+};
+
+const STATE = {
+  data: null,
+  bankroll: 1000,
+  t2Filter: "all",
+};
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+function fmtUsd(n) {
+  if (n == null || isNaN(n)) return "—";
+  if (Math.abs(n) >= 1000) return "$" + Math.round(n).toLocaleString();
+  if (Math.abs(n) >= 1) return "$" + n.toFixed(0);
+  return "$" + n.toFixed(2);
+}
+function fmtPct(n) {
+  if (n == null || isNaN(n)) return "—";
+  const sign = n > 0 ? "+" : "";
+  return sign + n.toFixed(2) + "%";
+}
+function fmtPrice(p) {
+  if (p == null || isNaN(p)) return "—";
+  return p.toFixed(3);
+}
+function fmtRelTime(iso) {
+  if (!iso) return "—";
+  const t = new Date(iso).getTime();
+  if (isNaN(t)) return "—";
+  const diffMs = Date.now() - t;
+  const m = Math.round(diffMs / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return m + "m ago";
+  const h = Math.round(m / 60);
+  if (h < 24) return h + "h ago";
+  const d = Math.round(h / 24);
+  return d + "d ago";
+}
+function executableProfit(opp, bankroll) {
+  const cap = opp.max_executable_size_per_leg_usd ?? 0;
+  const size = Math.min(bankroll, cap);
+  const perDollar = opp.edge_net_per_dollar ?? 0;
+  return size * perDollar;
+}
+function legPlatformOf(opp) {
+  const platforms = new Set((opp.legs || []).map(l => l.platform));
+  if (platforms.size > 1) return "cross";
+  if (platforms.has("polymarket")) return "poly";
+  if (platforms.has("kalshi")) return "kalshi";
+  return "other";
+}
+
+// ── render ───────────────────────────────────────────────────────────────────
+function renderStatus(data) {
+  const lastScan = data.generated_at
+    ? new Date(data.generated_at).toUTCString().replace("GMT", "UTC")
+    : "—";
+  document.getElementById("status-last-scan").textContent = lastScan;
+
+  const stats = data.stats || {};
+  const poly = stats.poly_markets_scanned ?? 0;
+  const kal = stats.kalshi_markets_scanned ?? 0;
+  document.getElementById("status-markets").textContent =
+    `Poly ${poly.toLocaleString()} · Kalshi ${kal.toLocaleString()}`;
+
+  const errs = data.errors || [];
+  const errEl = document.getElementById("status-errors");
+  const detailEl = document.getElementById("errors-detail");
+  if (errs.length === 0) {
+    errEl.textContent = "none";
+    errEl.classList.remove("text-warn", "text-bad");
+    errEl.classList.add("text-ok");
+    detailEl.style.display = "none";
+  } else {
+    errEl.textContent = errs.length + (errs.length === 1 ? " warning" : " warnings");
+    errEl.classList.remove("text-ok");
+    errEl.classList.add("text-warn");
+    detailEl.style.display = "";
+    detailEl.innerHTML = errs.map(e =>
+      `<div>• <strong>${escapeHtml(e.source)}</strong>: ${escapeHtml(e.msg)}</div>`
+    ).join("");
+  }
+}
+
+function renderHero(opps) {
+  const t1 = opps.filter(o => o.tier === 1).length;
+  const t2 = opps.filter(o => o.tier === 2).length;
+  const t3 = opps.filter(o => o.tier === 3).length;
+  document.getElementById("hero-t1").textContent = t1;
+  document.getElementById("hero-t2").textContent = t2;
+  document.getElementById("hero-t3").textContent = t3;
+}
+
+function legHtml(leg) {
+  const plat = leg.platform || "unknown";
+  const platLabel = plat === "polymarket" ? "Polymarket" : plat === "kalshi" ? "Kalshi" : plat;
+  const depth = leg.depth_usd_at_price != null ? fmtUsd(leg.depth_usd_at_price) : "—";
+  const last = fmtRelTime(leg.last_trade_at);
+  const price = fmtPrice(leg.price);
+  const side = escapeHtml(leg.side ?? "");
+  const v24 = leg.volume_24h_usd != null ? fmtUsd(leg.volume_24h_usd) : "—";
+  return `
+    <div class="leg-row">
+      <div class="leg-platform ${escapeHtml(plat)}">${escapeHtml(platLabel)}</div>
+      <div class="leg-data">
+        <span class="side">${side}</span> @ <span class="price">${price}</span>
+        · depth ${depth}
+        · last ${last}
+        · 24h vol ${v24}
+      </div>
+    </div>
+  `;
+}
+
+function flagsHtml(flags) {
+  if (!flags || !flags.length) return "";
+  return flags.map(f =>
+    `<span class="badge-flag ${escapeHtml(f)}">${escapeHtml(FLAG_LABELS[f] || f)}</span>`
+  ).join(" ");
+}
+
+function openLinksHtml(legs) {
+  return (legs || [])
+    .filter(l => l.market_url)
+    .map(l => {
+      const label = l.platform === "polymarket" ? "Open on Polymarket"
+                  : l.platform === "kalshi" ? "Open on Kalshi"
+                  : "Open market";
+      return `<a class="open-link ${escapeHtml(l.platform || "")}" href="${escapeHtml(l.market_url)}" target="_blank" rel="noopener">↗ ${escapeHtml(label)}</a>`;
+    }).join(" ");
+}
+
+function cardHtml(opp, bankroll) {
+  const exec = executableProfit(opp, bankroll);
+  const tierClass = "t" + opp.tier;
+  const grossPos = (opp.edge_gross_pct ?? 0) > 0;
+  const netPos = (opp.edge_net_estimate_pct ?? 0) > 0;
+  const execPos = exec > 0;
+
+  const grossClass = grossPos ? "pos" : "neg";
+  const netClass = netPos ? (opp.tier === 1 ? "pos" : "amber") : "neg";
+  const execClass = execPos && opp.tier === 1 ? "pos" : execPos ? "amber" : "neg";
+
+  const reso = opp.resolution_date
+    ? `${escapeHtml(opp.resolution_date)}${opp.resolution_type ? " · " + escapeHtml(opp.resolution_type) : ""}`
+    : "—";
+
+  return `
+    <article class="opp-card ${tierClass}" data-id="${escapeHtml(opp.id)}" data-platforms="${escapeHtml(legPlatformOf(opp))}" data-type="${escapeHtml(opp.type || '')}">
+      <div class="flex items-center flex-wrap gap-2 mb-2">
+        <span class="pill-type ${escapeHtml(opp.type || '')}">${escapeHtml(TYPE_LABELS[opp.type] || opp.type || 'unknown')}</span>
+        <span class="pill-underlying">${escapeHtml(opp.underlying || '—')}</span>
+        <span class="text-[11px] text-fg-muted num">${reso}</span>
+        <span class="ml-auto flex flex-wrap gap-1.5">${flagsHtml(opp.confidence_flags)}</span>
+      </div>
+      <div class="text-sm sm:text-[15px] font-semibold leading-snug mb-2">${escapeHtml(opp.summary || '')}</div>
+      <div>${(opp.legs || []).map(legHtml).join("")}</div>
+      <div class="edge-row">
+        <span><span class="label">Gross</span><span class="v ${grossClass} num">${fmtPct(opp.edge_gross_pct)}</span></span>
+        <span><span class="label">Net est</span><span class="v ${netClass} num">${fmtPct(opp.edge_net_estimate_pct)}</span></span>
+        <span><span class="label">Max/leg</span><span class="v muted num">${fmtUsd(opp.max_executable_size_per_leg_usd)}</span></span>
+        <span><span class="label">Executable @ bankroll</span><span class="v ${execClass} num">${fmtUsd(exec)}</span></span>
+      </div>
+      <div class="weakest">${escapeHtml(opp.weakest_link_summary || 'No weakest-link summary — opportunity should not be Tier 1.')}</div>
+      <div class="mt-2 flex flex-wrap gap-2">${openLinksHtml(opp.legs)}</div>
+    </article>
+  `;
+}
+
+function emptyStateHtml(tier) {
+  if (tier === 1) {
+    return `<div class="empty-state"><strong>No risk-free arbs right now.</strong><br>This is normal. Tier 1 opportunities are rare — they get arbed away in seconds.</div>`;
+  }
+  if (tier === 2) {
+    return `<div class="empty-state">No Tier-2 inconsistencies match your filter.</div>`;
+  }
+  return `<div class="empty-state">No Tier-3 signals.</div>`;
+}
+
+function tier2MatchesFilter(opp, filter) {
+  if (filter === "all") return true;
+  const p = legPlatformOf(opp);
+  if (filter === "poly") return p === "poly";
+  if (filter === "kalshi") return p === "kalshi";
+  if (filter === "cross") return p === "cross";
+  return true;
+}
+
+function renderAll() {
+  if (!STATE.data) return;
+  const opps = (STATE.data.opportunities || []).slice();
+  // sort by executable profit desc (live), tie-break time-to-resolution asc
+  opps.sort((a, b) => {
+    const da = executableProfit(a, STATE.bankroll);
+    const db = executableProfit(b, STATE.bankroll);
+    if (db !== da) return db - da;
+    const ta = a.resolution_date || "9999-12-31";
+    const tb = b.resolution_date || "9999-12-31";
+    return ta.localeCompare(tb);
+  });
+
+  renderHero(opps);
+
+  const t1 = opps.filter(o => o.tier === 1);
+  const t2 = opps.filter(o => o.tier === 2 && tier2MatchesFilter(o, STATE.t2Filter));
+  const t3 = opps.filter(o => o.tier === 3);
+
+  document.getElementById("tier1-list").innerHTML =
+    t1.length ? t1.map(o => cardHtml(o, STATE.bankroll)).join("") : emptyStateHtml(1);
+  document.getElementById("tier2-list").innerHTML =
+    t2.length ? t2.map(o => cardHtml(o, STATE.bankroll)).join("") : emptyStateHtml(2);
+  document.getElementById("tier3-list").innerHTML =
+    t3.length ? t3.map(o => cardHtml(o, STATE.bankroll)).join("") : emptyStateHtml(3);
+}
+
+// ── slider + filter wiring ───────────────────────────────────────────────────
+function wireBankroll() {
+  const input = document.getElementById("bankroll");
+  const out = document.getElementById("bankroll-out");
+  const update = () => {
+    STATE.bankroll = +input.value || 0;
+    out.textContent = "$" + STATE.bankroll.toLocaleString();
+    renderAll();
+  };
+  input.addEventListener("input", update);
+  update();
+}
+function wireFilters() {
+  document.querySelectorAll("#t2-filters .chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#t2-filters .chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      STATE.t2Filter = btn.dataset.filter;
+      renderAll();
+    });
+  });
+}
+
+// ── load ─────────────────────────────────────────────────────────────────────
+function showSchemaError(msg) {
+  const el = document.getElementById("schema-err");
+  el.style.display = "";
+  el.innerHTML = `<strong>Scanner / frontend out of sync.</strong><br>${escapeHtml(msg)}`;
+}
+
+async function load() {
+  try {
+    const url = "./opportunities.json?_=" + Date.now();
+    const resp = await fetch(url, { cache: "no-store" });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    if (data.schema_version !== EXPECTED_SCHEMA_VERSION) {
+      showSchemaError(`opportunities.json schema_version=${data.schema_version}, frontend expects ${EXPECTED_SCHEMA_VERSION}.`);
+      return;
+    }
+    STATE.data = data;
+    renderStatus(data);
+    renderAll();
+  } catch (e) {
+    showSchemaError("Could not load opportunities.json — " + (e.message || e));
+    document.getElementById("tier1-list").innerHTML = emptyStateHtml(1);
+    document.getElementById("tier2-list").innerHTML = emptyStateHtml(2);
+    document.getElementById("tier3-list").innerHTML = emptyStateHtml(3);
+  }
+}
+
+wireBankroll();
+wireFilters();
+load();
+</script>
+
+</body>
+</html>

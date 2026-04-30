@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-30T12:30:00Z",
+  "scan_duration_ms": 4231,
+  "errors": [],
+  "stats": {
+    "poly_markets_scanned": 0,
+    "kalshi_markets_scanned": 0,
+    "candidates_pre_filter": 0,
+    "tier1_count": 1,
+    "tier2_count": 2,
+    "tier3_count": 3,
+    "sample": true
+  },
+  "opportunities": [
+    {
+      "id": "sample-t1-cross-btc-100k-2026-05-01",
+      "tier": 1,
+      "type": "cross_platform",
+      "summary": "BTC ≥ $100k by May 1 — 4.2% gap (Poly 0.62 vs Kalshi 0.58)",
+      "underlying": "BTC",
+      "resolution_date": "2026-05-01",
+      "resolution_type": "daily",
+      "legs": [
+        {
+          "platform": "polymarket",
+          "market_id": "0xpoly-sample-btc-100k",
+          "market_url": "https://polymarket.com/event/btc-100k-may-1",
+          "side": "YES",
+          "price": 0.62,
+          "depth_usd_at_price": 1450,
+          "last_trade_at": "2026-04-30T12:18:11Z",
+          "volume_24h_usd": 38200
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXBTC-26MAY01-100",
+          "market_url": "https://kalshi.com/markets/kxbtc/btc-100k-may-1",
+          "side": "NO",
+          "price": 0.42,
+          "depth_usd_at_price": 980,
+          "last_trade_at": "2026-04-30T12:21:44Z",
+          "volume_24h_usd": 12100
+        }
+      ],
+      "edge_gross_pct": 4.2,
+      "edge_net_estimate_pct": -3.1,
+      "max_executable_size_per_leg_usd": 980,
+      "edge_net_per_dollar": -0.031,
+      "weakest_link_summary": "Kalshi leg depth limits fill to $980. Net edge negative after fees at any size — sample data, not actionable.",
+      "confidence_flags": ["fee_tight", "depth_limited"]
+    },
+    {
+      "id": "sample-t2-poly-sum-eth-3000-2026-05-15",
+      "tier": 2,
+      "type": "poly_sum_violation",
+      "summary": "Polymarket negRisk on ETH price ladder sums to 1.034 — 3.4% gross overpricing of basket",
+      "underlying": "ETH",
+      "resolution_date": "2026-05-15",
+      "resolution_type": "weekly",
+      "legs": [
+        {
+          "platform": "polymarket",
+          "market_id": "0xpoly-eth-ladder-may15",
+          "market_url": "https://polymarket.com/event/eth-price-may-15",
+          "side": "ALL_NO",
+          "price": 1.034,
+          "depth_usd_at_price": 2200,
+          "last_trade_at": "2026-04-30T12:08:55Z",
+          "volume_24h_usd": 51400
+        }
+      ],
+      "edge_gross_pct": 3.4,
+      "edge_net_estimate_pct": 0.6,
+      "max_executable_size_per_leg_usd": 2200,
+      "edge_net_per_dollar": 0.006,
+      "weakest_link_summary": "Polymarket dynamic taker fees on a 5-leg basket consume most of the edge — only ~0.6% net at fill.",
+      "confidence_flags": ["fee_tight"]
+    },
+    {
+      "id": "sample-t2-cross-fed-rate-2026-06-12",
+      "tier": 2,
+      "type": "cross_platform",
+      "summary": "FED_RATE June meeting hold — Poly 0.71 YES vs Kalshi 0.66 YES, 5pp gap",
+      "underlying": "FED_RATE",
+      "resolution_date": "2026-06-12",
+      "resolution_type": "monthly",
+      "legs": [
+        {
+          "platform": "polymarket",
+          "market_id": "0xpoly-fed-jun-hold",
+          "market_url": "https://polymarket.com/event/fed-rate-june-2026",
+          "side": "NO",
+          "price": 0.29,
+          "depth_usd_at_price": 1800,
+          "last_trade_at": "2026-04-30T11:42:09Z",
+          "volume_24h_usd": 28900
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXFED-26JUN-HOLD",
+          "market_url": "https://kalshi.com/markets/kxfed/jun-hold",
+          "side": "YES",
+          "price": 0.66,
+          "depth_usd_at_price": 1500,
+          "last_trade_at": "2026-04-30T11:55:33Z",
+          "volume_24h_usd": 19400
+        }
+      ],
+      "edge_gross_pct": 5.0,
+      "edge_net_estimate_pct": 1.2,
+      "max_executable_size_per_leg_usd": 1500,
+      "edge_net_per_dollar": 0.012,
+      "weakest_link_summary": "Settlement times differ by ~6h on a monthly market — within tolerance but adds uncertainty around the FOMC release.",
+      "confidence_flags": ["offset_warning"]
+    },
+    {
+      "id": "sample-t3-poly-mono-cpi-2026-05-13",
+      "tier": 3,
+      "type": "poly_monotonicity",
+      "summary": "Polymarket CPI ladder monotonicity violation — above-3.0% (0.31) priced lower than above-3.5% (0.34)",
+      "underlying": "CPI",
+      "resolution_date": "2026-05-13",
+      "resolution_type": "monthly",
+      "legs": [
+        {
+          "platform": "polymarket",
+          "market_id": "0xpoly-cpi-above-3.0",
+          "market_url": "https://polymarket.com/event/cpi-may-2026-above-3",
+          "side": "YES",
+          "price": 0.31,
+          "depth_usd_at_price": 600,
+          "last_trade_at": "2026-04-30T05:11:00Z",
+          "volume_24h_usd": 4200
+        },
+        {
+          "platform": "polymarket",
+          "market_id": "0xpoly-cpi-above-3.5",
+          "market_url": "https://polymarket.com/event/cpi-may-2026-above-3-5",
+          "side": "NO",
+          "price": 0.66,
+          "depth_usd_at_price": 850,
+          "last_trade_at": "2026-04-30T03:48:21Z",
+          "volume_24h_usd": 2900
+        }
+      ],
+      "edge_gross_pct": 3.0,
+      "edge_net_estimate_pct": -1.8,
+      "max_executable_size_per_leg_usd": 600,
+      "edge_net_per_dollar": -0.018,
+      "weakest_link_summary": "Both legs last traded 7+ hours ago — the violation may already be gone in the live book.",
+      "confidence_flags": ["stale_price", "low_volume"]
+    },
+    {
+      "id": "sample-t3-cross-sol-200-2026-07-01",
+      "tier": 3,
+      "type": "cross_platform",
+      "summary": "SOL ≥ $200 by July 1 — Poly 0.45 vs Kalshi 0.39 (6pp gap, low volume)",
+      "underlying": "SOL",
+      "resolution_date": "2026-07-01",
+      "resolution_type": "daily",
+      "legs": [
+        {
+          "platform": "polymarket",
+          "market_id": "0xpoly-sol-200-jul-1",
+          "market_url": "https://polymarket.com/event/sol-200-july-2026",
+          "side": "YES",
+          "price": 0.45,
+          "depth_usd_at_price": 320,
+          "last_trade_at": "2026-04-30T09:14:12Z",
+          "volume_24h_usd": 1100
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXSOL-26JUL01-200",
+          "market_url": "https://kalshi.com/markets/kxsol/sol-200-jul-1",
+          "side": "NO",
+          "price": 0.61,
+          "depth_usd_at_price": 280,
+          "last_trade_at": "2026-04-30T08:52:01Z",
+          "volume_24h_usd": 740
+        }
+      ],
+      "edge_gross_pct": 6.0,
+      "edge_net_estimate_pct": -2.4,
+      "max_executable_size_per_leg_usd": 280,
+      "edge_net_per_dollar": -0.024,
+      "weakest_link_summary": "Combined 24h volume under $2k — fills past $300/leg are unlikely without moving the book.",
+      "confidence_flags": ["low_volume", "depth_limited"]
+    },
+    {
+      "id": "sample-t3-kalshi-mono-nfp-2026-05-02",
+      "tier": 3,
+      "type": "kalshi_monotonicity",
+      "summary": "Kalshi NFP ladder monotonicity violation — above-200k (0.42) priced higher than above-150k (0.38)",
+      "underlying": "NFP",
+      "resolution_date": "2026-05-02",
+      "resolution_type": "monthly",
+      "legs": [
+        {
+          "platform": "kalshi",
+          "market_id": "KXNFP-26MAY-ABV200",
+          "market_url": "https://kalshi.com/markets/kxnfp/may-above-200",
+          "side": "NO",
+          "price": 0.58,
+          "depth_usd_at_price": 410,
+          "last_trade_at": "2026-04-30T10:02:18Z",
+          "volume_24h_usd": 6300
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXNFP-26MAY-ABV150",
+          "market_url": "https://kalshi.com/markets/kxnfp/may-above-150",
+          "side": "YES",
+          "price": 0.38,
+          "depth_usd_at_price": 540,
+          "last_trade_at": "2026-04-30T10:05:44Z",
+          "volume_24h_usd": 7800
+        }
+      ],
+      "edge_gross_pct": 4.0,
+      "edge_net_estimate_pct": 0.3,
+      "max_executable_size_per_leg_usd": 410,
+      "edge_net_per_dollar": 0.003,
+      "weakest_link_summary": "Net edge near zero after Kalshi fees at this strike — practically not actionable, kept as a calibration signal.",
+      "confidence_flags": ["fee_tight", "low_volume"]
+    }
+  ]
+}
