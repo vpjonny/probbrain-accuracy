@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>404 — Market resolved NO · ProbBrain</title>
+  <title>[404] · ProbBrain</title>
   <meta name="robots" content="noindex">
   <link rel="canonical" href="https://probbrain.com/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -131,15 +131,15 @@
   </div>
 
   <main class="card">
-    <span class="badge"><span class="badge-dot"></span> Market resolved NO</span>
+    <span class="badge"><span class="badge-dot"></span> <span id="badge-text">Market resolved NO</span></span>
     <p class="code">404</p>
-    <h1>This page didn't make it.</h1>
-    <p class="tagline">We sized this URL at full Kelly. Should've used quarter.</p>
+    <h1 id="headline">This page didn't make it.</h1>
+    <p class="tagline" id="tagline">We sized this URL at full Kelly. Should've used quarter.</p>
 
     <div class="stats" role="group" aria-label="Signal calibration">
-      <div><span class="stat-label">Our estimate</span><span class="stat-val">0.99</span></div>
-      <div><span class="stat-label">Actual</span><span class="stat-val bad">0.00</span></div>
-      <div><span class="stat-label">Brier</span><span class="stat-val bad">0.98</span></div>
+      <div><span class="stat-label" id="s1-label">Our estimate</span><span class="stat-val" id="s1-val">0.99</span></div>
+      <div><span class="stat-label" id="s2-label">Actual</span><span class="stat-val bad" id="s2-val">0.00</span></div>
+      <div><span class="stat-label" id="s3-label">Brier</span><span class="stat-val bad" id="s3-val">0.98</span></div>
     </div>
 
     <div class="actions">
@@ -147,5 +147,83 @@
       <a class="btn secondary" href="/kelly">🧮 Kelly Calculator</a>
     </div>
   </main>
+
+  <script>
+    const quips = [
+      {
+        badge: "Market resolved NO",
+        headline: "This page didn't make it.",
+        tagline: "We sized this URL at full Kelly. Should've used quarter.",
+        stats: [
+          ["Our estimate", "0.99", false],
+          ["Actual",       "0.00", true],
+          ["Brier",        "0.98", true]
+        ]
+      },
+      {
+        badge: "Bayesian update failed",
+        headline: "Prior: page exists.",
+        tagline: "Posterior: nope.",
+        stats: [
+          ["Prior",     "1.00", false],
+          ["Posterior", "0.00", true],
+          ["Brier",     "1.00", true]
+        ]
+      },
+      {
+        badge: "Out of distribution",
+        headline: "Outside our calibration range.",
+        tagline: "This one's on us.",
+        stats: [
+          ["95% CI",      "[—,—]", true],
+          ["Coverage",    "0%",    true],
+          ["Calibration", "off",   true]
+        ]
+      },
+      {
+        badge: "No edge detected",
+        headline: "Edge: 0%.",
+        tagline: "You found the one URL that doesn't pay out.",
+        stats: [
+          ["Kelly",  "0.00",  true],
+          ["EV",     "-1.00", true],
+          ["Sharpe", "−∞",    true]
+        ]
+      },
+      {
+        badge: "Scanner empty",
+        headline: "Signal not found.",
+        tagline: "Have you tried predicting where you put it?",
+        stats: [
+          ["Signals",  "0",   true],
+          ["Coverage", "0%",  true],
+          ["Brier",    "—",   true]
+        ]
+      },
+      {
+        badge: "Market disagrees",
+        headline: "The market was wrong.",
+        tagline: "This page never traded.",
+        stats: [
+          ["Volume",    "$0", true],
+          ["Liquidity", "$0", true],
+          ["Spread",    "∞",  true]
+        ]
+      }
+    ];
+
+    const q = quips[Math.floor(Math.random() * quips.length)];
+    document.getElementById("badge-text").textContent = q.badge;
+    document.getElementById("headline").textContent   = q.headline;
+    document.getElementById("tagline").textContent    = q.tagline;
+    document.title = "[404] " + q.badge + " · ProbBrain";
+    for (let i = 0; i < 3; i++) {
+      const [label, val, bad] = q.stats[i];
+      document.getElementById(`s${i+1}-label`).textContent = label;
+      const valEl = document.getElementById(`s${i+1}-val`);
+      valEl.textContent = val;
+      valEl.classList.toggle("bad", bad);
+    }
+  </script>
 </body>
 </html>
