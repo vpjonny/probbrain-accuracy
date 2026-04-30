@@ -1716,7 +1716,7 @@
         case 'market': return (a.title || '').localeCompare(b.title || '');
         case 'direction': return (a.direction || '').localeCompare(b.direction || '');
         case 'market_price': return (a.market_price || 0) - (b.market_price || 0);
-        case 'gap': return (a.gap_pct || 0) - (b.gap_pct || 0);
+        case 'gap': return (a.calibrated_gap_pct ?? a.gap_pct ?? 0) - (b.calibrated_gap_pct ?? b.gap_pct ?? 0);
         case 'confidence': return (CONF_ORDER[a.confidence] || 0) - (CONF_ORDER[b.confidence] || 0);
         case 'status': return (STATUS_ORDER[a.status] || 0) - (STATUS_ORDER[b.status] || 0);
         case 'close_date': return (a.close_date || '').localeCompare(b.close_date || '');
@@ -1774,7 +1774,7 @@
         <td>${dirBadge(s.direction)}</td>
         <td><span class="prob-col"><span class="prob-market">${mkt}</span><span class="prob-sep">/</span><span class="prob-ours">${ours}</span></span></td>
         <td>${renderSparkline(s.price_history)}</td>
-        <td>${gapPill(s.gap_pct)}</td>
+        <td>${gapPill(s.calibrated_gap_pct ?? s.gap_pct)}</td>
         <td>${confBadge(s.confidence)}</td>
         <td>${statusBadge(s.status, s)}</td>
         <td><span class="close-date">${s.close_date || '—'}</span></td>
