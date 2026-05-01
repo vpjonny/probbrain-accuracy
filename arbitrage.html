@@ -565,20 +565,20 @@
 
   <!-- Tier 1 -->
   <section class="mb-8">
-    <div class="section-h">Tier 1 — Actionable</div>
+    <div class="section-h">Tier 1 — Actionable<span id="tier1-count" class="text-fg-muted num"></span></div>
     <div id="tier1-list" class="space-y-3"></div>
   </section>
 
   <!-- Tier 2 -->
   <section class="mb-8">
-    <div class="section-h">Tier 2 — Inconsistencies</div>
+    <div class="section-h">Tier 2 — Inconsistencies<span id="tier2-count" class="text-fg-muted num"></span></div>
     <div id="tier2-list" class="space-y-3"></div>
   </section>
 
-  <!-- Tier 3 (collapsed) -->
+  <!-- Tier 3 (collapsed by default; auto-opens when a filter narrows results to T3 only) -->
   <section class="mb-8">
-    <details>
-      <summary class="section-h">Tier 3 — Signals (collapsed)</summary>
+    <details id="tier3-details">
+      <summary class="section-h">Tier 3 — Signals<span id="tier3-count" class="text-fg-muted num"></span></summary>
       <div id="tier3-list" class="space-y-3 mt-3"></div>
     </details>
   </section>
@@ -963,6 +963,25 @@ function renderAll() {
   const t1 = opps.filter(o => o.tier === 1);
   const t2 = opps.filter(o => o.tier === 2);
   const t3 = opps.filter(o => o.tier === 3);
+
+  // Per-tier counts in section headers — important when a filter is narrowing
+  // the set so the user can tell at a glance which tier holds the matches.
+  const fmtCount = (n) => n ? ` (${n})` : "";
+  document.getElementById("tier1-count").textContent = fmtCount(t1.length);
+  document.getElementById("tier2-count").textContent = fmtCount(t2.length);
+  document.getElementById("tier3-count").textContent = fmtCount(t3.length);
+
+  // Auto-open the Tier 3 disclosure when a filter is active AND T3 is the
+  // only tier with results, so the matches don't sit hidden behind a closed
+  // <details>. Don't auto-close on subsequent renders — once the user has
+  // opened it, leave it open.
+  const filterActive = STATE.platformFilter !== "all"
+    || STATE.underlying !== "all"
+    || !!STATE.search;
+  const t3Details = document.getElementById("tier3-details");
+  if (t3Details && filterActive && t3.length > 0 && t1.length === 0 && t2.length === 0) {
+    t3Details.open = true;
+  }
 
   document.getElementById("tier1-list").innerHTML =
     t1.length ? t1.map(o => cardHtml(o, STATE.bankroll)).join("") : emptyStateHtml(1);
