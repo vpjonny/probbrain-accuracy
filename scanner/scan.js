@@ -247,13 +247,44 @@ async function main() {
   // ── Cap per tier — keep the JSON small and signal-dense ───────────────────
   // Sort by net edge desc within tier, keep top N. Pre-cap counts in stats so
   // we know how many were filtered.
+  //
+  // Curated reservation: noisy poly_sum violations on `OTHER` underlyings
+  // dominate the edge distribution and would crowd out hand-validated Pass 4
+  // emissions even when they're real arbs. Reserve up to N per curated_pair_id
+  // per tier so the operator's curated work always surfaces. Hard-cap total
+  // reserved at half the tier cap so curated never eats the whole list.
   const PER_TIER_CAP = 50;
+  const CURATED_RESERVE_PER_PAIR = 5;
+  const MAX_RESERVED_PER_TIER = Math.floor(PER_TIER_CAP / 2);
   const preCapTallies = tallyTiers(valid);
   const capped = [];
   for (const t of [1, 2, 3]) {
     const tierOpps = valid.filter(o => o.tier === t);
-    tierOpps.sort((a, b) => (b.edge_net_estimate_pct ?? 0) - (a.edge_net_estimate_pct ?? 0));
-    capped.push(...tierOpps.slice(0, PER_TIER_CAP));
+    const byPair = new Map();
+    for (const o of tierOpps) {
+      if (!o.curated_pair_id) continue;
+      const arr = byPair.get(o.curated_pair_id) || [];
+      arr.push(o);
+      byPair.set(o.curated_pair_id, arr);
+    }
+    const reservedIds = new Set();
+    for (const [, opps] of byPair) {
+      opps.sort((a, b) => (b.edge_net_estimate_pct ?? 0) - (a.edge_net_estimate_pct ?? 0));
+      for (const o of opps.slice(0, CURATED_RESERVE_PER_PAIR)) reservedIds.add(o.id);
+    }
+    let reservedOpps = tierOpps.filter(o => reservedIds.has(o.id));
+    reservedOpps.sort((a, b) => (b.edge_net_estimate_pct ?? 0) - (a.edge_net_estimate_pct ?? 0));
+    if (reservedOpps.length > MAX_RESERVED_PER_TIER) {
+      const dropped = reservedOpps.slice(MAX_RESERVED_PER_TIER);
+      reservedOpps = reservedOpps.slice(0, MAX_RESERVED_PER_TIER);
+      for (const o of dropped) reservedIds.delete(o.id);
+    }
+    const others = tierOpps.filter(o => !reservedIds.has(o.id));
+    others.sort((a, b) => (b.edge_net_estimate_pct ?? 0) - (a.edge_net_estimate_pct ?? 0));
+    const slotsLeft = Math.max(0, PER_TIER_CAP - reservedOpps.length);
+    const tierFinal = [...reservedOpps, ...others.slice(0, slotsLeft)];
+    tierFinal.sort((a, b) => (b.edge_net_estimate_pct ?? 0) - (a.edge_net_estimate_pct ?? 0));
+    capped.push(...tierFinal);
   }
 
   // ── Assemble ───────────────────────────────────────────────────────────────
