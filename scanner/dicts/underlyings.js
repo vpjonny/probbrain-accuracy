@@ -21,20 +21,23 @@
 export const UNDERLYINGS = {
   BTC: {
     aliases: ['bitcoin', 'btc', '₿'],
-    category_hints: ['crypto', 'bitcoin'],
+    // 'crypto' deliberately omitted: Polymarket cross-tags every crypto event
+    // with a generic "Crypto" tag, so 'crypto' here would steal ETH/SOL events
+    // for BTC just because BTC iterates first. Use the asset-specific tag.
+    category_hints: ['bitcoin'],
     kalshi_series: ['KXBTC', 'KXBTCD', 'KXBTCMAXY'],
     strike_range: [1_000, 5_000_000],
   },
   ETH: {
     aliases: ['ethereum', 'eth'],
-    category_hints: ['crypto', 'ethereum'],
-    kalshi_series: ['KXETH', 'KXETHD'],
+    category_hints: ['ethereum'],
+    kalshi_series: ['KXETH', 'KXETHD', 'KXETHMAXY'],
     strike_range: [50, 50_000],
   },
   SOL: {
     aliases: ['solana', 'sol'],
-    category_hints: ['crypto', 'solana'],
-    kalshi_series: ['KXSOL', 'KXSOLD'],
+    category_hints: ['solana'],
+    kalshi_series: ['KXSOL', 'KXSOLD', 'KXSOLMAXY'],
     strike_range: [1, 5_000],
   },
   FED_RATE: {
