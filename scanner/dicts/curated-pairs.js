@@ -74,6 +74,90 @@ export const CURATED_PAIRS = [
       '(midnight ET on Dec 31). Kalshi expiration is Jan 31 2027 (settlement window) but ' +
       'the observable is identical — Dec 31 2026 daily close. Verified 2026-04-30.',
   },
+
+  {
+    id: 'eth-year-end-2026',
+    underlying: 'ETH',
+
+    polyFilter: (event, market) => {
+      const slug = String(event.slug || '').toLowerCase();
+      const q = String(market.question || '').toLowerCase();
+      const groupTitle = String(market.groupItemTitle || '').toLowerCase();
+      const blob = `${slug} ${q} ${groupTitle}`;
+      const isYearEnd2026 =
+        /december[\s,-]*31[\s,-]*2026/.test(blob) ||
+        /by-?the-?end-?of-?2026/.test(blob) ||
+        /by-end-of-2026/.test(blob) ||
+        /before-2027/.test(blob);
+      const isAboveStrike = /(reach|hit|above)\s*\$?[\d,]+(?:k|m|bn)?/i.test(q) ||
+                            /\$[\d,]+/.test(q);
+      const isEth = /\bethereum\b|\beth\b/i.test(blob);
+      return isEth && isYearEnd2026 && isAboveStrike;
+    },
+
+    kalshiFilter: (market) => {
+      const series = String(market._series_ticker_hint || market.series_ticker || '').toUpperCase();
+      const ticker = String(market.ticker || '').toUpperCase();
+      // KXETHMAXY = ETH year-end high-water ladder. Expiration is Jan 1 2027
+      // (the day after year-end), tickers carry 27JAN01.
+      if (series !== 'KXETHMAXY') return false;
+      return ticker.includes('27JAN01');
+    },
+
+    match: {
+      strikeTolerancePct: 0.5,
+      requireSameDirection: true,
+    },
+
+    sameResolutionWindow: true,
+    notes:
+      'Both venues resolve on whether ETH ever reached the strike before Jan 1 2027 ' +
+      '(high-water observable, not closing price). Poly endDate 2027-01-01T05:00:00Z. ' +
+      'Kalshi KXETHMAXY expiration 27JAN01 — same observable window. Mirrors the BTC ' +
+      'seed pattern. Verified 2026-05-01: 16 Poly markets in event ' +
+      '"what-price-will-ethereum-hit-before-2027", 8 Kalshi strikes.',
+  },
+
+  {
+    id: 'sol-year-end-2026',
+    underlying: 'SOL',
+
+    polyFilter: (event, market) => {
+      const slug = String(event.slug || '').toLowerCase();
+      const q = String(market.question || '').toLowerCase();
+      const groupTitle = String(market.groupItemTitle || '').toLowerCase();
+      const blob = `${slug} ${q} ${groupTitle}`;
+      const isYearEnd2026 =
+        /december[\s,-]*31[\s,-]*2026/.test(blob) ||
+        /by-?the-?end-?of-?2026/.test(blob) ||
+        /by-end-of-2026/.test(blob) ||
+        /before-2027/.test(blob);
+      const isAboveStrike = /(reach|hit|above)\s*\$?[\d,]+(?:k|m|bn)?/i.test(q) ||
+                            /\$[\d,]+/.test(q);
+      const isSol = /\bsolana\b|\bsol\b/i.test(blob);
+      return isSol && isYearEnd2026 && isAboveStrike;
+    },
+
+    kalshiFilter: (market) => {
+      const series = String(market._series_ticker_hint || market.series_ticker || '').toUpperCase();
+      const ticker = String(market.ticker || '').toUpperCase();
+      // KXSOLMAXY = SOL year-end high-water ladder, 27JAN01 expiration.
+      if (series !== 'KXSOLMAXY') return false;
+      return ticker.includes('27JAN01');
+    },
+
+    match: {
+      strikeTolerancePct: 0.5,
+      requireSameDirection: true,
+    },
+
+    sameResolutionWindow: true,
+    notes:
+      'Both venues resolve on whether SOL ever reached the strike before Jan 1 2027 ' +
+      '(high-water observable). Poly endDate 2027-01-01T05:00:00Z. Kalshi KXSOLMAXY ' +
+      'expiration 27JAN01 — same observable window. Verified 2026-05-01: 18 Poly ' +
+      'markets in event "what-price-will-solana-hit-before-2027", 8 Kalshi strikes.',
+  },
 ];
 
 // Apply a curated pair's match logic to a normalized (poly, kalshi) item pair.
