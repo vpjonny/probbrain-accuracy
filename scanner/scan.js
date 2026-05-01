@@ -93,6 +93,15 @@ function gitPush(message) {
   try {
     execFileSync('git', ['add', 'opportunities.json'], opts);
     execFileSync('git', ['commit', '-m', message], opts);
+    // Sync with remote before pushing — the ProbBrain dashboard sync pushes
+    // accuracy.json to this same remote, so a plain push gets rejected as
+    // non-fast-forward whenever a dashboard update lands between our scans.
+    try {
+      execFileSync('git', ['pull', '--rebase', 'origin', 'main'], opts);
+    } catch (e) {
+      try { execFileSync('git', ['rebase', '--abort'], { ...opts, stdio: 'ignore' }); } catch {}
+      throw e;
+    }
     execFileSync('git', ['push', 'origin', 'HEAD'], opts);
     return { ok: true };
   } catch (e) {
