@@ -540,6 +540,15 @@
         <button class="chip active" data-underlying="all">All</button>
       </div>
     </div>
+    <div class="flex items-center flex-wrap gap-2 mb-2">
+      <span class="text-[11px] uppercase tracking-wide text-fg-muted">Platform:</span>
+      <div id="platform-filters" class="flex flex-wrap gap-1.5">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="poly">Within-Poly</button>
+        <button class="chip" data-filter="kalshi">Within-Kalshi</button>
+        <button class="chip" data-filter="cross">Cross-platform</button>
+      </div>
+    </div>
     <div class="flex items-center gap-2">
       <input
         id="search"
@@ -562,15 +571,7 @@
 
   <!-- Tier 2 -->
   <section class="mb-8">
-    <div class="flex items-center justify-between mb-3">
-      <div class="section-h" style="margin-bottom:0">Tier 2 — Inconsistencies</div>
-      <div id="t2-filters" class="flex flex-wrap gap-1.5">
-        <button class="chip active" data-filter="all">All</button>
-        <button class="chip" data-filter="poly">Within-Poly</button>
-        <button class="chip" data-filter="kalshi">Within-Kalshi</button>
-        <button class="chip" data-filter="cross">Cross-platform</button>
-      </div>
-    </div>
+    <div class="section-h">Tier 2 — Inconsistencies</div>
     <div id="tier2-list" class="space-y-3"></div>
   </section>
 
@@ -618,17 +619,17 @@ const TYPE_LABELS = {
 const STATE = {
   data: null,
   bankroll: 1000,
-  t2Filter: "all",
+  platformFilter: "all",
   underlying: "all",
   search: "",
 };
 
 // ── URL hash persistence ────────────────────────────────────────────────────
-// Format: #u=BTC&t2=cross&q=150k&b=2500
+// Format: #u=BTC&p=cross&q=150k&b=2500
 // Parsed once on load, written on every filter mutation. popstate hook lets
 // browser back/forward navigate filter history. Empty values stay out of the
 // URL so the bare /arbitrage URL is the "no filters" default.
-const HASH_KEYS = { u: "underlying", t2: "t2Filter", q: "search", b: "bankroll" };
+const HASH_KEYS = { u: "underlying", p: "platformFilter", q: "search", b: "bankroll" };
 
 function parseHash() {
   const h = (window.location.hash || "").replace(/^#/, "");
@@ -644,7 +645,7 @@ function parseHash() {
 function readHashIntoState() {
   const h = parseHash();
   if (h.u) STATE.underlying = h.u;
-  if (h.t2 && ["all", "poly", "kalshi", "cross"].includes(h.t2)) STATE.t2Filter = h.t2;
+  if (h.p && ["all", "poly", "kalshi", "cross"].includes(h.p)) STATE.platformFilter = h.p;
   if (h.q) STATE.search = h.q;
   if (h.b) {
     const n = parseInt(h.b, 10);
@@ -655,7 +656,7 @@ function readHashIntoState() {
 function writeStateToHash() {
   const parts = [];
   if (STATE.underlying && STATE.underlying !== "all") parts.push(`u=${encodeURIComponent(STATE.underlying)}`);
-  if (STATE.t2Filter && STATE.t2Filter !== "all") parts.push(`t2=${encodeURIComponent(STATE.t2Filter)}`);
+  if (STATE.platformFilter && STATE.platformFilter !== "all") parts.push(`p=${encodeURIComponent(STATE.platformFilter)}`);
   if (STATE.search) parts.push(`q=${encodeURIComponent(STATE.search)}`);
   if (STATE.bankroll && STATE.bankroll !== 1000) parts.push(`b=${STATE.bankroll}`);
   const next = parts.length ? "#" + parts.join("&") : "";
@@ -881,16 +882,26 @@ function cardHtml(opp, bankroll) {
 }
 
 function emptyStateHtml(tier) {
+  // Filter-aware copy: if any user filter is narrowing the set, the empty
+  // state isn't an "absence in the data" claim — it's "no match for what
+  // you asked." Don't tell the user T1s are rare when actually they exist
+  // but got filtered out.
+  const filterActive = STATE.platformFilter !== "all"
+    || STATE.underlying !== "all"
+    || !!STATE.search;
+  if (filterActive) {
+    return `<div class="empty-state">No Tier-${tier} opportunities match your filter.</div>`;
+  }
   if (tier === 1) {
     return `<div class="empty-state"><strong>No risk-free arbs right now.</strong><br>This is normal. Tier 1 opportunities are rare — they get arbed away in seconds.</div>`;
   }
   if (tier === 2) {
-    return `<div class="empty-state">No Tier-2 inconsistencies match your filter.</div>`;
+    return `<div class="empty-state">No Tier-2 inconsistencies right now.</div>`;
   }
   return `<div class="empty-state">No Tier-3 signals.</div>`;
 }
 
-function tier2MatchesFilter(opp, filter) {
+function platformMatchesFilter(opp, filter) {
   if (filter === "all") return true;
   const p = legPlatformOf(opp);
   if (filter === "poly") return p === "poly";
@@ -948,8 +959,9 @@ function renderAll() {
     return ta.localeCompare(tb);
   });
 
+  opps = opps.filter(o => platformMatchesFilter(o, STATE.platformFilter));
   const t1 = opps.filter(o => o.tier === 1);
-  const t2 = opps.filter(o => o.tier === 2 && tier2MatchesFilter(o, STATE.t2Filter));
+  const t2 = opps.filter(o => o.tier === 2);
   const t3 = opps.filter(o => o.tier === 3);
 
   document.getElementById("tier1-list").innerHTML =
@@ -976,20 +988,20 @@ function wireBankroll() {
   update();
 }
 function wireFilters() {
-  document.querySelectorAll("#t2-filters .chip").forEach(btn => {
+  document.querySelectorAll("#platform-filters .chip").forEach(btn => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll("#t2-filters .chip").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll("#platform-filters .chip").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      STATE.t2Filter = btn.dataset.filter;
+      STATE.platformFilter = btn.dataset.filter;
       writeStateToHash();
       renderAll();
     });
   });
-  // Reflect hash-restored t2Filter onto the chip set after DOM is ready.
-  const t2Active = document.querySelector(`#t2-filters .chip[data-filter="${STATE.t2Filter}"]`);
-  if (t2Active) {
-    document.querySelectorAll("#t2-filters .chip").forEach(b => b.classList.remove("active"));
-    t2Active.classList.add("active");
+  // Reflect hash-restored platformFilter onto the chip set after DOM is ready.
+  const active = document.querySelector(`#platform-filters .chip[data-filter="${STATE.platformFilter}"]`);
+  if (active) {
+    document.querySelectorAll("#platform-filters .chip").forEach(b => b.classList.remove("active"));
+    active.classList.add("active");
   }
 }
 
@@ -1040,11 +1052,11 @@ function wirePopstate() {
       if (bOut) bOut.textContent = "$" + STATE.bankroll.toLocaleString();
     }
     populateUnderlyingFilter();
-    // t2 chip active class
-    const t2Active = document.querySelector(`#t2-filters .chip[data-filter="${STATE.t2Filter}"]`);
-    if (t2Active) {
-      document.querySelectorAll("#t2-filters .chip").forEach(b => b.classList.remove("active"));
-      t2Active.classList.add("active");
+    // platform chip active class
+    const platformActive = document.querySelector(`#platform-filters .chip[data-filter="${STATE.platformFilter}"]`);
+    if (platformActive) {
+      document.querySelectorAll("#platform-filters .chip").forEach(b => b.classList.remove("active"));
+      platformActive.classList.add("active");
     }
     renderAll();
   });
