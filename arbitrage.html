@@ -230,13 +230,72 @@
   /* ─── Opportunity card ─── */
   .opp-card {
     background: rgba(255,255,255,.02); border: 1px solid #222; border-radius: 12px;
-    padding: 14px 16px; transition: border-color .12s;
+    padding: 0; transition: border-color .12s, background .12s;
+    overflow: hidden;
   }
-  .opp-card:hover { border-color: #2a2a2a; }
+  .opp-card:hover { border-color: #2a2a2a; background: rgba(255,255,255,.035); }
   .opp-card.t1 { border-color: rgba(34,197,94,.4); }
   .opp-card.t1:hover { border-color: rgba(34,197,94,.6); }
   .opp-card.t2 { border-color: rgba(245,158,11,.3); }
   .opp-card.t3 { opacity: .85; }
+  .opp-card.t3:hover { opacity: 1; }
+
+  /* Compact ribbon row — always visible. Click or hover to expand the body. */
+  .opp-summary {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    min-height: 40px;
+  }
+  .opp-summary .opp-headline {
+    flex: 1 1 auto; min-width: 0;
+    font-size: 13px; font-weight: 600; color: #d8d8d8;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .opp-summary .opp-edge {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 12px; font-variant-numeric: tabular-nums;
+    flex: none;
+  }
+  .opp-summary .opp-edge.pos { color: #22c55e; }
+  .opp-summary .opp-edge.amber { color: #f59e0b; }
+  .opp-summary .opp-edge.neg { color: #888; }
+  .opp-summary .opp-edge .label {
+    color: #666; font-weight: 500; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .06em; margin-right: 3px;
+  }
+  .opp-summary .chev {
+    flex: none; width: 14px; height: 14px;
+    color: #555; transition: transform .15s, color .15s;
+  }
+  .opp-card:hover .opp-summary .chev,
+  .opp-card.expanded .opp-summary .chev { color: #a0a0a0; transform: rotate(180deg); }
+
+  .opp-body {
+    padding: 0 14px 14px; border-top: 1px solid #1a1a1a;
+    max-height: 0; overflow: hidden;
+    transition: max-height .25s ease, padding .15s, border-color .15s;
+    border-top-color: transparent;
+  }
+  /* Expand on hover (desktop) OR when JS pinned the .expanded class (touch) */
+  .opp-card:hover .opp-body,
+  .opp-card.expanded .opp-body {
+    max-height: 1500px;          /* generous cap; cards rarely exceed ~600px */
+    padding-top: 12px;
+    border-top-color: #1a1a1a;
+  }
+  /* On touch devices (no hover capability), require the .expanded class so a
+     stray finger drag past a card doesn't blow out the layout. */
+  @media (hover: none) {
+    .opp-card:hover .opp-body { max-height: 0; padding-top: 0; border-top-color: transparent; }
+    .opp-card.expanded .opp-body { max-height: 1500px; padding-top: 12px; border-top-color: #1a1a1a; }
+  }
+  @media (max-width: 640px) {
+    .opp-summary { gap: 8px; padding: 9px 12px; }
+    .opp-summary .opp-headline { font-size: 12.5px; }
+    .opp-summary .opp-edge { font-size: 11.5px; }
+  }
 
   .pill-type {
     display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px;
@@ -436,7 +495,6 @@
     /* Sticky bar gets tighter padding on mobile so it doesn't dominate */
     .sticky-filter { padding: 8px 0 10px; }
     /* Card header pills wrap aggressively — smaller gap */
-    .opp-card { padding: 12px 12px; }
     .pill-type, .pill-underlying { font-size: 10px; padding: 2px 6px; }
     .pill-persistence { font-size: 9.5px; padding: 2px 6px; }
     .badge-flag { font-size: 9px; padding: 2px 6px; }
@@ -1050,24 +1108,31 @@ function cardHtml(opp, bankroll) {
 
   return `
     <article class="opp-card ${tierClass}" data-id="${escapeHtml(opp.id)}" data-platforms="${escapeHtml(legPlatformOf(opp))}" data-type="${escapeHtml(opp.type || '')}">
-      <div class="flex items-center flex-wrap gap-2 mb-2">
+      <div class="opp-summary" data-toggle="expand">
         <span class="pill-type ${escapeHtml(opp.type || '')}">${escapeHtml(TYPE_LABELS[opp.type] || opp.type || 'unknown')}</span>
         <span class="pill-underlying">${escapeHtml(opp.underlying || '—')}</span>
-        <span class="text-[11px] text-fg-muted num">${reso}</span>
-        ${persistencePillHtml(opp.persistence)}
-        ${sparklineSvg(opp.persistence?.gross_pct_history, opp.persistence?.trend)}
-        <span class="ml-auto flex flex-wrap gap-1.5">${flagsHtml(opp.confidence_flags)}</span>
+        <span class="opp-headline">${escapeHtml(opp.summary || '')}</span>
+        <span class="opp-edge ${grossClass}"><span class="label">G</span>${fmtPct(opp.edge_gross_pct)}</span>
+        <span class="opp-edge ${netClass}"><span class="label">N</span>${fmtPct(opp.edge_net_estimate_pct)}</span>
+        <svg class="chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3,4.5 6,8 9,4.5"/></svg>
       </div>
-      <div class="text-sm sm:text-[15px] font-semibold leading-snug mb-2">${escapeHtml(opp.summary || '')}</div>
-      <div>${(opp.legs || []).map(legHtml).join("")}</div>
-      <div class="edge-row">
-        <span><span class="label">Gross</span><span class="v ${grossClass} num">${fmtPct(opp.edge_gross_pct)}</span></span>
-        <span><span class="label">Net est</span><span class="v ${netClass} num">${fmtPct(opp.edge_net_estimate_pct)}</span></span>
-        <span><span class="label">Max/leg</span><span class="v muted num">${fmtUsd(opp.max_executable_size_per_leg_usd)}</span></span>
-        <span><span class="label">Executable @ bankroll</span><span class="v ${execClass} num">${fmtUsd(exec)}</span></span>
+      <div class="opp-body">
+        <div class="flex items-center flex-wrap gap-2 mb-2">
+          <span class="text-[11px] text-fg-muted num">${reso}</span>
+          ${persistencePillHtml(opp.persistence)}
+          ${sparklineSvg(opp.persistence?.gross_pct_history, opp.persistence?.trend)}
+          <span class="ml-auto flex flex-wrap gap-1.5">${flagsHtml(opp.confidence_flags)}</span>
+        </div>
+        <div>${(opp.legs || []).map(legHtml).join("")}</div>
+        <div class="edge-row">
+          <span><span class="label">Gross</span><span class="v ${grossClass} num">${fmtPct(opp.edge_gross_pct)}</span></span>
+          <span><span class="label">Net est</span><span class="v ${netClass} num">${fmtPct(opp.edge_net_estimate_pct)}</span></span>
+          <span><span class="label">Max/leg</span><span class="v muted num">${fmtUsd(opp.max_executable_size_per_leg_usd)}</span></span>
+          <span><span class="label">Executable @ bankroll</span><span class="v ${execClass} num">${fmtUsd(exec)}</span></span>
+        </div>
+        <div class="weakest">${escapeHtml(opp.weakest_link_summary || 'No weakest-link summary — opportunity should not be Tier 1.')}</div>
+        <div class="mt-2 flex flex-wrap gap-2">${openLinksHtml(opp.legs)}</div>
       </div>
-      <div class="weakest">${escapeHtml(opp.weakest_link_summary || 'No weakest-link summary — opportunity should not be Tier 1.')}</div>
-      <div class="mt-2 flex flex-wrap gap-2">${openLinksHtml(opp.legs)}</div>
     </article>
   `;
 }
@@ -1435,7 +1500,23 @@ wireBankroll();
 wireFilters();
 wireSearch();
 wirePopstate();
+wireCardExpand();
 load();
+
+// Click on a card's compact ribbon toggles .expanded (sticky, for touch and
+// for users who want the body pinned open). Clicks on links inside the body
+// pass through so "Open on Polymarket" etc. behave normally. Hover-driven
+// expansion is pure CSS, so this only handles the click case.
+function wireCardExpand() {
+  document.body.addEventListener('click', (e) => {
+    if (e.target.closest('a, button, input, select, textarea')) return;
+    const summary = e.target.closest('.opp-summary[data-toggle="expand"]');
+    if (!summary) return;
+    const card = summary.closest('.opp-card');
+    if (!card) return;
+    card.classList.toggle('expanded');
+  });
+}
 
 // ── Auto-refresh ────────────────────────────────────────────────────────────
 // Cron writes opportunities.json every 15 min. Polling more often than that
