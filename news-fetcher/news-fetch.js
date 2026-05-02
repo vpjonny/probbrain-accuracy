@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { SOURCES, CATEGORIES, ARXIV_INTERVAL_MS } from './sources.js';
 import { itemId, itemAnchor, buildHashtags, toUtcIso } from './lib/normalize.js';
 import { readJson, writeJsonAtomic, indexBy } from './lib/persist.js';
@@ -35,6 +36,7 @@ const VERBOSE = argv.has('--verbose');
 const NO_POST = argv.has('--no-post');
 const NO_BSKY = argv.has('--no-bsky');
 const NO_TELEGRAM = argv.has('--no-telegram');
+const NO_PUSH = argv.has('--no-push');
 const log = (...a) => console.log(`[${toUtcIso(new Date())}]`, ...a);
 const vlog = (...a) => { if (VERBOSE) log(...a); };
 
@@ -167,8 +169,38 @@ async function run() {
   }
 
   if (DRY_RUN || NO_POST) return;
+
+  // Push news.json + news.xml live BEFORE we notify subscribers — Telegram and
+  // Bluesky posts deep-link to probbrain.com/news#anchor, and that anchor
+  // doesn't exist on the live site until Vercel sees the commit.
+  if (!NO_PUSH && stats.new > 0) gitPushNews(stats.new);
+
   if (!NO_TELEGRAM) await postToTelegram(items);
   if (!NO_BSKY)     await postToBluesky(items);
+}
+
+function gitPushNews(newCount) {
+  const opts = { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] };
+  const message = `news: ${newCount} new item${newCount === 1 ? '' : 's'} ${toUtcIso(new Date())}`;
+  try {
+    execFileSync('git', ['add', 'news.json', 'news.xml'], opts);
+    // Bail if nothing actually staged (e.g. files unchanged on disk).
+    const staged = execFileSync('git', ['diff', '--cached', '--name-only'], opts).trim();
+    if (!staged) { log('git: no news changes to commit'); return; }
+    execFileSync('git', ['commit', '-m', message], opts);
+    // Rebase before push — the arb scanner pushes opportunities.json to this
+    // same remote every 15 min, so a plain push gets rejected as non-fast-fwd.
+    try {
+      execFileSync('git', ['pull', '--rebase', 'origin', 'main'], opts);
+    } catch (e) {
+      try { execFileSync('git', ['rebase', '--abort'], { ...opts, stdio: 'ignore' }); } catch {}
+      throw e;
+    }
+    execFileSync('git', ['push', 'origin', 'HEAD'], opts);
+    log(`git: pushed → "${message}"`);
+  } catch (e) {
+    console.error(`git: push failed: ${e.stderr?.toString() || e.message}`);
+  }
 }
 
 function rssEscape(s) {
