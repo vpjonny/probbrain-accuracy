@@ -255,18 +255,15 @@
   }
   .opp-summary .opp-edge {
     font-family: 'JetBrains Mono', monospace; font-weight: 700;
-    font-size: 12px; font-variant-numeric: tabular-nums;
-    flex: none;
+    font-size: 13px; font-variant-numeric: tabular-nums;
+    flex: none; min-width: 64px; text-align: right;
   }
   .opp-summary .opp-edge.pos { color: #22c55e; }
   .opp-summary .opp-edge.amber { color: #f59e0b; }
   .opp-summary .opp-edge.neg { color: #888; }
-  .opp-summary .opp-edge .label {
-    color: #666; font-weight: 500; font-size: 10px;
-    text-transform: uppercase; letter-spacing: .06em; margin-right: 3px;
-  }
   .opp-summary .chev {
     flex: none; width: 14px; height: 14px;
+    margin-left: 4px;
     color: #555; transition: transform .15s, color .15s;
   }
   .opp-card:hover .opp-summary .chev,
@@ -294,7 +291,7 @@
   @media (max-width: 640px) {
     .opp-summary { gap: 8px; padding: 9px 12px; }
     .opp-summary .opp-headline { font-size: 12.5px; }
-    .opp-summary .opp-edge { font-size: 11.5px; }
+    .opp-summary .opp-edge { font-size: 12px; min-width: 56px; }
   }
 
   .pill-type {
@@ -1116,8 +1113,8 @@ function cardHtml(opp, bankroll) {
         <span class="pill-type ${escapeHtml(opp.type || '')}">${escapeHtml(TYPE_LABELS[opp.type] || opp.type || 'unknown')}</span>
         <span class="pill-underlying">${escapeHtml(opp.underlying || '—')}</span>
         <span class="opp-headline">${escapeHtml(opp.summary || '')}</span>
-        <span class="opp-edge ${grossClass}"><span class="label">G</span>${fmtPct(opp.edge_gross_pct)}</span>
-        <span class="opp-edge ${netClass}"><span class="label">N</span>${fmtPct(opp.edge_net_estimate_pct)}</span>
+        <span class="opp-edge ${grossClass}" title="Gross edge">${fmtPct(opp.edge_gross_pct)}</span>
+        <span class="opp-edge ${netClass}" title="Net est. edge (after fees)">${fmtPct(opp.edge_net_estimate_pct)}</span>
         <svg class="chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3,4.5 6,8 9,4.5"/></svg>
       </div>
       <div class="opp-body">
