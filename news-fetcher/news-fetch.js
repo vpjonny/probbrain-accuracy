@@ -2,7 +2,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { SOURCES, CATEGORIES, ARXIV_INTERVAL_MS } from './sources.js';
-import { itemId, buildHashtags, toUtcIso } from './lib/normalize.js';
+import { itemId, itemAnchor, buildHashtags, toUtcIso } from './lib/normalize.js';
 import { readJson, writeJsonAtomic, indexBy } from './lib/persist.js';
 import { fetchRss } from './lib/fetch-rss.js';
 import { fetchHn } from './lib/fetch-hn.js';
@@ -81,6 +81,7 @@ async function run() {
       if (byId.has(id)) continue;
       const item = {
         id,
+        anchor: itemAnchor(id),
         source_id: source.id,
         source_name: source.name,
         category: source.category,

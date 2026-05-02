@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 export function toUtcIso(input) {
   if (!input) return null;
   const d = input instanceof Date ? input : new Date(input);
@@ -22,6 +24,10 @@ export function canonicalUrl(raw) {
 
 export function itemId(sourceId, url) {
   return `${sourceId}|${canonicalUrl(url)}`;
+}
+
+export function itemAnchor(id) {
+  return createHash('sha1').update(id).digest('hex').slice(0, 10);
 }
 
 export function cleanTitle(s) {

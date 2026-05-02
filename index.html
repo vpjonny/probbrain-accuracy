@@ -1187,11 +1187,12 @@
             <th data-sort="gap">Gap</th>
             <th data-sort="confidence">Confidence</th>
             <th data-sort="status">Status</th>
+            <th data-sort="resolved_at">Resolved</th>
             <th data-sort="close_date">Closes</th>
           </tr>
         </thead>
         <tbody id="signal-body">
-          <tr class="empty-row"><td colspan="9">Loading signals...</td></tr>
+          <tr class="empty-row"><td colspan="10">Loading signals...</td></tr>
         </tbody>
       </table>
       <div class="pagination" id="pagination" style="display:none"></div>
@@ -1640,19 +1641,17 @@
             streakSub.textContent = 'no resolved signals';
           }
 
-          // Signal table — resolved first (most recently resolved on top), then pending by publish date.
-          // resolution time is proxied by the last price_history entry (when the scanner stopped polling).
-          const resolvedAt = (s) => {
-            if (s.status !== 'WIN' && s.status !== 'LOSS' && s.status !== 'delisted') return null;
+          // Signal table — store globally for pagination/search (newest first by publish date).
+          // Each signal also gets _resolvedAt: last price_history timestamp, only set if resolved.
+          // Used by the "Resolved" column sorter.
+          (d.signals || []).forEach(s => {
+            const isResolved = s.status === 'WIN' || s.status === 'LOSS' || s.status === 'delisted';
             const ph = s.price_history || [];
-            return ph.length ? (ph[ph.length - 1].t || null) : null;
-          };
+            s._resolvedAt = (isResolved && ph.length) ? (ph[ph.length - 1].t || null) : null;
+          });
           window._allSignals = (d.signals || []).slice().sort((a, b) => {
-            const ra = resolvedAt(a), rb = resolvedAt(b);
-            if (ra && rb) return ra < rb ? 1 : ra > rb ? -1 : b.signal_number - a.signal_number;
-            if (ra) return -1;
-            if (rb) return 1;
-            const da = a.published_at || '', db = b.published_at || '';
+            const da = a.published_at || '';
+            const db = b.published_at || '';
             return da < db ? 1 : da > db ? -1 : b.signal_number - a.signal_number;
           });
           window._searchQuery = document.getElementById('signal-search').value;
@@ -1810,6 +1809,7 @@
         case 'gap': return (a.calibrated_gap_pct ?? a.gap_pct ?? 0) - (b.calibrated_gap_pct ?? b.gap_pct ?? 0);
         case 'confidence': return (CONF_ORDER[effectiveConfidence(a)] || 0) - (CONF_ORDER[effectiveConfidence(b)] || 0);
         case 'status': return (STATUS_ORDER[a.status] || 0) - (STATUS_ORDER[b.status] || 0);
+        case 'resolved_at': return (a._resolvedAt || '').localeCompare(b._resolvedAt || '');
         case 'close_date': return (a.close_date || '').localeCompare(b.close_date || '');
         default: return 0;
       }
@@ -1868,6 +1868,7 @@
         <td>${gapPill(s.calibrated_gap_pct ?? s.gap_pct)}</td>
         <td>${confBadge(effectiveConfidence(s))}</td>
         <td>${statusBadge(s.status, s)}</td>
+        <td><span class="close-date">${s._resolvedAt ? s._resolvedAt.slice(0, 10) : '—'}</span></td>
         <td><span class="close-date">${s.close_date || '—'}</span></td>
       </tr>`;
     }
@@ -1916,7 +1917,7 @@
 
       if (!filtered.length) {
         const msg = window._searchQuery ? 'No signals match your search.' : 'No signals published yet.';
-        tbody.innerHTML = `<tr class="empty-row"><td colspan="9">${msg}</td></tr>`;
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="10">${msg}</td></tr>`;
         pagination.style.display = 'none';
         pageInfo.textContent = '';
         return;

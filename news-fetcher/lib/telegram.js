@@ -1,24 +1,17 @@
+import { itemAnchor } from './normalize.js';
+
 const TG_API = 'https://api.telegram.org';
 const SEND_TIMEOUT_MS = 20_000;
+const NEWS_PAGE = 'https://probbrain.com/news';
 
 function escapeHtml(s) {
   return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function displayDomain(url) {
-  try {
-    const h = new URL(url).hostname.toLowerCase();
-    return h.startsWith('www.') ? h.slice(4) : h;
-  } catch {
-    return url;
-  }
-}
-
 export function formatPost(item) {
   const headline = escapeHtml(item.headline || item.title);
-  const domain = escapeHtml(displayDomain(item.url));
-  const href = escapeHtml(item.url);
-  return `${headline}\n\n🔗 <a href="${href}">${domain}</a>`;
+  const anchor = itemAnchor(item.id);
+  return `${headline}\n\n🔗 <a href="${NEWS_PAGE}#${anchor}">probbrain.com/news</a>`;
 }
 
 export async function sendMessage({ token, chat_id, text }) {
