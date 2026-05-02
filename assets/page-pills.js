@@ -16,9 +16,8 @@
   const SESSION_FLAG = 'pb_hit_counted_v1';
 
   const path = location.pathname.replace(/\/$/, '').replace(/\.html$/, '');
-  const onStatusPage      = path === '/status';
-  const onMethodologyPage = path === '/methodology';
-  const onArbitragePage   = path === '/arbitrage';
+  const onStatusPage    = path === '/status';
+  const onArbitragePage = path === '/arbitrage';
 
   // ── Styles ─────────────────────────────────────────────────────────────
   const css = `
@@ -105,11 +104,9 @@
       transform: translateY(-1px);
       box-shadow: 0 8px 22px rgba(99,102,241,.20);
     }
-    .pb-nav.top    { bottom: 56px; }
     .pb-nav.bottom { bottom: 16px; }
     @media (max-width: 640px) {
       .pb-nav        { padding: 5px 10px; font-size: 0.70rem; left: 12px; }
-      .pb-nav.top    { bottom: 46px; }
       .pb-nav.bottom { bottom: 12px; }
     }
   `;
@@ -187,24 +184,16 @@
     }).catch(() => { /* keep default green */ });
   }
 
-  // ── Bottom-left nav pills ──────────────────────────────────────────────
-  // Methodology + Arbitrage. Each pill suppresses itself on its own page,
-  // and if only one is visible it drops to the bottom slot so it doesn't
-  // float alone in the upper position.
-  const navItems = [
-    { href: '/methodology', label: '📊 Methodology', title: 'How the arb scanner works', skip: onMethodologyPage },
-    { href: '/arbitrage',   label: '⚖ Arbitrage',    title: 'Polymarket × Kalshi arbitrage scanner', skip: onArbitragePage },
-  ];
-  const visible = navItems.filter(it => !it.skip);
-  visible.forEach((it, i) => {
+  // ── Bottom-left nav pill ───────────────────────────────────────────────
+  // Methodology only — and only on /arbitrage, since that's the only page
+  // where "how the scanner works" is the natural follow-up. Arbitrage is
+  // already in the header on every page.
+  if (onArbitragePage) {
     const a = document.createElement('a');
-    // If both visible: first → top slot, second → bottom slot. If only one
-    // visible: it always takes the bottom slot.
-    const slot = (visible.length === 2 && i === 0) ? 'top' : 'bottom';
-    a.className = `pb-nav ${slot}`;
-    a.href = it.href;
-    a.title = it.title;
-    a.textContent = it.label;
+    a.className = 'pb-nav bottom';
+    a.href = '/methodology';
+    a.title = 'How the arb scanner works';
+    a.textContent = '📊 Methodology';
     document.body.appendChild(a);
-  });
+  }
 })();
