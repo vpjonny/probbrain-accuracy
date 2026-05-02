@@ -17,8 +17,10 @@ import { formatPost, sendMessage } from './lib/telegram.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const NEWS_JSON = join(REPO_ROOT, 'news.json');
+const NEWS_FEED = join(REPO_ROOT, 'news.xml');
 const LAST_POSTED = join(__dirname, 'last_posted.json');
 const DEFAULT_PER_SOURCE_KEEP = 30;
+const FEED_LIMIT = 60;
 const SUMMARY_MAX_PER_RUN = 8;
 const TELEGRAM_THROTTLE_MS = 1100;
 const TELEGRAM_MAX_PER_RUN = 30;
@@ -148,13 +150,70 @@ async function run() {
 
   if (DRY_RUN) {
     log(`(dry) would write news.json with ${items.length} items`);
+    log(`(dry) would write news.xml with ${Math.min(items.length, FEED_LIMIT)} items`);
   } else {
     await writeJsonAtomic(NEWS_JSON, out);
     log(`wrote news.json: ${items.length} items (${stats.new} new, ${stats.summarized} summarized, ${stats.errors} fetch errors, ${stats.summarizeFails} summary errors)`);
+    const { writeFile } = await import('node:fs/promises');
+    const xml = renderRssFeed(items.slice(0, FEED_LIMIT));
+    await writeFile(NEWS_FEED, xml, 'utf8');
+    log(`wrote news.xml: ${Math.min(items.length, FEED_LIMIT)} items`);
   }
 
   if (DRY_RUN || NO_POST) return;
   await postToTelegram(items);
+}
+
+function rssEscape(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function rfc822(d) {
+  // RSS 2.0 spec requires RFC 822 dates. toUTCString() emits them.
+  return d.toUTCString();
+}
+
+function renderRssFeed(items) {
+  const now = new Date();
+  const itemXml = items.map(it => {
+    const src = it.source_name || '';
+    let title = it.title || it.headline || '(untitled)';
+    if (src && !title.startsWith(`[${src}]`)) title = `[${src}] ${title}`;
+    const link = it.url || `https://probbrain.com/news#${it.anchor || ''}`;
+    const pub = it.published_at ? new Date(it.published_at) : now;
+    const desc = it.headline || it.description || '';
+    const cat = it.category || '';
+    const guid = it.id || it.url || title.slice(0, 80);
+    return (
+      '    <item>\n' +
+      `      <title>${rssEscape(title)}</title>\n` +
+      `      <link>${rssEscape(link)}</link>\n` +
+      `      <guid isPermaLink="false">${rssEscape(guid)}</guid>\n` +
+      `      <pubDate>${rfc822(pub)}</pubDate>\n` +
+      `      <category>${rssEscape(cat)}</category>\n` +
+      `      <description><![CDATA[${desc}]]></description>\n` +
+      '    </item>'
+    );
+  }).join('\n');
+  return (
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n' +
+    '  <channel>\n' +
+    '    <title>ProbBrain — AI News Terminal</title>\n' +
+    '    <link>https://probbrain.com/news</link>\n' +
+    '    <atom:link href="https://probbrain.com/news.xml" rel="self" type="application/rss+xml"/>\n' +
+    '    <description>AI lab announcements, arXiv papers, GitHub &amp; HuggingFace trending, AI Hacker News, and independent writers — aggregated, deduped, and posted to @ProbBrain on Telegram.</description>\n' +
+    '    <language>en</language>\n' +
+    `    <lastBuildDate>${rfc822(now)}</lastBuildDate>\n` +
+    '    <ttl>15</ttl>\n' +
+    itemXml + '\n' +
+    '  </channel>\n</rss>\n'
+  );
 }
 
 async function postToTelegram(items) {
