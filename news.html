@@ -651,7 +651,9 @@ function render(highlightAnchor) {
   let html = '';
   let lastDay = null;
   for (const it of visible) {
-    const d = dayKey(it.published_at);
+    // Group by discovered date so day headers track sort order. Fall back
+    // to published_at for legacy items missing discovered_at.
+    const d = dayKey(it.discovered_at || it.published_at);
     if (d !== lastDay) {
       html += `<div class="day-header">${escHtml(dayLabel(d))}</div>`;
       lastDay = d;
@@ -711,7 +713,7 @@ function buildMarquee(d) {
       });
     }
     const e = bySource.get(it.source_id);
-    const t = new Date(it.published_at || 0).getTime() || 0;
+    const t = new Date(it.discovered_at || it.published_at || 0).getTime() || 0;
     if (now - t < DAY_MS) e.count_24h++;
     if (t > e.latest_at) e.latest_at = t;
   }
@@ -748,7 +750,14 @@ async function load() {
     const r = await fetch(NEWS_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
-    state.items = (d.items || []).slice().sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''));
+    // Sort by when ProbBrain DISCOVERED the item, not when the source
+    // published it. HN-trending items often surface a day after publication —
+    // the user's expectation is "newest at top" = "what ProbBrain just found".
+    state.items = (d.items || []).slice().sort((a, b) => {
+      const ka = a.discovered_at || a.published_at || '';
+      const kb = b.discovered_at || b.published_at || '';
+      return kb.localeCompare(ka);
+    });
     state.generated_at = d.generated_at;
     updateStatus(d);
     buildMarquee(d);
