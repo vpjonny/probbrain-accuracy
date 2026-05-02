@@ -11,16 +11,22 @@ import { fetchGithubTrending } from './lib/fetch-github.js';
 import { fetchSitemap } from './lib/fetch-sitemap.js';
 import { fetchHtmlIndex } from './lib/fetch-html-index.js';
 import { summarize } from './lib/summarize.js';
+import { loadEnv, require_ } from './lib/env.js';
+import { formatPost, sendMessage } from './lib/telegram.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const NEWS_JSON = join(REPO_ROOT, 'news.json');
+const LAST_POSTED = join(__dirname, 'last_posted.json');
 const DEFAULT_PER_SOURCE_KEEP = 30;
 const SUMMARY_MAX_PER_RUN = 8;
+const TELEGRAM_THROTTLE_MS = 1100;
+const TELEGRAM_MAX_PER_RUN = 30;
 
 const argv = new Set(process.argv.slice(2));
 const DRY_RUN = argv.has('--dry-run');
 const VERBOSE = argv.has('--verbose');
+const NO_POST = argv.has('--no-post');
 const log = (...a) => console.log(`[${toUtcIso(new Date())}]`, ...a);
 const vlog = (...a) => { if (VERBOSE) log(...a); };
 
@@ -141,6 +147,70 @@ async function run() {
     await writeJsonAtomic(NEWS_JSON, out);
     log(`wrote news.json: ${items.length} items (${stats.new} new, ${stats.summarized} summarized, ${stats.errors} fetch errors, ${stats.summarizeFails} summary errors)`);
   }
+
+  if (DRY_RUN || NO_POST) return;
+  await postToTelegram(items);
+}
+
+async function postToTelegram(items) {
+  loadEnv();
+  let creds;
+  try {
+    const e = require_('TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHANNEL_ID');
+    creds = { token: e.TELEGRAM_BOT_TOKEN, chat_id: e.TELEGRAM_CHANNEL_ID };
+  } catch (e) {
+    log(`SKIP telegram: ${e.message}`);
+    return;
+  }
+
+  const state = await readJson(LAST_POSTED, null);
+  const isFirstRun = state === null;
+
+  if (isFirstRun) {
+    const seed = { posted_ids: items.map(it => it.id), updated_at: toUtcIso(new Date()), seeded: true };
+    await writeJsonAtomic(LAST_POSTED, seed);
+    log(`first-run silent seed: ${seed.posted_ids.length} ids written to last_posted.json (no telegram posts)`);
+    return;
+  }
+
+  const posted = new Set(state.posted_ids || []);
+  const candidates = items
+    .filter(it => !posted.has(it.id))
+    .sort((a, b) => (a.published_at || '').localeCompare(b.published_at || ''));
+
+  if (candidates.length === 0) {
+    vlog('telegram: nothing new to post');
+    return;
+  }
+
+  if (candidates.length > TELEGRAM_MAX_PER_RUN) {
+    log(`telegram: capping batch ${candidates.length} → ${TELEGRAM_MAX_PER_RUN} (rest will post next run)`);
+  }
+  const batch = candidates.slice(0, TELEGRAM_MAX_PER_RUN);
+
+  let sent = 0, failed = 0;
+  for (let i = 0; i < batch.length; i++) {
+    const it = batch[i];
+    const text = formatPost(it);
+    try {
+      await sendMessage({ ...creds, text });
+      posted.add(it.id);
+      sent++;
+      vlog(`  → tg ${it.source_id}: ${(it.headline || it.title).slice(0, 60)}`);
+      const next = { posted_ids: [...posted], updated_at: toUtcIso(new Date()) };
+      await writeJsonAtomic(LAST_POSTED, next);
+    } catch (e) {
+      failed++;
+      log(`TG ERR ${it.id}: ${e.message}`);
+      if (e.body && e.body.error_code === 429) {
+        const wait = (e.body.parameters?.retry_after || 30) * 1000;
+        log(`telegram 429 — sleeping ${wait}ms`);
+        await sleep(wait);
+      }
+    }
+    if (i < batch.length - 1) await sleep(TELEGRAM_THROTTLE_MS);
+  }
+  log(`telegram: sent=${sent} failed=${failed} posted_total=${posted.size}`);
 }
 
 run().catch(e => { console.error('FATAL:', e); process.exit(1); });

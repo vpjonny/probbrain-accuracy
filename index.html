@@ -1640,10 +1640,19 @@
             streakSub.textContent = 'no resolved signals';
           }
 
-          // Signal table — store globally for pagination/search (newest first)
+          // Signal table — resolved first (most recently resolved on top), then pending by publish date.
+          // resolution time is proxied by the last price_history entry (when the scanner stopped polling).
+          const resolvedAt = (s) => {
+            if (s.status !== 'WIN' && s.status !== 'LOSS' && s.status !== 'delisted') return null;
+            const ph = s.price_history || [];
+            return ph.length ? (ph[ph.length - 1].t || null) : null;
+          };
           window._allSignals = (d.signals || []).slice().sort((a, b) => {
-            const da = a.published_at || '';
-            const db = b.published_at || '';
+            const ra = resolvedAt(a), rb = resolvedAt(b);
+            if (ra && rb) return ra < rb ? 1 : ra > rb ? -1 : b.signal_number - a.signal_number;
+            if (ra) return -1;
+            if (rb) return 1;
+            const da = a.published_at || '', db = b.published_at || '';
             return da < db ? 1 : da > db ? -1 : b.signal_number - a.signal_number;
           });
           window._searchQuery = document.getElementById('signal-search').value;
