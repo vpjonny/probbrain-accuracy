@@ -219,6 +219,14 @@
   .chip:hover { color: #e8e8e8; border-color: #2a2a2a; }
   .chip.active { background: #1a1a1a; color: #e8e8e8; border-color: #6366f1; }
 
+  /* ─── Lazy-load sentinel (per-tier load-more cue) ─── */
+  .lazy-sentinel {
+    text-align: center; padding: 18px 0;
+    font-size: 11.5px; color: #555; font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .lazy-sentinel .num { color: #888; }
+
   /* ─── Opportunity card ─── */
   .opp-card {
     background: rgba(255,255,255,.02); border: 1px solid #222; border-radius: 12px;
@@ -787,7 +795,25 @@ const STATE = {
   platformFilter: "all",
   underlying: "all",
   search: "",
+  // Per-tier render cap; bumped by IntersectionObserver when sentinel scrolls
+  // into view. Reset to INITIAL_RENDER on filter/search changes; preserved
+  // across auto-refresh + bankroll tweaks so users don't lose scroll progress.
+  renderLimits: { 1: 15, 2: 15, 3: 15 },
 };
+
+const INITIAL_RENDER = 15;
+const LAZY_BATCH = 15;
+const lazyIO = ('IntersectionObserver' in window) ? new IntersectionObserver(entries => {
+  for (const e of entries) {
+    if (!e.isIntersecting) continue;
+    const tier = +e.target.dataset.tier;
+    if (!tier) continue;
+    STATE.renderLimits[tier] = (STATE.renderLimits[tier] || INITIAL_RENDER) + LAZY_BATCH;
+    renderAll();
+    break;
+  }
+}, { rootMargin: '600px 0px' }) : null;
+function resetRenderLimits() { STATE.renderLimits = { 1: INITIAL_RENDER, 2: INITIAL_RENDER, 3: INITIAL_RENDER }; }
 
 // ── URL hash persistence ────────────────────────────────────────────────────
 // Format: #u=BTC&p=cross&q=150k&b=2500
@@ -1148,12 +1174,27 @@ function renderAll() {
     t3Details.open = true;
   }
 
-  document.getElementById("tier1-list").innerHTML =
-    t1.length ? t1.map(o => cardHtml(o, STATE.bankroll)).join("") : emptyStateHtml(1);
-  document.getElementById("tier2-list").innerHTML =
-    t2.length ? t2.map(o => cardHtml(o, STATE.bankroll)).join("") : emptyStateHtml(2);
-  document.getElementById("tier3-list").innerHTML =
-    t3.length ? t3.map(o => cardHtml(o, STATE.bankroll)).join("") : emptyStateHtml(3);
+  renderTier(1, t1);
+  renderTier(2, t2);
+  renderTier(3, t3);
+}
+
+function renderTier(tier, opps) {
+  const el = document.getElementById(`tier${tier}-list`);
+  if (!el) return;
+  if (!opps.length) { el.innerHTML = emptyStateHtml(tier); return; }
+  const limit = STATE.renderLimits[tier] || INITIAL_RENDER;
+  const shown = opps.slice(0, limit);
+  let html = shown.map(o => cardHtml(o, STATE.bankroll)).join("");
+  if (opps.length > limit) {
+    const remaining = opps.length - limit;
+    html += `<div class="lazy-sentinel" data-tier="${tier}">loading… <span class="num">${remaining}</span> more</div>`;
+  }
+  el.innerHTML = html;
+  if (lazyIO) {
+    const sentinel = el.querySelector('.lazy-sentinel');
+    if (sentinel) lazyIO.observe(sentinel);
+  }
 }
 
 // ── slider + filter wiring ───────────────────────────────────────────────────
@@ -1177,6 +1218,7 @@ function wireFilters() {
       document.querySelectorAll("#platform-filters .chip").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       STATE.platformFilter = btn.dataset.filter;
+      resetRenderLimits();
       writeStateToHash();
       renderAll();
     });
@@ -1202,6 +1244,7 @@ function wireSearch() {
     t = setTimeout(() => {
       STATE.search = input.value.trim();
       clear.classList.toggle("visible", !!STATE.search);
+      resetRenderLimits();
       writeStateToHash();
       renderAll();
     }, 120);
@@ -1211,6 +1254,7 @@ function wireSearch() {
     input.value = "";
     STATE.search = "";
     clear.classList.remove("visible");
+    resetRenderLimits();
     writeStateToHash();
     renderAll();
     input.focus();
@@ -1242,6 +1286,7 @@ function wirePopstate() {
       document.querySelectorAll("#platform-filters .chip").forEach(b => b.classList.remove("active"));
       platformActive.classList.add("active");
     }
+    resetRenderLimits();
     renderAll();
   });
 }
@@ -1270,6 +1315,7 @@ function populateUnderlyingFilter() {
       wrap.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       STATE.underlying = btn.dataset.underlying;
+      resetRenderLimits();
       writeStateToHash();
       renderAll();
     });
