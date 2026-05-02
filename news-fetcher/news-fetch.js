@@ -15,6 +15,7 @@ import { summarize } from './lib/summarize.js';
 import { loadEnv, require_ } from './lib/env.js';
 import { formatPost, sendMessage } from './lib/telegram.js';
 import { createBlueskyClient, postNewsItem as postBskyItem } from './lib/bluesky.js';
+import { generateSitemap } from './lib/sitemap.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
@@ -190,6 +191,12 @@ async function run() {
   // Status snapshot reads gitignored last_posted*.json (which we own) and
   // surfaces aggregate latency to the public /status page.
   await writeStatusJson(items);
+
+  // Regenerate sitemap.xml from current HTML files (top-level + signals/).
+  // No-op when content unchanged; otherwise rides along with the status push.
+  const sm = generateSitemap(REPO_ROOT);
+  if (sm.changed) log(`wrote sitemap.xml: ${sm.count} urls`);
+
   if (!NO_PUSH) gitPushStatus();
 }
 
@@ -243,10 +250,11 @@ function postChannelStats(state, itemById) {
 function gitPushStatus() {
   const opts = { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] };
   try {
-    execFileSync('git', ['add', 'status.json'], opts);
+    execFileSync('git', ['add', 'status.json', 'sitemap.xml'], opts);
     const staged = execFileSync('git', ['diff', '--cached', '--name-only'], opts).trim();
     if (!staged) return;
-    execFileSync('git', ['commit', '-m', `status: ${toUtcIso(new Date())}`], opts);
+    const msg = staged.includes('sitemap.xml') ? `status + sitemap: ${toUtcIso(new Date())}` : `status: ${toUtcIso(new Date())}`;
+    execFileSync('git', ['commit', '-m', msg], opts);
     try {
       execFileSync('git', ['pull', '--rebase', 'origin', 'main'], opts);
     } catch (e) {
