@@ -504,18 +504,19 @@ const state = {
   cat: 'all',
   q: '',
   knownIds: new Set(),
-  renderLimit: 40,
+  renderLimit: 15,
 };
 
-const RENDER_BATCH = 40;
+const INITIAL_RENDER = 15;
+const LAZY_BATCH = 30;
 const lazyIO = ('IntersectionObserver' in window) ? new IntersectionObserver(entries => {
   for (const e of entries) if (e.isIntersecting) {
-    state.renderLimit += RENDER_BATCH;
+    state.renderLimit += LAZY_BATCH;
     render();
     break;
   }
 }, { rootMargin: '600px 0px' }) : null;
-function resetRenderLimit() { state.renderLimit = RENDER_BATCH; }
+function resetRenderLimit() { state.renderLimit = INITIAL_RENDER; }
 
 function $(sel) { return document.querySelector(sel); }
 function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
@@ -634,7 +635,7 @@ function render(highlightAnchor) {
   if (highlightAnchor) {
     const idx = items.findIndex(it => it.anchor === highlightAnchor);
     if (idx >= state.renderLimit) {
-      state.renderLimit = Math.ceil((idx + 1) / RENDER_BATCH) * RENDER_BATCH;
+      state.renderLimit = Math.max(idx + LAZY_BATCH, INITIAL_RENDER);
     }
   }
 
