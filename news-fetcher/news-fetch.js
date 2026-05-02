@@ -214,7 +214,7 @@ function renderRssFeed(items) {
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n' +
     '  <channel>\n' +
-    '    <title>ProbBrain — AI News Terminal</title>\n' +
+    '    <title>ProbBrain - AI News Terminal</title>\n' +
     '    <link>https://probbrain.com/news</link>\n' +
     '    <atom:link href="https://probbrain.com/news.xml" rel="self" type="application/rss+xml"/>\n' +
     '    <description>AI lab announcements, arXiv papers, GitHub and HuggingFace trending, AI Hacker News, and independent writers - aggregated, deduped, and posted to @ProbBrain on Telegram.</description>\n' +
