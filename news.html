@@ -314,6 +314,13 @@
     background: rgba(255,255,255,.012);
   }
 
+  .lazy-sentinel {
+    text-align: center; padding: 20px 0;
+    font-size: 11.5px; color: #555; font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .lazy-sentinel .num { color: #888; }
+
   /* ─── Status bar ─── */
   .stat-tile { background: rgba(255,255,255,.02); border: 1px solid #222; border-radius: 12px; padding: 12px 14px; }
   .stat-tile .label { font-size: 10.5px; color: #666; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
@@ -497,7 +504,18 @@ const state = {
   cat: 'all',
   q: '',
   knownIds: new Set(),
+  renderLimit: 40,
 };
+
+const RENDER_BATCH = 40;
+const lazyIO = ('IntersectionObserver' in window) ? new IntersectionObserver(entries => {
+  for (const e of entries) if (e.isIntersecting) {
+    state.renderLimit += RENDER_BATCH;
+    render();
+    break;
+  }
+}, { rootMargin: '600px 0px' }) : null;
+function resetRenderLimit() { state.renderLimit = RENDER_BATCH; }
 
 function $(sel) { return document.querySelector(sel); }
 function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
@@ -613,9 +631,17 @@ function render(highlightAnchor) {
   }
   empty.style.display = 'none';
 
+  if (highlightAnchor) {
+    const idx = items.findIndex(it => it.anchor === highlightAnchor);
+    if (idx >= state.renderLimit) {
+      state.renderLimit = Math.ceil((idx + 1) / RENDER_BATCH) * RENDER_BATCH;
+    }
+  }
+
+  const visible = items.slice(0, state.renderLimit);
   let html = '';
   let lastDay = null;
-  for (const it of items) {
+  for (const it of visible) {
     const d = dayKey(it.published_at);
     if (d !== lastDay) {
       html += `<div class="day-header">${escHtml(dayLabel(d))}</div>`;
@@ -623,7 +649,16 @@ function render(highlightAnchor) {
     }
     html += rowHtml(it);
   }
+  if (state.renderLimit < items.length) {
+    const remaining = items.length - state.renderLimit;
+    html += `<div id="lazy-sentinel" class="lazy-sentinel">loading… <span class="num">${remaining}</span> more</div>`;
+  }
   list.innerHTML = html;
+
+  if (lazyIO) {
+    const sentinel = document.getElementById('lazy-sentinel');
+    if (sentinel) lazyIO.observe(sentinel);
+  }
 
   if (highlightAnchor) {
     const el = document.getElementById(highlightAnchor);
@@ -746,6 +781,7 @@ $$('.chip').forEach(c => c.addEventListener('click', () => {
   $$('.chip').forEach(x => x.classList.remove('active'));
   c.classList.add('active');
   state.cat = c.dataset.cat;
+  resetRenderLimit();
   writeHash();
   render();
 }));
@@ -759,6 +795,7 @@ searchEl.addEventListener('input', () => {
   searchClear.classList.toggle('visible', !!v);
   searchTimer = setTimeout(() => {
     state.q = v;
+    resetRenderLimit();
     writeHash();
     render();
   }, 80);
@@ -767,6 +804,7 @@ searchClear.addEventListener('click', () => {
   searchEl.value = '';
   state.q = '';
   searchClear.classList.remove('visible');
+  resetRenderLimit();
   writeHash();
   render();
   searchEl.focus();
@@ -784,6 +822,7 @@ document.addEventListener('click', (ev) => {
   searchClear.classList.toggle('visible', !!newQ);
   state.cat = 'all';
   $$('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
+  resetRenderLimit();
   writeHash();
   render();
   $$('.tick-pill').forEach(p => p.classList.toggle('active', !isActive && p.dataset.sourceName === name));
@@ -804,6 +843,7 @@ window.addEventListener('hashchange', () => {
   }
   if (dirty) {
     $$('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === state.cat));
+    resetRenderLimit();
     render(item);
   } else if (item) {
     const el = document.getElementById(item);
