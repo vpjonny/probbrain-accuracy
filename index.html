@@ -1532,18 +1532,17 @@
           : (sig.polymarket_url === null
               ? `<div class="modal-section-title">Source</div><div class="modal-link" style="color:var(--muted2);cursor:default" title="Polymarket has archived this market's event page after resolution.">Market archived on Polymarket &mdash; no public link</div>`
               : '')}
-        ${sig.shadow ? '' : `
-          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
-            <a href="/signals/${(sig.id || '').toLowerCase()}"
-               style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;
-                      background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:#fff;
-                      font-weight:700;font-size:13px;text-decoration:none;
-                      border:1px solid rgba(99,102,241,.6);
-                      box-shadow:0 6px 20px rgba(99,102,241,.25);"
-               title="Open the dedicated page for this signal">
-              Check full signal &rarr;
-            </a>
-          </div>`}
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+          <a href="/signals/${(sig.id || '').toLowerCase()}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;
+                    background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:#fff;
+                    font-weight:700;font-size:13px;text-decoration:none;
+                    border:1px solid rgba(99,102,241,.6);
+                    box-shadow:0 6px 20px rgba(99,102,241,.25);"
+             title="Open the dedicated page for this signal">
+            Check full signal &rarr;
+          </a>
+        </div>
       `;
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
@@ -1870,11 +1869,8 @@
       const mkt = s.market_price > 0 ? Math.round(s.market_price * 100) + '%' : '—';
       const ours = s.our_estimate > 0 ? Math.round(s.our_estimate * 100) + '%' : '—';
       const shadowMark = s.shadow ? ' <span style="color:#a78bfa;font-size:10px" title="Shadow signal — not posted to X">🕶</span>' : '';
-      // Live (non-shadow) signals get a deep-link to /signals/sig-XXX. Shadow signals
-      // don't have public landing pages so the # stays plain.
-      const numCell = s.shadow
-        ? `<span class="signal-num">#${s.signal_number}</span>`
-        : `<a href="/signals/${(s.id || '').toLowerCase()}" class="signal-num" style="color:var(--accent);text-decoration:none" title="Open signal page" onclick="event.stopPropagation()">#${s.signal_number}</a>`;
+      // Every signal (live + shadow) deep-links to its /signals/sig-XXX page.
+      const numCell = `<a href="/signals/${(s.id || '').toLowerCase()}" class="signal-num" style="color:var(--accent);text-decoration:none" title="Open signal page" onclick="event.stopPropagation()">#${s.signal_number}</a>`;
       return `<tr data-signal-id="${s.id}" style="cursor:pointer">
         <td>${numCell}${shadowMark}</td>
         <td>
