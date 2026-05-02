@@ -22,6 +22,17 @@
 
   // ── Styles ─────────────────────────────────────────────────────────────
   const css = `
+    /* Reserve bottom space site-wide so floating pills don't cover the
+       last bit of page content when scrolled to bottom. */
+    body { padding-bottom: 90px; }
+    @media (max-width: 640px) { body { padding-bottom: 110px; } }
+
+    /* Safety net: prevent any rogue child from forcing the page wider than
+       the viewport on small screens (no-op on desktop where content fits). */
+    @media (max-width: 768px) {
+      html, body { overflow-x: hidden; max-width: 100vw; }
+    }
+
     .pb-pill {
       position: fixed; right: 16px;
       display: flex; align-items: center; gap: 7px;
