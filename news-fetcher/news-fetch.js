@@ -13,22 +13,28 @@ import { fetchHtmlIndex } from './lib/fetch-html-index.js';
 import { summarize } from './lib/summarize.js';
 import { loadEnv, require_ } from './lib/env.js';
 import { formatPost, sendMessage } from './lib/telegram.js';
+import { createBlueskyClient, postNewsItem as postBskyItem } from './lib/bluesky.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const NEWS_JSON = join(REPO_ROOT, 'news.json');
 const NEWS_FEED = join(REPO_ROOT, 'news.xml');
 const LAST_POSTED = join(__dirname, 'last_posted.json');
+const LAST_POSTED_BSKY = join(__dirname, 'last_posted_bsky.json');
 const DEFAULT_PER_SOURCE_KEEP = 30;
 const FEED_LIMIT = 60;
 const SUMMARY_MAX_PER_RUN = 8;
 const TELEGRAM_THROTTLE_MS = 1100;
 const TELEGRAM_MAX_PER_RUN = 30;
+const BSKY_THROTTLE_MS = 1100;
+const BSKY_MAX_PER_RUN = 25;
 
 const argv = new Set(process.argv.slice(2));
 const DRY_RUN = argv.has('--dry-run');
 const VERBOSE = argv.has('--verbose');
 const NO_POST = argv.has('--no-post');
+const NO_BSKY = argv.has('--no-bsky');
+const NO_TELEGRAM = argv.has('--no-telegram');
 const log = (...a) => console.log(`[${toUtcIso(new Date())}]`, ...a);
 const vlog = (...a) => { if (VERBOSE) log(...a); };
 
@@ -161,7 +167,8 @@ async function run() {
   }
 
   if (DRY_RUN || NO_POST) return;
-  await postToTelegram(items);
+  if (!NO_TELEGRAM) await postToTelegram(items);
+  if (!NO_BSKY)     await postToBluesky(items);
 }
 
 function rssEscape(s) {
@@ -174,8 +181,11 @@ function rssEscape(s) {
 }
 
 function rfc822(d) {
-  // RSS 2.0 spec requires RFC 822 dates. toUTCString() emits them.
-  return d.toUTCString();
+  // RSS 2.0 spec requires RFC 822 dates. toUTCString() emits "GMT" suffix
+  // which is technically valid, but Google's feed validator only accepts
+  // the numeric offset form. Convert
+  // "Sat, 02 May 2026 16:31:37 GMT" → "Sat, 02 May 2026 16:31:37 +0000".
+  return d.toUTCString().replace(/GMT$/, '+0000');
 }
 
 function renderRssFeed(items) {
@@ -207,7 +217,7 @@ function renderRssFeed(items) {
     '    <title>ProbBrain — AI News Terminal</title>\n' +
     '    <link>https://probbrain.com/news</link>\n' +
     '    <atom:link href="https://probbrain.com/news.xml" rel="self" type="application/rss+xml"/>\n' +
-    '    <description>AI lab announcements, arXiv papers, GitHub &amp; HuggingFace trending, AI Hacker News, and independent writers — aggregated, deduped, and posted to @ProbBrain on Telegram.</description>\n' +
+    '    <description>AI lab announcements, arXiv papers, GitHub and HuggingFace trending, AI Hacker News, and independent writers - aggregated, deduped, and posted to @ProbBrain on Telegram.</description>\n' +
     '    <language>en</language>\n' +
     `    <lastBuildDate>${rfc822(now)}</lastBuildDate>\n` +
     '    <ttl>15</ttl>\n' +
@@ -275,6 +285,68 @@ async function postToTelegram(items) {
     if (i < batch.length - 1) await sleep(TELEGRAM_THROTTLE_MS);
   }
   log(`telegram: sent=${sent} failed=${failed} posted_total=${posted.size}`);
+}
+
+async function postToBluesky(items) {
+  let session;
+  try {
+    session = await createBlueskyClient();
+  } catch (e) {
+    log(`SKIP bluesky: login failed — ${e.message}`);
+    return;
+  }
+  if (!session) {
+    log(`SKIP bluesky: no creds at ~/automation/bluesky-poster/probbrain-config.json`);
+    return;
+  }
+
+  const state = await readJson(LAST_POSTED_BSKY, null);
+  const isFirstRun = state === null;
+
+  if (isFirstRun) {
+    const seed = { posted_ids: items.map(it => it.id), updated_at: toUtcIso(new Date()), seeded: true, handle: session.creds.handle };
+    await writeJsonAtomic(LAST_POSTED_BSKY, seed);
+    log(`first-run silent seed: ${seed.posted_ids.length} ids written to last_posted_bsky.json (no bluesky posts)`);
+    return;
+  }
+
+  const posted = new Set(state.posted_ids || []);
+  const candidates = items
+    .filter(it => !posted.has(it.id))
+    .sort((a, b) => (a.published_at || '').localeCompare(b.published_at || ''));
+
+  if (candidates.length === 0) {
+    vlog('bluesky: nothing new to post');
+    return;
+  }
+
+  if (candidates.length > BSKY_MAX_PER_RUN) {
+    log(`bluesky: capping batch ${candidates.length} → ${BSKY_MAX_PER_RUN} (rest will post next run)`);
+  }
+  const batch = candidates.slice(0, BSKY_MAX_PER_RUN);
+
+  let sent = 0, failed = 0;
+  for (let i = 0; i < batch.length; i++) {
+    const it = batch[i];
+    try {
+      await postBskyItem(session.agent, it);
+      posted.add(it.id);
+      sent++;
+      vlog(`  → bsky ${it.source_id}: ${(it.headline || it.title).slice(0, 60)}`);
+      const next = { posted_ids: [...posted], updated_at: toUtcIso(new Date()), handle: session.creds.handle };
+      await writeJsonAtomic(LAST_POSTED_BSKY, next);
+    } catch (e) {
+      failed++;
+      log(`BSKY ERR ${it.id}: ${e.message}`);
+      const status = e.status || e.statusCode;
+      if (status === 429) {
+        log(`bluesky 429 — sleeping 60s`);
+        await sleep(60_000);
+      }
+    }
+    if (i < batch.length - 1) await sleep(BSKY_THROTTLE_MS);
+  }
+  log(`bluesky: sent=${sent} failed=${failed} posted_total=${posted.size}`);
 }
 
 run().catch(e => { console.error('FATAL:', e); process.exit(1); });
