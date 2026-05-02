@@ -606,8 +606,13 @@ function filterItems() {
 function rowHtml(it) {
   const cat = it.category || 'lab';
   const emoji = it.category_emoji || (CATS[cat]?.emoji || '');
-  const ago = timeAgo(it.published_at);
-  const stamp = localTime(it.published_at);
+  // Prefer discovered_at (when ProbBrain saw it) over published_at (source's
+  // original publish time) so the badge matches Telegram/Bluesky notif timing.
+  const seenIso = it.discovered_at || it.published_at;
+  const ago = timeAgo(seenIso);
+  const stamp = it.discovered_at && it.published_at && it.discovered_at !== it.published_at
+    ? `seen ${localTime(it.discovered_at)} · published ${localTime(it.published_at)}`
+    : localTime(seenIso);
   const headline = escHtml(it.headline || it.title);
   const url = escHtml(it.url);
   const linkDomain = (() => { try { return new URL(it.url).hostname.replace(/^www\./, ''); } catch { return it.url; } })();
@@ -681,7 +686,7 @@ function updateStatus(d) {
   $('#stat-fetched-ago').textContent = localTime(d.generated_at);
   const newest = d.items?.[0];
   if (newest) {
-    $('#stat-newest').textContent = timeAgo(newest.published_at);
+    $('#stat-newest').textContent = timeAgo(newest.discovered_at || newest.published_at);
     $('#stat-newest-src').textContent = newest.source_name;
   }
 }

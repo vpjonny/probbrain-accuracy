@@ -101,6 +101,10 @@ async function run() {
         headline: it.title,
         url: it.url,
         published_at: it.published_at || toUtcIso(new Date()),
+        // discovered_at = when ProbBrain first saw it. Drives the "ago" badge
+        // on /news so timing matches Telegram/Bluesky notifs, not the source's
+        // original publish time (which can be hours stale for HN-trending links).
+        discovered_at: toUtcIso(new Date()),
         description: it.description || '',
         summarize: !!source.summarize,
         summarized: false,
