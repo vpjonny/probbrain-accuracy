@@ -15,7 +15,10 @@
   const HIT_BASE = 'https://abacus.jasoncameron.dev';
   const SESSION_FLAG = 'pb_hit_counted_v1';
 
-  const onStatusPage = location.pathname.replace(/\/$/, '') === '/status';
+  const path = location.pathname.replace(/\/$/, '').replace(/\.html$/, '');
+  const onStatusPage      = path === '/status';
+  const onMethodologyPage = path === '/methodology';
+  const onArbitragePage   = path === '/arbitrage';
 
   // ── Styles ─────────────────────────────────────────────────────────────
   const css = `
@@ -68,6 +71,35 @@
       .pb-pill   { padding: 4px 9px; font-size: 0.65rem; right: 12px; }
       .pb-visits { bottom: 12px; }
       .pb-status { bottom: 46px; }
+    }
+
+    /* Bottom-LEFT nav pills — mirror the right-side stack but use the
+       header-cta indigo gradient treatment (these are buttons, not status). */
+    .pb-nav {
+      position: fixed; left: 16px;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 12px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(139,92,246,.12));
+      border: 1px solid rgba(99,102,241,.32);
+      color: #e8e8e8; text-decoration: none;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: .01em;
+      z-index: 100;
+      transition: border-color .15s, background .15s, transform .12s, box-shadow .15s;
+      box-shadow: 0 4px 14px rgba(99,102,241,.10);
+    }
+    .pb-nav:hover {
+      border-color: rgba(99,102,241,.65);
+      background: linear-gradient(135deg, rgba(99,102,241,.30), rgba(139,92,246,.20));
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(99,102,241,.20);
+    }
+    .pb-nav.top    { bottom: 56px; }
+    .pb-nav.bottom { bottom: 16px; }
+    @media (max-width: 640px) {
+      .pb-nav        { padding: 5px 10px; font-size: 0.70rem; left: 12px; }
+      .pb-nav.top    { bottom: 46px; }
+      .pb-nav.bottom { bottom: 12px; }
     }
   `;
   const style = document.createElement('style');
@@ -143,4 +175,25 @@
       if (sub) sub.textContent = level === 'ok' ? 'live' : level === 'warn' ? 'stale' : 'down';
     }).catch(() => { /* keep default green */ });
   }
+
+  // ── Bottom-left nav pills ──────────────────────────────────────────────
+  // Methodology + Arbitrage. Each pill suppresses itself on its own page,
+  // and if only one is visible it drops to the bottom slot so it doesn't
+  // float alone in the upper position.
+  const navItems = [
+    { href: '/methodology', label: '📊 Methodology', title: 'How the arb scanner works', skip: onMethodologyPage },
+    { href: '/arbitrage',   label: '⚖ Arbitrage',    title: 'Polymarket × Kalshi arbitrage scanner', skip: onArbitragePage },
+  ];
+  const visible = navItems.filter(it => !it.skip);
+  visible.forEach((it, i) => {
+    const a = document.createElement('a');
+    // If both visible: first → top slot, second → bottom slot. If only one
+    // visible: it always takes the bottom slot.
+    const slot = (visible.length === 2 && i === 0) ? 'top' : 'bottom';
+    a.className = `pb-nav ${slot}`;
+    a.href = it.href;
+    a.title = it.title;
+    a.textContent = it.label;
+    document.body.appendChild(a);
+  });
 })();
