@@ -20,6 +20,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 const NEWS_JSON = join(REPO_ROOT, 'news.json');
 const NEWS_FEED = join(REPO_ROOT, 'news.xml');
+const STATUS_JSON = join(REPO_ROOT, 'status.json');
+const OPPORTUNITIES_JSON = join(REPO_ROOT, 'opportunities.json');
+const PUBLISHED_SIGNALS = join(REPO_ROOT, 'data', 'published_signals.json');
 const LAST_POSTED = join(__dirname, 'last_posted.json');
 const LAST_POSTED_BSKY = join(__dirname, 'last_posted_bsky.json');
 const DEFAULT_PER_SOURCE_KEEP = 30;
@@ -172,15 +175,88 @@ async function run() {
     log(`wrote news.xml: ${Math.min(items.length, FEED_LIMIT)} items`);
   }
 
-  if (DRY_RUN || NO_POST) return;
+  if (DRY_RUN) return;
 
   // Push news.json + news.xml live BEFORE we notify subscribers — Telegram and
   // Bluesky posts deep-link to probbrain.com/news#anchor, and that anchor
   // doesn't exist on the live site until Vercel sees the commit.
   if (!NO_PUSH && stats.new > 0) gitPushNews(stats.new);
 
-  if (!NO_TELEGRAM) await postToTelegram(items);
-  if (!NO_BSKY)     await postToBluesky(items);
+  if (!NO_POST) {
+    if (!NO_TELEGRAM) await postToTelegram(items);
+    if (!NO_BSKY)     await postToBluesky(items);
+  }
+
+  // Status snapshot reads gitignored last_posted*.json (which we own) and
+  // surfaces aggregate latency to the public /status page.
+  await writeStatusJson(items);
+  if (!NO_PUSH) gitPushStatus();
+}
+
+async function writeStatusJson(items) {
+  const itemById = new Map(items.map(it => [it.id, it]));
+  const tg = await readJson(LAST_POSTED, null);
+  const bs = await readJson(LAST_POSTED_BSKY, null);
+  const status = {
+    generated_at: toUtcIso(new Date()),
+    fetcher: { last_run_at: toUtcIso(new Date()), items_count: items.length, new_last_run: items.filter(it => it.discovered_at && (Date.now() - new Date(it.discovered_at).getTime()) < 30 * 60 * 1000).length, expected_cadence_sec: 900 },
+    telegram: postChannelStats(tg, itemById),
+    bluesky: postChannelStats(bs, itemById),
+  };
+  try {
+    const { writeFile } = await import('node:fs/promises');
+    await writeFile(STATUS_JSON, JSON.stringify(status, null, 2) + '\n', 'utf8');
+    log(`wrote status.json: tg=${status.telegram.posts_24h}/24h p50=${status.telegram.median_latency_sec ?? '—'}s · bsky=${status.bluesky.posts_24h}/24h p50=${status.bluesky.median_latency_sec ?? '—'}s`);
+  } catch (e) {
+    log(`status.json write failed: ${e.message}`);
+  }
+}
+
+function postChannelStats(state, itemById) {
+  const out = { last_post_at: null, posts_24h: 0, posts_total: 0, median_latency_sec: null, p95_latency_sec: null, seeded: !!state?.seeded };
+  if (!state) return out;
+  const posted = readPostedMap(state);
+  const entries = Object.entries(posted).filter(([, t]) => !!t);
+  out.posts_total = Object.keys(posted).length;
+  if (entries.length === 0) return out;
+
+  const cutoff = Date.now() - 24 * 3600 * 1000;
+  const last24 = entries.filter(([, t]) => new Date(t).getTime() >= cutoff);
+  out.posts_24h = last24.length;
+  out.last_post_at = entries.reduce((m, [, t]) => (t > m ? t : m), entries[0][1]);
+
+  const latencies = last24
+    .map(([id, postedAt]) => {
+      const it = itemById.get(id);
+      if (!it?.discovered_at) return null;
+      return (new Date(postedAt).getTime() - new Date(it.discovered_at).getTime()) / 1000;
+    })
+    .filter(x => x != null && x >= 0)
+    .sort((a, b) => a - b);
+  if (latencies.length > 0) {
+    out.median_latency_sec = Math.round(latencies[Math.floor(latencies.length * 0.5)]);
+    out.p95_latency_sec = Math.round(latencies[Math.min(latencies.length - 1, Math.floor(latencies.length * 0.95))]);
+  }
+  return out;
+}
+
+function gitPushStatus() {
+  const opts = { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] };
+  try {
+    execFileSync('git', ['add', 'status.json'], opts);
+    const staged = execFileSync('git', ['diff', '--cached', '--name-only'], opts).trim();
+    if (!staged) return;
+    execFileSync('git', ['commit', '-m', `status: ${toUtcIso(new Date())}`], opts);
+    try {
+      execFileSync('git', ['pull', '--rebase', 'origin', 'main'], opts);
+    } catch (e) {
+      try { execFileSync('git', ['rebase', '--abort'], { ...opts, stdio: 'ignore' }); } catch {}
+      throw e;
+    }
+    execFileSync('git', ['push', 'origin', 'HEAD'], opts);
+  } catch (e) {
+    console.error(`git: status push failed: ${e.stderr?.toString() || e.message}`);
+  }
 }
 
 function gitPushNews(newCount) {
@@ -277,15 +353,17 @@ async function postToTelegram(items) {
   const isFirstRun = state === null;
 
   if (isFirstRun) {
-    const seed = { posted_ids: items.map(it => it.id), updated_at: toUtcIso(new Date()), seeded: true };
+    const ts = toUtcIso(new Date());
+    const posted = Object.fromEntries(items.map(it => [it.id, null])); // null = unknown post time (silent seed)
+    const seed = { posted, updated_at: ts, seeded: true };
     await writeJsonAtomic(LAST_POSTED, seed);
-    log(`first-run silent seed: ${seed.posted_ids.length} ids written to last_posted.json (no telegram posts)`);
+    log(`first-run silent seed: ${Object.keys(posted).length} ids written to last_posted.json (no telegram posts)`);
     return;
   }
 
-  const posted = new Set(state.posted_ids || []);
+  const posted = readPostedMap(state);
   const candidates = items
-    .filter(it => !posted.has(it.id))
+    .filter(it => !(it.id in posted))
     .sort((a, b) => (a.published_at || '').localeCompare(b.published_at || ''));
 
   if (candidates.length === 0) {
@@ -304,11 +382,11 @@ async function postToTelegram(items) {
     const text = formatPost(it);
     try {
       await sendMessage({ ...creds, text });
-      posted.add(it.id);
+      const postedAt = toUtcIso(new Date());
+      posted[it.id] = postedAt;
       sent++;
       vlog(`  → tg ${it.source_id}: ${(it.headline || it.title).slice(0, 60)}`);
-      const next = { posted_ids: [...posted], updated_at: toUtcIso(new Date()) };
-      await writeJsonAtomic(LAST_POSTED, next);
+      await writeJsonAtomic(LAST_POSTED, { posted, updated_at: postedAt });
     } catch (e) {
       failed++;
       log(`TG ERR ${it.id}: ${e.message}`);
@@ -320,7 +398,7 @@ async function postToTelegram(items) {
     }
     if (i < batch.length - 1) await sleep(TELEGRAM_THROTTLE_MS);
   }
-  log(`telegram: sent=${sent} failed=${failed} posted_total=${posted.size}`);
+  log(`telegram: sent=${sent} failed=${failed} posted_total=${Object.keys(posted).length}`);
 }
 
 async function postToBluesky(items) {
@@ -340,15 +418,17 @@ async function postToBluesky(items) {
   const isFirstRun = state === null;
 
   if (isFirstRun) {
-    const seed = { posted_ids: items.map(it => it.id), updated_at: toUtcIso(new Date()), seeded: true, handle: session.creds.handle };
+    const ts = toUtcIso(new Date());
+    const posted = Object.fromEntries(items.map(it => [it.id, null]));
+    const seed = { posted, updated_at: ts, seeded: true, handle: session.creds.handle };
     await writeJsonAtomic(LAST_POSTED_BSKY, seed);
-    log(`first-run silent seed: ${seed.posted_ids.length} ids written to last_posted_bsky.json (no bluesky posts)`);
+    log(`first-run silent seed: ${Object.keys(posted).length} ids written to last_posted_bsky.json (no bluesky posts)`);
     return;
   }
 
-  const posted = new Set(state.posted_ids || []);
+  const posted = readPostedMap(state);
   const candidates = items
-    .filter(it => !posted.has(it.id))
+    .filter(it => !(it.id in posted))
     .sort((a, b) => (a.published_at || '').localeCompare(b.published_at || ''));
 
   if (candidates.length === 0) {
@@ -366,11 +446,11 @@ async function postToBluesky(items) {
     const it = batch[i];
     try {
       await postBskyItem(session.agent, it);
-      posted.add(it.id);
+      const postedAt = toUtcIso(new Date());
+      posted[it.id] = postedAt;
       sent++;
       vlog(`  → bsky ${it.source_id}: ${(it.headline || it.title).slice(0, 60)}`);
-      const next = { posted_ids: [...posted], updated_at: toUtcIso(new Date()), handle: session.creds.handle };
-      await writeJsonAtomic(LAST_POSTED_BSKY, next);
+      await writeJsonAtomic(LAST_POSTED_BSKY, { posted, updated_at: postedAt, handle: session.creds.handle });
     } catch (e) {
       failed++;
       log(`BSKY ERR ${it.id}: ${e.message}`);
@@ -382,7 +462,17 @@ async function postToBluesky(items) {
     }
     if (i < batch.length - 1) await sleep(BSKY_THROTTLE_MS);
   }
-  log(`bluesky: sent=${sent} failed=${failed} posted_total=${posted.size}`);
+  log(`bluesky: sent=${sent} failed=${failed} posted_total=${Object.keys(posted).length}`);
+}
+
+// Migrate legacy {posted_ids:[]} to {posted:{id:postedAt}} on read. Legacy
+// entries get null post-times (we never recorded them), so they show up in
+// the dedupe set but won't contribute to latency stats.
+function readPostedMap(state) {
+  if (!state) return {};
+  if (state.posted && typeof state.posted === 'object' && !Array.isArray(state.posted)) return { ...state.posted };
+  if (Array.isArray(state.posted_ids)) return Object.fromEntries(state.posted_ids.map(id => [id, null]));
+  return {};
 }
 
 run().catch(e => { console.error('FATAL:', e); process.exit(1); });
