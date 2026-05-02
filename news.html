@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XJEDNGMEV6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XJEDNGMEV6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<meta name="theme-color" content="#6366f1">
+<title>AI News Terminal — ProbBrain</title>
+<meta name="description" content="Live AI news terminal: lab announcements, arXiv papers, GitHub & HuggingFace trending, AI HN front page, and independent writers — aggregated, deduped, and posted to @ProbBrain on Telegram.">
+<meta name="keywords" content="AI news, LLM news, anthropic blog, openai blog, arxiv cs.LG, hugging face trending, github ai trending, hacker news AI">
+<meta property="og:title" content="AI News Terminal — ProbBrain">
+<meta property="og:description" content="Live AI news from labs, arXiv, GitHub, HuggingFace, HN, and independent writers. Mirror channel: @ProbBrain on Telegram.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://probbrain.com/news">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@ProbBrain">
+<link rel="canonical" href="https://probbrain.com/news">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          ink:    { 950: '#0a0a0a', 900: '#111111', 800: '#171717', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a' },
+          fg:     { DEFAULT: '#e8e8e8', dim: '#a0a0a0', muted: '#666666' },
+          ok:     '#22c55e',
+          warn:   '#f59e0b',
+          bad:    '#ef4444',
+          accent: '#6366f1',
+          info:   '#3b82f6',
+          poly:   '#a78bfa',
+          kalshi: '#22d3ee',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0a0a0a; color: #e8e8e8;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11' 1, 'ss01' 1;
+  }
+  .num, input[type="search"], select {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+  }
+
+  /* ─── Atmospheric blobs (mirrors arbitrage.html) ─── */
+  .bg-blobs { position: fixed; inset: 0; z-index: -1; overflow: hidden;
+              pointer-events: none; filter: blur(80px) saturate(1.3); opacity: 0.32; }
+  .bg-blob { position: absolute; border-radius: 50%; will-change: transform; }
+  .bg-blob.b1 { width: 32vmin; height: 32vmin; top: -12vmin; left: -12vmin;
+                background: radial-gradient(circle, rgba(99,102,241,1) 0%, rgba(99,102,241,0) 65%);
+                animation: drift-a 24s ease-in-out infinite alternate; }
+  .bg-blob.b2 { width: 32vmin; height: 32vmin; top: -12vmin; right: -12vmin;
+                background: radial-gradient(circle, rgba(34,211,238,1) 0%, rgba(34,211,238,0) 65%);
+                animation: drift-b 28s ease-in-out infinite alternate; }
+  .bg-blob.b3 { width: 36vmin; height: 36vmin; bottom: -12vmin; left: -12vmin;
+                background: radial-gradient(circle, rgba(167,139,250,1) 0%, rgba(167,139,250,0) 65%);
+                animation: drift-c 26s ease-in-out infinite alternate; }
+  .bg-blob.b4 { width: 28vmin; height: 28vmin; bottom: -12vmin; right: -12vmin;
+                background: radial-gradient(circle, rgba(59,130,246,1) 0%, rgba(59,130,246,0) 65%);
+                animation: drift-d 30s ease-in-out infinite alternate; }
+  @keyframes drift-a { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40vw,28vh) scale(1.15); } 100% { transform: translate(62vw,52vh) scale(0.88); } }
+  @keyframes drift-b { 0% { transform: translate(0,0) scale(0.92); } 50% { transform: translate(-50vw,36vh) scale(1.18); } 100% { transform: translate(-26vw,60vh) scale(1.02); } }
+  @keyframes drift-c { 0% { transform: translate(0,0) scale(1.08); } 50% { transform: translate(46vw,-32vh) scale(0.92); } 100% { transform: translate(22vw,-56vh) scale(1.15); } }
+  @keyframes drift-d { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-42vw,-26vh) scale(0.86); } 100% { transform: translate(-66vw,-46vh) scale(1.12); } }
+
+  .bg-glyphs { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; user-select: none; }
+  .glyph { position: absolute; font-family: 'JetBrains Mono', monospace; font-weight: 800;
+           letter-spacing: -0.06em; line-height: 1; white-space: nowrap; text-shadow: 0 0 60px currentColor; }
+  .glyph.g1 { top: 6vh;  left: 4vw;  font-size: clamp(140px,18vw,280px); transform: rotate(-12deg); color: #6366f1; opacity: .055; }
+  .glyph.g2 { top: 16vh; right: 10vw; font-size: clamp(80px,10vw,160px);  transform: rotate(8deg);   color: #22d3ee; opacity: .04; }
+  .glyph.g3 { top: 50vh; left: 26vw;  font-size: clamp(60px,8vw,130px);   transform: rotate(-6deg);  color: #a78bfa; opacity: .055; }
+  .glyph.g4 { top: 60vh; right: 6vw;  font-size: clamp(200px,24vw,380px); transform: rotate(14deg);  color: #3b82f6; opacity: .045; }
+  .glyph.g5 { bottom: 6vh; left: 12vw; font-size: clamp(110px,13vw,220px); transform: rotate(-20deg); color: #6366f1; opacity: .05; }
+  @media (prefers-reduced-motion: reduce) { .bg-blob { animation: none !important; } .bg-blobs { opacity: .2; } }
+
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,.7);
+    animation: pulse 2.4s cubic-bezier(.4,0,.6,1) infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); transform: scale(1); }
+    70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); transform: scale(1); }
+  }
+
+  /* ─── Marquee (live source ticker) ─── */
+  .marquee {
+    overflow: hidden;
+    border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a;
+    background: linear-gradient(180deg, rgba(255,255,255,.012) 0%, rgba(255,255,255,.025) 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%);
+  }
+  .marquee-track {
+    display: flex; gap: 12px; padding: 10px 12px;
+    white-space: nowrap;
+    animation: marquee 60s linear infinite;
+    will-change: transform;
+  }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  .tick-pill {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 4px 10px 4px 11px;
+    border: 1px solid #1f1f1f; border-radius: 999px;
+    background: rgba(255,255,255,.02);
+    color: #b8b8b8; font-size: 11.5px;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: .02em;
+    cursor: pointer;
+    transition: color .14s, border-color .14s, background .14s, box-shadow .14s;
+    user-select: none;
+  }
+  .tick-pill:hover { color: #fff; border-color: #3a3a3a; background: rgba(255,255,255,.05); }
+  .tick-pill .count {
+    font-size: 10px; padding: 0 6px; height: 16px; min-width: 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #181818; border-radius: 999px; color: #888;
+    font-weight: 700;
+    border: 1px solid #1f1f1f;
+  }
+  .tick-pill:hover .count { color: #d8d8d8; border-color: #2a2a2a; }
+  .tick-pill .count.zero { opacity: .55; }
+
+  .tick-pill.lab        { border-color: rgba(99,102,241,.22); }
+  .tick-pill.paper      { border-color: rgba(34,211,238,.22); }
+  .tick-pill.code       { border-color: rgba(167,139,250,.22); }
+  .tick-pill.writing    { border-color: rgba(59,130,246,.22); }
+  .tick-pill.community  { border-color: rgba(245,158,11,.22); }
+
+  .tick-pill.lab       .count { color: #c7d2fe; }
+  .tick-pill.paper     .count { color: #a5f3fc; }
+  .tick-pill.code      .count { color: #ddd6fe; }
+  .tick-pill.writing   .count { color: #bfdbfe; }
+  .tick-pill.community .count { color: #fcd9a3; }
+
+  .tick-pill.active {
+    background: #1a1a1a; color: #fff; border-color: #6366f1;
+  }
+
+  .tick-pill.fresh { animation: tick-pulse 3.6s ease-out 1; }
+  @keyframes tick-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(99,102,241,.50); }
+    55%  { box-shadow: 0 0 0 9px rgba(99,102,241,0); }
+    100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+    .tick-pill.fresh { animation: none; }
+  }
+  @media (max-width: 640px) {
+    .marquee-track { gap: 8px; padding: 8px 10px; }
+    .tick-pill { font-size: 11px; padding: 3px 8px 3px 9px; }
+    .tick-pill .count { font-size: 9.5px; min-width: 16px; height: 14px; }
+  }
+
+  /* ─── Section header ─── */
+  .section-h { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; margin-bottom: 12px; }
+
+  /* ─── Sticky filter bar (matches arbitrage.html) ─── */
+  .sticky-filter {
+    position: sticky; top: 0;
+    z-index: 30;
+    padding: 10px 0 12px;
+    background: linear-gradient(180deg, rgba(10,10,10,.95) 75%, rgba(10,10,10,0));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1a1a1a;
+    margin-left: -8px; padding-left: 8px;
+    margin-right: -8px; padding-right: 8px;
+  }
+
+  .search-input {
+    flex: 1; min-width: 0;
+    background: #111; color: #e8e8e8;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    transition: border-color .12s;
+  }
+  .search-input:focus { outline: none; border-color: #6366f1; background: #131313; }
+  .search-input::placeholder { color: #555; }
+
+  .search-clear {
+    width: 32px; height: 32px;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    background: #111; color: #888;
+    font-size: 18px; line-height: 1;
+    cursor: pointer; transition: all .12s;
+    display: none;
+  }
+  .search-clear:hover { color: #e8e8e8; border-color: #2a2a2a; }
+  .search-clear.visible { display: inline-flex; align-items: center; justify-content: center; }
+
+  /* ─── Filter chips ─── */
+  .chip {
+    padding: 5px 12px; border-radius: 999px; background: transparent;
+    color: #a0a0a0; font-weight: 600; font-size: 11.5px;
+    cursor: pointer; transition: all .12s; border: 1px solid #222;
+    font-family: inherit; text-transform: uppercase; letter-spacing: .06em;
+  }
+  .chip:hover { color: #e8e8e8; border-color: #2a2a2a; }
+  .chip.active { background: #1a1a1a; color: #e8e8e8; border-color: #6366f1; }
+  .chip[data-cat="lab"].active       { border-color: #6366f1; }
+  .chip[data-cat="paper"].active     { border-color: #22d3ee; }
+  .chip[data-cat="code"].active      { border-color: #a78bfa; }
+  .chip[data-cat="writing"].active   { border-color: #3b82f6; }
+  .chip[data-cat="community"].active { border-color: #f59e0b; }
+
+  /* ─── News row ─── */
+  .news-row {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #131313;
+    scroll-margin-top: 96px;
+  }
+  .news-row:hover { background: rgba(255,255,255,.012); }
+  .news-row.flash { animation: flash 1.6s ease-out; }
+  @keyframes flash {
+    0% { background: rgba(99,102,241,.18); }
+    100% { background: transparent; }
+  }
+
+  .news-emoji { font-size: 16px; line-height: 1.2; text-align: center; }
+  .news-meta { font-size: 11px; color: #666; font-family: 'JetBrains Mono', monospace; letter-spacing: .04em; white-space: nowrap; }
+  .news-meta .src { color: #a0a0a0; font-weight: 600; }
+  .news-meta .src.lab       { color: #c7d2fe; }
+  .news-meta .src.paper     { color: #a5f3fc; }
+  .news-meta .src.code      { color: #ddd6fe; }
+  .news-meta .src.writing   { color: #bfdbfe; }
+  .news-meta .src.community { color: #fcd9a3; }
+  .news-meta .dot { color: #2a2a2a; padding: 0 5px; }
+  .news-meta .ago { color: #666; }
+
+  .news-headline {
+    color: #e8e8e8; font-size: 14.5px; line-height: 1.45;
+    text-decoration: none;
+    transition: color .12s;
+  }
+  .news-headline:hover { color: #fff; }
+  .news-row.lab       .news-headline:hover { color: #c7d2fe; }
+  .news-row.paper     .news-headline:hover { color: #a5f3fc; }
+  .news-row.code      .news-headline:hover { color: #ddd6fe; }
+  .news-row.writing   .news-headline:hover { color: #bfdbfe; }
+  .news-row.community .news-headline:hover { color: #fcd9a3; }
+  .news-row.summarized .news-headline::before {
+    content: "✦ ";
+    color: #555;
+    font-size: 11px;
+    vertical-align: 1px;
+  }
+
+  .news-link {
+    font-size: 11px; color: #666; font-family: 'JetBrains Mono', monospace;
+    text-decoration: none; white-space: nowrap;
+    border: 1px solid transparent;
+    padding: 2px 6px; border-radius: 5px;
+    transition: all .12s;
+  }
+  .news-link:hover { color: #e8e8e8; border-color: #2a2a2a; }
+
+  .day-header {
+    font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: .12em; font-weight: 700;
+    padding: 18px 0 6px;
+    border-top: 1px solid #1a1a1a;
+    margin-top: 8px;
+  }
+  .day-header:first-child { border-top: none; margin-top: 0; padding-top: 4px; }
+
+  .empty-state {
+    border: 1px dashed #2a2a2a; border-radius: 12px; padding: 28px 20px;
+    color: #a0a0a0; text-align: center; font-size: 13.5px; line-height: 1.55;
+    background: rgba(255,255,255,.012);
+  }
+
+  /* ─── Status bar ─── */
+  .stat-tile { background: rgba(255,255,255,.02); border: 1px solid #222; border-radius: 12px; padding: 12px 14px; }
+  .stat-tile .label { font-size: 10.5px; color: #666; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+  .stat-tile .v { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1.05; margin-top: 5px; }
+  .stat-tile .sub { font-size: 11px; color: #a0a0a0; margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+
+  @media (max-width: 640px) {
+    .section-h { font-size: 10px; margin-bottom: 8px; }
+    .news-row { grid-template-columns: 22px minmax(0, 1fr); padding: 9px 0; }
+    .news-link { display: none; }
+    .news-headline { font-size: 14px; }
+    .stat-tile .v { font-size: 18px; }
+    .chip { padding: 7px 12px; font-size: 11px; min-height: 32px; }
+    .search-input { padding: 10px 12px; font-size: 14px; min-height: 40px; }
+    .bg-blobs { filter: blur(40px) saturate(1); opacity: .2; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="bg-blobs" aria-hidden="true">
+  <div class="bg-blob b1"></div><div class="bg-blob b2"></div>
+  <div class="bg-blob b3"></div><div class="bg-blob b4"></div>
+</div>
+<div class="bg-glyphs" aria-hidden="true">
+  <div class="glyph g1">&gt;_</div>
+  <div class="glyph g2">AI</div>
+  <div class="glyph g3">∂L</div>
+  <div class="glyph g4">{ }</div>
+  <div class="glyph g5">//</div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <header class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-ink-600">
+    <div class="flex items-center gap-3">
+      <div class="text-xl font-extrabold tracking-tight">Prob<span class="text-accent">Brain</span></div>
+      <div class="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/40 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-accent">📰 News</div>
+      <div class="inline-flex items-center gap-1.5 bg-[#0f2010] border border-[#1a4020] rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-ok">
+        <span class="pulse-dot"></span>Live
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="https://t.me/ProbBrain" target="_blank" rel="noopener" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">📡 Telegram</a>
+      <a href="./arbitrage" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">⚖ Arb</a>
+      <a href="./kelly" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">🧮 Kelly</a>
+      <a href="./" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">← dashboard</a>
+    </div>
+  </header>
+
+  <div class="my-6">
+    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">AI News Terminal</h1>
+    <p class="text-sm text-fg-dim mt-1 max-w-3xl">
+      Lab announcements, arXiv papers, GitHub & HuggingFace trending, AI on Hacker News, and independent writers.
+      Aggregated, deduped, and mirrored to <a href="https://t.me/ProbBrain" class="text-accent hover:underline" target="_blank" rel="noopener">@ProbBrain</a> on Telegram.
+    </p>
+  </div>
+</div>
+
+<div class="marquee">
+  <div class="marquee-track" id="marquee-track">
+    <!-- populated by JS from sources -->
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <section class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+    <div class="stat-tile"><div class="label">Items</div><div id="stat-total" class="v">—</div><div class="sub">tracked</div></div>
+    <div class="stat-tile"><div class="label">Sources</div><div id="stat-sources" class="v">—</div><div class="sub">live feeds</div></div>
+    <div class="stat-tile"><div class="label">Last fetch</div><div id="stat-fetched" class="v">—</div><div class="sub" id="stat-fetched-ago">—</div></div>
+    <div class="stat-tile"><div class="label">Newest item</div><div id="stat-newest" class="v">—</div><div class="sub" id="stat-newest-src">—</div></div>
+    <div class="stat-tile"><div class="label">Cadence</div><div class="v">15m</div><div class="sub">systemd timer</div></div>
+  </section>
+
+  <div id="filter-bar" class="sticky-filter mb-4">
+    <div class="flex items-center flex-wrap gap-2 mb-2">
+      <span class="text-[11px] uppercase tracking-wide text-fg-muted">Category:</span>
+      <div id="cat-filters" class="flex flex-wrap gap-1.5">
+        <button class="chip active" data-cat="all">All</button>
+        <button class="chip" data-cat="lab">🧠 Lab</button>
+        <button class="chip" data-cat="paper">📄 Paper</button>
+        <button class="chip" data-cat="code">💻 Code</button>
+        <button class="chip" data-cat="writing">✍️ Writing</button>
+        <button class="chip" data-cat="community">🔥 Community</button>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <input id="search" class="search-input" type="search" placeholder="search headlines, sources, hashtags…" autocomplete="off" spellcheck="false">
+      <button id="search-clear" class="search-clear" title="Clear search">✕</button>
+    </div>
+  </div>
+
+  <div id="news-list" class="mb-10"></div>
+  <div id="empty-state" class="empty-state" style="display:none">
+    No items match the current filters.
+  </div>
+
+  <footer class="text-[11.5px] text-fg-muted leading-relaxed border-t border-ink-700 pt-4 mt-10 max-w-3xl">
+    Sources: 6 lab blogs · arXiv cs.LG + cs.CL · GitHub trending · HuggingFace · AI on HN · Simon Willison · Latent Space · Interconnects.
+    Auto-refreshes every 5 min. Headlines link directly to the source. Telegram posts link back here. Built on top of <a href="./arbitrage" class="hover:underline text-fg-dim">probbrain.com</a> infra.
+  </footer>
+</div>
+
+<script>
+const NEWS_JSON_URL = './news.json';
+const REFRESH_MS = 5 * 60 * 1000;
+
+const CATS = {
+  lab:       { emoji: '🧠', label: 'Lab' },
+  paper:     { emoji: '📄', label: 'Paper' },
+  code:      { emoji: '💻', label: 'Code' },
+  writing:   { emoji: '✍️', label: 'Writing' },
+  community: { emoji: '🔥', label: 'Community' },
+};
+
+const state = {
+  items: [],
+  generated_at: null,
+  cat: 'all',
+  q: '',
+  knownIds: new Set(),
+};
+
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
+function escHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function dayKey(iso) { return (iso || '').slice(0, 10); }
+
+function timeAgo(iso) {
+  if (!iso) return '—';
+  const t = new Date(iso).getTime();
+  if (isNaN(t)) return '—';
+  const diff = Date.now() - t;
+  const s = Math.round(diff / 1000);
+  if (s < 60) return s + 's';
+  const m = Math.round(s / 60);
+  if (m < 60) return m + 'm';
+  const h = Math.round(m / 60);
+  if (h < 24) return h + 'h';
+  const d = Math.round(h / 24);
+  if (d < 7) return d + 'd';
+  if (d < 30) return Math.round(d / 7) + 'w';
+  return Math.round(d / 30) + 'mo';
+}
+
+function localTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function dayLabel(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d.getTime())) return iso;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((today - d) / 86400000);
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return d.toLocaleDateString(undefined, { weekday: 'long' });
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: now.getFullYear() === d.getFullYear() ? undefined : 'numeric' });
+}
+
+function readHash() {
+  const h = location.hash.replace(/^#/, '');
+  if (!h) return { item: null, params: {} };
+  if (/^[0-9a-f]{10}$/.test(h)) return { item: h, params: {} };
+  const params = {};
+  for (const part of h.split('&')) {
+    const [k, v] = part.split('=');
+    if (k) params[k] = v || '';
+  }
+  return { item: params.item || null, params };
+}
+
+function writeHash() {
+  const parts = [];
+  if (state.cat && state.cat !== 'all') parts.push('cat=' + encodeURIComponent(state.cat));
+  if (state.q) parts.push('q=' + encodeURIComponent(state.q));
+  const h = parts.join('&');
+  if (h) history.replaceState(null, '', '#' + h);
+  else history.replaceState(null, '', location.pathname);
+}
+
+function applyHash() {
+  const { item, params } = readHash();
+  if (params.cat && CATS[params.cat]) state.cat = params.cat;
+  if (params.q) state.q = decodeURIComponent(params.q);
+  return item;
+}
+
+function filterItems() {
+  const q = state.q.trim().toLowerCase();
+  const out = [];
+  for (const it of state.items) {
+    if (state.cat !== 'all' && it.category !== state.cat) continue;
+    if (q) {
+      const hay = (it.headline + ' ' + it.title + ' ' + it.source_name + ' ' + (it.hashtags || []).join(' ')).toLowerCase();
+      if (!hay.includes(q)) continue;
+    }
+    out.push(it);
+  }
+  return out;
+}
+
+function rowHtml(it) {
+  const cat = it.category || 'lab';
+  const emoji = it.category_emoji || (CATS[cat]?.emoji || '');
+  const ago = timeAgo(it.published_at);
+  const stamp = localTime(it.published_at);
+  const headline = escHtml(it.headline || it.title);
+  const url = escHtml(it.url);
+  const linkDomain = (() => { try { return new URL(it.url).hostname.replace(/^www\./, ''); } catch { return it.url; } })();
+  const summarizedClass = it.summarized ? 'summarized' : '';
+  return `<a class="news-row ${cat} ${summarizedClass}" id="${it.anchor}" href="${url}" target="_blank" rel="noopener">
+    <div class="news-emoji" aria-hidden="true">${emoji}</div>
+    <div class="min-w-0">
+      <div class="news-meta"><span class="src ${cat}">${escHtml(it.source_name)}</span><span class="dot">·</span><span class="ago" title="${escHtml(stamp)}">${ago}</span></div>
+      <div class="news-headline">${headline}</div>
+    </div>
+    <div class="news-link" aria-hidden="true">→ ${escHtml(linkDomain)}</div>
+  </a>`;
+}
+
+function render(highlightAnchor) {
+  const items = filterItems();
+  const list = $('#news-list');
+  const empty = $('#empty-state');
+
+  if (items.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  let html = '';
+  let lastDay = null;
+  for (const it of items) {
+    const d = dayKey(it.published_at);
+    if (d !== lastDay) {
+      html += `<div class="day-header">${escHtml(dayLabel(d))}</div>`;
+      lastDay = d;
+    }
+    html += rowHtml(it);
+  }
+  list.innerHTML = html;
+
+  if (highlightAnchor) {
+    const el = document.getElementById(highlightAnchor);
+    if (el) {
+      el.classList.add('flash');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+}
+
+function updateStatus(d) {
+  const total = (d.items || []).length;
+  const sources = new Set((d.items || []).map(i => i.source_id)).size;
+  $('#stat-total').textContent = total;
+  $('#stat-sources').textContent = sources;
+  $('#stat-fetched').textContent = timeAgo(d.generated_at) + ' ago';
+  $('#stat-fetched-ago').textContent = localTime(d.generated_at);
+  const newest = d.items?.[0];
+  if (newest) {
+    $('#stat-newest').textContent = timeAgo(newest.published_at);
+    $('#stat-newest-src').textContent = newest.source_name;
+  }
+}
+
+const FRESH_WINDOW_MS = 90 * 60 * 1000;
+const DAY_MS = 24 * 3600 * 1000;
+let prevSourceLatest = null;
+
+function buildMarquee(d) {
+  const items = d.items || [];
+  const now = Date.now();
+  const bySource = new Map();
+  for (const it of items) {
+    if (!bySource.has(it.source_id)) {
+      bySource.set(it.source_id, {
+        source_id: it.source_id,
+        source_name: it.source_name,
+        category: it.category,
+        count_24h: 0,
+        latest_at: 0,
+      });
+    }
+    const e = bySource.get(it.source_id);
+    const t = new Date(it.published_at || 0).getTime() || 0;
+    if (now - t < DAY_MS) e.count_24h++;
+    if (t > e.latest_at) e.latest_at = t;
+  }
+  const sorted = Array.from(bySource.values()).sort((a, b) => b.latest_at - a.latest_at);
+
+  const justArrived = (e) => {
+    if (!prevSourceLatest) return false;
+    const prev = prevSourceLatest.get(e.source_id) || 0;
+    return e.latest_at > prev;
+  };
+
+  const pillHtml = (e) => {
+    const recent = (now - e.latest_at < FRESH_WINDOW_MS);
+    const flashOnArrival = justArrived(e);
+    const fresh = (recent || flashOnArrival) ? 'fresh' : '';
+    const cat = e.category || '';
+    const active = state.q && state.q.toLowerCase() === e.source_name.toLowerCase() ? 'active' : '';
+    const ago = e.latest_at ? timeAgo(new Date(e.latest_at).toISOString()) : '—';
+    const title = `${e.source_name} · ${e.count_24h} in 24h · last ${ago} ago`;
+    return `<button class="tick-pill ${cat} ${fresh} ${active}" data-source="${escHtml(e.source_id)}" data-source-name="${escHtml(e.source_name)}" title="${escHtml(title)}">
+      <span>${escHtml(e.source_name)}</span><span class="count ${e.count_24h === 0 ? 'zero' : ''}">${e.count_24h}</span>
+    </button>`;
+  };
+
+  const seq = sorted.map(pillHtml).join('');
+  $('#marquee-track').innerHTML = seq + seq;
+
+  prevSourceLatest = new Map(sorted.map(e => [e.source_id, e.latest_at]));
+}
+
+let firstLoad = true;
+async function load() {
+  try {
+    const r = await fetch(NEWS_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    state.items = (d.items || []).slice().sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''));
+    state.generated_at = d.generated_at;
+    updateStatus(d);
+    buildMarquee(d);
+
+    const targetAnchor = firstLoad ? applyHash() : null;
+    if (firstLoad) {
+      // sync UI controls to hash-derived state
+      $$('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === state.cat));
+      $('#search').value = state.q;
+      $('#search-clear').classList.toggle('visible', !!state.q);
+    }
+
+    // detect new ids since last load (for subtle visual cue)
+    const fresh = !firstLoad
+      ? state.items.filter(it => !state.knownIds.has(it.id)).map(it => it.anchor)
+      : [];
+    state.knownIds = new Set(state.items.map(i => i.id));
+
+    render(targetAnchor);
+
+    // flash newly-arrived items briefly (top of list)
+    if (fresh.length) {
+      for (const a of fresh.slice(0, 5)) {
+        const el = document.getElementById(a);
+        if (el) {
+          el.classList.add('flash');
+          setTimeout(() => el.classList.remove('flash'), 1700);
+        }
+      }
+    }
+    firstLoad = false;
+  } catch (e) {
+    console.error('news load failed:', e);
+  }
+}
+
+// ─── Wiring ──────────────────────────────────────────────────────
+$$('.chip').forEach(c => c.addEventListener('click', () => {
+  $$('.chip').forEach(x => x.classList.remove('active'));
+  c.classList.add('active');
+  state.cat = c.dataset.cat;
+  writeHash();
+  render();
+}));
+
+const searchEl = $('#search');
+const searchClear = $('#search-clear');
+let searchTimer = null;
+searchEl.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const v = searchEl.value;
+  searchClear.classList.toggle('visible', !!v);
+  searchTimer = setTimeout(() => {
+    state.q = v;
+    writeHash();
+    render();
+  }, 80);
+});
+searchClear.addEventListener('click', () => {
+  searchEl.value = '';
+  state.q = '';
+  searchClear.classList.remove('visible');
+  writeHash();
+  render();
+  searchEl.focus();
+});
+
+document.addEventListener('click', (ev) => {
+  const pill = ev.target.closest('.tick-pill');
+  if (!pill) return;
+  const name = pill.dataset.sourceName;
+  if (!name) return;
+  const isActive = pill.classList.contains('active');
+  const newQ = isActive ? '' : name;
+  state.q = newQ;
+  searchEl.value = newQ;
+  searchClear.classList.toggle('visible', !!newQ);
+  state.cat = 'all';
+  $$('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
+  writeHash();
+  render();
+  $$('.tick-pill').forEach(p => p.classList.toggle('active', !isActive && p.dataset.sourceName === name));
+  document.getElementById('news-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+window.addEventListener('hashchange', () => {
+  const { item, params } = readHash();
+  let dirty = false;
+  const newCat = (params.cat && CATS[params.cat]) ? params.cat : 'all';
+  if (newCat !== state.cat) { state.cat = newCat; dirty = true; }
+  const newQ = params.q ? decodeURIComponent(params.q) : '';
+  if (newQ !== state.q) {
+    state.q = newQ;
+    searchEl.value = newQ;
+    searchClear.classList.toggle('visible', !!newQ);
+    dirty = true;
+  }
+  if (dirty) {
+    $$('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === state.cat));
+    render(item);
+  } else if (item) {
+    const el = document.getElementById(item);
+    if (el) {
+      el.classList.add('flash');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => el.classList.remove('flash'), 1700);
+    }
+  }
+});
+
+load();
+setInterval(load, REFRESH_MS);
+</script>
+</body>
+</html>

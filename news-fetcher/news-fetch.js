@@ -124,6 +124,10 @@ async function run() {
     }
   }
 
+  for (const it of byId.values()) {
+    if (!it.anchor) it.anchor = itemAnchor(it.id);
+  }
+
   const grouped = new Map();
   for (const it of byId.values()) {
     if (!grouped.has(it.source_id)) grouped.set(it.source_id, []);
