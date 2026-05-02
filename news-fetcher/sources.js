@@ -22,7 +22,7 @@ export const SOURCES = [
 
   { id: 'hn',           name: 'Hacker News',       type: 'hn',   url: 'https://hacker-news.firebaseio.com/v0',                    category: 'community', summarize: false, hashtag: 'hn' },
 
-  { id: 'simonw',       name: 'Simon Willison',    type: 'rss',  url: 'https://simonwillison.net/atom/everything/',               category: 'writing',   summarize: false, hashtag: 'simonw' },
+  { id: 'simonw',       name: 'Simon Willison',    type: 'rss',  url: 'https://simonwillison.net/atom/everything/',               category: 'writing',   summarize: false, hashtag: 'simonw', aiOnly: true },
   { id: 'latentspace',  name: 'Latent Space',      type: 'rss',  url: 'https://www.latent.space/feed',                            category: 'writing',   summarize: false, hashtag: 'latentspace' },
   { id: 'interconnects', name: 'Interconnects',    type: 'rss',  url: 'https://www.interconnects.ai/feed',                        category: 'writing',   summarize: false, hashtag: 'interconnects' },
 ];
@@ -32,8 +32,20 @@ export const HN_AI_KEYWORDS = [
   'llama', 'mistral', 'hugging face', 'huggingface', 'transformer', 'neural', 'agent',
   'rag', 'fine-tun', 'prompt', 'embedding', 'inference', 'mlops', 'ml ',
   'machine learning', 'machine-learning', 'deep learning', 'deep-learning',
-  'diffusion', 'stable diffusion', 'tokenizer', 'open-source ai', 'open source ai',
+  'language model', 'language-model', 'foundation model', 'multimodal',
+  'diffusion', 'stable diffusion', 'tokenizer', 'tokeniz', 'open-source ai', 'open source ai',
+  'codex', 'chatgpt', 'grok', 'copilot', 'agentic', 'qwen', 'deepseek', 'mlx', 'rlhf',
+  'vibe cod', 'vibe-cod', 'tts', 'voice model', 'speech model',
 ];
+
+// Reused by fetch-rss when source.aiOnly is set: drops items whose title+URL
+// don't match any AI keyword. Description is excluded on purpose — Simon's
+// blog tags (e.g. "ai", "llms") get embedded in description HTML and would
+// false-positive on photography/wildlife posts that happen to be tagged.
+export function matchesAiKeyword(item) {
+  const hay = `${item.title || ''} ${item.url || ''}`.toLowerCase();
+  return HN_AI_KEYWORDS.some(k => hay.includes(k));
+}
 
 export const HN_MIN_SCORE = 100;
 export const HN_TOP_LIMIT = 60;

@@ -1,5 +1,5 @@
 import Parser from 'rss-parser';
-import { USER_AGENT, FETCH_TIMEOUT_MS } from '../sources.js';
+import { USER_AGENT, FETCH_TIMEOUT_MS, matchesAiKeyword } from '../sources.js';
 import { toUtcIso, canonicalUrl, cleanTitle } from './normalize.js';
 
 const parser = new Parser({
@@ -9,11 +9,12 @@ const parser = new Parser({
 
 export async function fetchRss(source) {
   const feed = await parser.parseURL(source.url);
-  const items = (feed.items || []).map(it => ({
+  let items = (feed.items || []).map(it => ({
     title: cleanTitle(it.title || ''),
     url: canonicalUrl(it.link || it.guid || ''),
     published_at: toUtcIso(it.isoDate || it.pubDate || it.published || it.updated),
     description: cleanTitle(it.contentSnippet || it.summary || ''),
   })).filter(it => it.title && it.url);
+  if (source.aiOnly) items = items.filter(matchesAiKeyword);
   return items;
 }
