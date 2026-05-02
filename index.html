@@ -1896,8 +1896,13 @@
       const mkt = s.market_price > 0 ? Math.round(s.market_price * 100) + '%' : '—';
       const ours = s.our_estimate > 0 ? Math.round(s.our_estimate * 100) + '%' : '—';
       const shadowMark = s.shadow ? ' <span style="color:#a78bfa;font-size:10px" title="Shadow signal — not posted to X">🕶</span>' : '';
+      // Live (non-shadow) signals get a deep-link to /signals/sig-XXX. Shadow signals
+      // don't have public landing pages so the # stays plain.
+      const numCell = s.shadow
+        ? `<span class="signal-num">#${s.signal_number}</span>`
+        : `<a href="/signals/${(s.id || '').toLowerCase()}" class="signal-num" style="color:var(--accent);text-decoration:none" title="Open signal page" onclick="event.stopPropagation()">#${s.signal_number}</a>`;
       return `<tr data-signal-id="${s.id}" style="cursor:pointer">
-        <td><span class="signal-num">#${s.signal_number}</span>${shadowMark}</td>
+        <td>${numCell}${shadowMark}</td>
         <td>
           <div class="signal-title">${s.title}</div>
           <div class="signal-cat">${s.category}</div>
