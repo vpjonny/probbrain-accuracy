@@ -15,6 +15,7 @@ import { summarize } from './lib/summarize.js';
 import { loadEnv, require_ } from './lib/env.js';
 import { formatPost, sendMessage } from './lib/telegram.js';
 import { createBlueskyClient, postNewsItem as postBskyItem } from './lib/bluesky.js';
+import { createXClient, pickDigestItems, postDigest as postXDigest } from './lib/x.js';
 import { generateSitemap } from './lib/sitemap.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -26,6 +27,7 @@ const OPPORTUNITIES_JSON = join(REPO_ROOT, 'opportunities.json');
 const PUBLISHED_SIGNALS = join(REPO_ROOT, 'data', 'published_signals.json');
 const LAST_POSTED = join(__dirname, 'last_posted.json');
 const LAST_POSTED_BSKY = join(__dirname, 'last_posted_bsky.json');
+const LAST_POSTED_X = join(__dirname, 'last_posted_x.json');
 const DEFAULT_PER_SOURCE_KEEP = 30;
 const FEED_LIMIT = 60;
 const SUMMARY_MAX_PER_RUN = 8;
@@ -33,6 +35,10 @@ const TELEGRAM_THROTTLE_MS = 1100;
 const TELEGRAM_MAX_PER_RUN = 30;
 const BSKY_THROTTLE_MS = 1100;
 const BSKY_MAX_PER_RUN = 25;
+const X_DIGEST_WINDOW_MS = 2 * 60 * 60 * 1000;
+const X_MIN_INTERVAL_MS = 2 * 60 * 60 * 1000;
+const X_DIGEST_MIN_ITEMS = 3;
+const X_DIGEST_PICK = 3;
 
 const argv = new Set(process.argv.slice(2));
 const DRY_RUN = argv.has('--dry-run');
@@ -40,6 +46,7 @@ const VERBOSE = argv.has('--verbose');
 const NO_POST = argv.has('--no-post');
 const NO_BSKY = argv.has('--no-bsky');
 const NO_TELEGRAM = argv.has('--no-telegram');
+const NO_X = argv.has('--no-x');
 const NO_PUSH = argv.has('--no-push');
 const log = (...a) => console.log(`[${toUtcIso(new Date())}]`, ...a);
 const vlog = (...a) => { if (VERBOSE) log(...a); };
@@ -186,6 +193,7 @@ async function run() {
   if (!NO_POST) {
     if (!NO_TELEGRAM) await postToTelegram(items);
     if (!NO_BSKY)     await postToBluesky(items);
+    if (!NO_X)        await postToX(items);
   }
 
   // Status snapshot reads gitignored last_posted*.json (which we own) and
@@ -204,16 +212,18 @@ async function writeStatusJson(items) {
   const itemById = new Map(items.map(it => [it.id, it]));
   const tg = await readJson(LAST_POSTED, null);
   const bs = await readJson(LAST_POSTED_BSKY, null);
+  const xs = await readJson(LAST_POSTED_X, null);
   const status = {
     generated_at: toUtcIso(new Date()),
     fetcher: { last_run_at: toUtcIso(new Date()), items_count: items.length, new_last_run: items.filter(it => it.discovered_at && (Date.now() - new Date(it.discovered_at).getTime()) < 30 * 60 * 1000).length, expected_cadence_sec: 900 },
     telegram: postChannelStats(tg, itemById),
     bluesky: postChannelStats(bs, itemById),
+    x: postChannelStats(xs, itemById),
   };
   try {
     const { writeFile } = await import('node:fs/promises');
     await writeFile(STATUS_JSON, JSON.stringify(status, null, 2) + '\n', 'utf8');
-    log(`wrote status.json: tg=${status.telegram.posts_24h}/24h p50=${status.telegram.median_latency_sec ?? '—'}s · bsky=${status.bluesky.posts_24h}/24h p50=${status.bluesky.median_latency_sec ?? '—'}s`);
+    log(`wrote status.json: tg=${status.telegram.posts_24h}/24h p50=${status.telegram.median_latency_sec ?? '—'}s · bsky=${status.bluesky.posts_24h}/24h p50=${status.bluesky.median_latency_sec ?? '—'}s · x=${status.x.posts_24h}/24h`);
   } catch (e) {
     log(`status.json write failed: ${e.message}`);
   }
@@ -471,6 +481,62 @@ async function postToBluesky(items) {
     if (i < batch.length - 1) await sleep(BSKY_THROTTLE_MS);
   }
   log(`bluesky: sent=${sent} failed=${failed} posted_total=${Object.keys(posted).length}`);
+}
+
+async function postToX(items) {
+  const client = createXClient();
+  if (!client) {
+    log(`SKIP x: missing X_CONSUMER_KEY/SECRET or X_ACCESS_TOKEN/SECRET in env`);
+    return;
+  }
+
+  const state = await readJson(LAST_POSTED_X, null);
+  const isFirstRun = state === null;
+
+  if (isFirstRun) {
+    const ts = toUtcIso(new Date());
+    const posted = Object.fromEntries(items.map(it => [it.id, null]));
+    const seed = { posted, last_digest_at: null, updated_at: ts, seeded: true };
+    await writeJsonAtomic(LAST_POSTED_X, seed);
+    log(`first-run silent seed: ${Object.keys(posted).length} ids written to last_posted_x.json (no x posts)`);
+    return;
+  }
+
+  const posted = readPostedMap(state);
+  const lastDigestAt = state.last_digest_at ? new Date(state.last_digest_at).getTime() : 0;
+  const now = Date.now();
+
+  if (lastDigestAt && now - lastDigestAt < X_MIN_INTERVAL_MS) {
+    const mins = Math.round((now - lastDigestAt) / 60000);
+    vlog(`x: skip (last digest ${mins}m ago, min ${X_MIN_INTERVAL_MS / 60000}m)`);
+    return;
+  }
+
+  const cutoff = now - X_DIGEST_WINDOW_MS;
+  const candidates = items.filter(it => {
+    if (it.id in posted) return false;
+    const t = it.published_at ? new Date(it.published_at).getTime() : 0;
+    return t >= cutoff;
+  });
+
+  if (candidates.length < X_DIGEST_MIN_ITEMS) {
+    vlog(`x: skip (${candidates.length} unposted items in past 2h, need ≥${X_DIGEST_MIN_ITEMS})`);
+    return;
+  }
+
+  const picked = pickDigestItems(candidates, X_DIGEST_PICK);
+
+  try {
+    const result = await postXDigest(client, picked);
+    const postedAt = toUtcIso(new Date());
+    for (const it of picked) posted[it.id] = postedAt;
+    await writeJsonAtomic(LAST_POSTED_X, { posted, last_digest_at: postedAt, updated_at: postedAt });
+    log(`x: posted digest with ${picked.length} items (tweet_id=${result.id})`);
+    vlog(`  tweet text:\n${result.text}`);
+  } catch (e) {
+    log(`X ERR: ${e.message}`);
+    if (e.data) log(`  details: ${JSON.stringify(e.data).slice(0, 300)}`);
+  }
 }
 
 // Migrate legacy {posted_ids:[]} to {posted:{id:postedAt}} on read. Legacy
