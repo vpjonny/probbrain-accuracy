@@ -14,9 +14,15 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <meta name="theme-color" content="#6366f1">
   <title>ProbBrain — Signal Accuracy Hub</title>
   <meta name="description" content="Live accuracy track record for ProbBrain's Polymarket signals: every call, our calibrated estimate vs. the market, win/loss outcomes, Brier score, and category breakdowns.">
   <link rel="canonical" href="https://probbrain.com/">
+  <link rel="alternate" type="application/rss+xml" title="ProbBrain — Polymarket Signal Feed" href="https://probbrain.com/feed.xml">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -36,6 +42,31 @@
         "description": "Live accuracy track record for ProbBrain's Polymarket signals: every call, calibrated estimate vs. market, win/loss outcomes, Brier score, and category breakdowns.",
         "publisher": {"@id": "https://probbrain.com/#organization"},
         "inLanguage": "en"
+      },
+      {
+        "@type": "Dataset",
+        "@id": "https://probbrain.com/#dataset",
+        "name": "ProbBrain Polymarket Signal Accuracy Track Record",
+        "description": "Live, append-only public track record of every ProbBrain Polymarket signal: calibrated probability estimate vs. market price at publication, win/loss outcome at resolution, Brier score, per-category accuracy, and reliability calibration.",
+        "url": "https://probbrain.com/",
+        "creator": {"@id": "https://probbrain.com/#organization"},
+        "publisher": {"@id": "https://probbrain.com/#organization"},
+        "isAccessibleForFree": true,
+        "inLanguage": "en",
+        "keywords": ["prediction markets", "Polymarket", "calibration", "Brier score", "probability forecasting", "track record"],
+        "distribution": [
+          {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://probbrain.com/accuracy.json"},
+          {"@type": "DataDownload", "encodingFormat": "application/rss+xml", "contentUrl": "https://probbrain.com/feed.xml"}
+        ],
+        "variableMeasured": [
+          "Win/loss outcome",
+          "Calibrated probability estimate",
+          "Market price at signal",
+          "Calibrated gap (percentage points)",
+          "Brier score contribution",
+          "Confidence band",
+          "Resolution timestamp"
+        ]
       }
     ]
   }
@@ -44,8 +75,14 @@
   <meta property="og:description" content="Live accuracy track record for ProbBrain's Polymarket signals: every call, our calibrated estimate vs. the market, win/loss outcomes, Brier score, and category breakdowns.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://probbrain.com/">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@ProbBrain">
+  <meta name="twitter:image" content="https://probbrain.com/og-card.png">
+  <meta property="og:image" content="https://probbrain.com/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="ProbBrain — live Polymarket signal accuracy + arbitrage scanner + AI news">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -92,6 +129,8 @@
 
     /* Header */
     .header {
+      max-width: 1280px;
+      margin: 0 auto;
       border-bottom: 1px solid var(--border);
       padding: 16px 24px;
       display: flex;
@@ -106,16 +145,9 @@
     .header-center {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(234, 179, 8, 0.1);
-      border: 1px solid rgba(234, 179, 8, 0.3);
-      border-radius: 6px;
-      padding: 4px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #eab308;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      gap: 10px;
+      flex: 1 1 auto;
+      justify-content: center;
     }
 
     .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
@@ -277,13 +309,15 @@
       font-size: 0.6rem;
     }
 
+    .ticker-text.ticker-warn { color: #eab308; }
+
     @keyframes ticker {
       0% { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
 
     /* Main */
-    .main { padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+    .main { padding: 28px 24px; max-width: 1280px; margin: 0 auto; }
 
     .section-title {
       font-size: 0.72rem;
@@ -865,7 +899,7 @@
 
     /* History chart */
     .chart-section { margin: 24px 0; }
-    #history-chart svg { width: 100%; height: 220px; max-width: 1100px; display: block; }
+    #history-chart svg { width: 100%; height: 220px; max-width: 1280px; display: block; }
     .chart-line { fill: none; stroke: #3b82f6; stroke-width: 2; }
     .chart-baseline { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
     .chart-axis { stroke: var(--border, #1a1a1a); stroke-width: 1; }
@@ -943,38 +977,7 @@
     .modal .modal-link { color: #3b82f6; text-decoration: none; font-size: 13px; }
     .modal .modal-link:hover { text-decoration: underline; }
 
-    .visit-counter {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 0.72rem;
-      color: var(--muted);
-      z-index: 100;
-      transition: border-color 0.15s, color 0.15s;
-    }
-
-    .visit-counter:hover {
-      border-color: var(--accent);
-      color: var(--text);
-    }
-
-    .visit-counter svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .visit-count { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text); }
-    .visit-label { color: var(--muted); }
-
-    @keyframes countPop {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-      100% { transform: scale(1); }
-    }
-    .visit-counter.loaded { animation: countPop 0.3s ease; }
+    /* Floating Status + visits pills are injected by /assets/page-pills.js */
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -1002,10 +1005,11 @@
       .filter-btn { padding: 5px 10px; font-size: 0.75rem; }
       /* Reliability chart fits within viewport with margin */
       #reliability-chart svg { max-width: 100%; height: 280px; }
-      /* Visit counter doesn't compete with thumb-zone */
-      .visit-counter { bottom: 12px; right: 12px; padding: 4px 9px; font-size: 0.65rem; }
-      /* Header center "kill switches" pill: hide label, keep icon-only feel */
-      .header-center { padding: 3px 8px; font-size: 0.68rem; }
+      /* Pill mobile sizing handled by /assets/page-pills.js */
+      /* Header already has flex-wrap; on narrow screens let the centered logo
+         claim its own row above the side buttons. */
+      .header-center { order: -1; flex: 1 1 100%; justify-content: center; }
+      .header-left, .header-right { flex: 1 1 auto; justify-content: center; flex-wrap: wrap; }
     }
 
     @media (max-width: 400px) {
@@ -1025,19 +1029,21 @@
 
   <header class="header">
     <div class="header-left">
+      <a class="header-cta" href="./news" title="AI news terminal — labs, arXiv, GitHub, HN, writers">
+        📰 News
+      </a>
+      <a class="header-cta" href="https://probbrain.com/arbitrage" title="Polymarket × Kalshi arbitrage scanner">
+        ⚖ Arbitrage
+      </a>
+    </div>
+    <div class="header-center">
       <div class="logo">Prob<span>Brain</span></div>
       <div class="live-badge">
         <div class="pulse-dot"></div>
         Live
       </div>
     </div>
-    <div class="header-center">
-      ⚠ We are still testing and calibrating the system, USE CAUTION
-    </div>
     <div class="header-right">
-      <a class="header-cta" href="https://probbrain.com/arbitrage" title="Polymarket × Kalshi arbitrage scanner">
-        ⚖ Arbitrage
-      </a>
       <a class="header-cta" href="kelly.html" title="Free Polymarket Kelly Criterion calculator">
         🧮 Kelly Calculator
       </a>
@@ -1072,11 +1078,11 @@
       <div class="ticker-segment">
         <span class="ticker-text">Dashboard is updated every 2 hours</span>
         <span class="ticker-sep">&bull;</span>
-        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-text ticker-warn">⚠ We are still testing and calibrating the system — USE CAUTION</span>
         <span class="ticker-sep">&bull;</span>
         <span class="ticker-text">Dashboard is updated every 2 hours</span>
         <span class="ticker-sep">&bull;</span>
-        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-text ticker-warn">⚠ We are still testing and calibrating the system — USE CAUTION</span>
         <span class="ticker-sep">&bull;</span>
         <span class="ticker-text">Dashboard is updated every 2 hours</span>
         <span class="ticker-sep">&bull;</span>
@@ -1084,11 +1090,11 @@
       <div class="ticker-segment">
         <span class="ticker-text">Dashboard is updated every 2 hours</span>
         <span class="ticker-sep">&bull;</span>
-        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-text ticker-warn">⚠ We are still testing and calibrating the system — USE CAUTION</span>
         <span class="ticker-sep">&bull;</span>
         <span class="ticker-text">Dashboard is updated every 2 hours</span>
         <span class="ticker-sep">&bull;</span>
-        <span class="ticker-text">Dashboard is updated every 2 hours</span>
+        <span class="ticker-text ticker-warn">⚠ We are still testing and calibrating the system — USE CAUTION</span>
         <span class="ticker-sep">&bull;</span>
         <span class="ticker-text">Dashboard is updated every 2 hours</span>
         <span class="ticker-sep">&bull;</span>
@@ -1182,11 +1188,12 @@
             <th data-sort="gap">Gap</th>
             <th data-sort="confidence">Confidence</th>
             <th data-sort="status">Status</th>
+            <th data-sort="resolved_at">Resolved</th>
             <th data-sort="close_date">Closes</th>
           </tr>
         </thead>
         <tbody id="signal-body">
-          <tr class="empty-row"><td colspan="9">Loading signals...</td></tr>
+          <tr class="empty-row"><td colspan="10">Loading signals...</td></tr>
         </tbody>
       </table>
       <div class="pagination" id="pagination" style="display:none"></div>
@@ -1221,12 +1228,6 @@
 
   </main>
 
-  <div class="visit-counter" id="visit-counter" title="Total page visits">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-    <span class="visit-count" id="visit-count">—</span>
-    <span class="visit-label">visits</span>
-  </div>
-
   <div class="modal-backdrop" id="signal-modal" role="dialog" aria-hidden="true">
     <div class="modal" id="signal-modal-content"></div>
   </div>
@@ -1235,6 +1236,13 @@
     <div>
       <div id="updated">Loading...</div>
       <div id="last-activity" style="font-size: 11px; color: var(--muted); margin-top: 4px;"></div>
+      <div style="font-size:11px;margin-top:6px;">
+        <a href="/feed.xml" style="color:#f59e0b;text-decoration:none;font-weight:600;" title="RSS feed of recent Polymarket signals">📡 Signals RSS</a>
+        <span style="color:var(--muted2);margin:0 6px;">·</span>
+        <a href="/news.xml" style="color:#f59e0b;text-decoration:none;font-weight:600;" title="RSS feed of recent AI news items">📰 News RSS</a>
+        <span style="color:var(--muted2);margin:0 6px;">·</span>
+        <a href="/status" style="color:var(--muted);text-decoration:none;font-weight:600;" title="Pipeline status & uptime">📊 Status</a>
+      </div>
     </div>
     <div>
       <div class="disclaimer">Not financial advice. All numbers are exact — no rounding up.</div>
@@ -1524,6 +1532,17 @@
           : (sig.polymarket_url === null
               ? `<div class="modal-section-title">Source</div><div class="modal-link" style="color:var(--muted2);cursor:default" title="Polymarket has archived this market's event page after resolution.">Market archived on Polymarket &mdash; no public link</div>`
               : '')}
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+          <a href="/signals/${(sig.id || '').toLowerCase()}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;
+                    background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:#fff;
+                    font-weight:700;font-size:13px;text-decoration:none;
+                    border:1px solid rgba(99,102,241,.6);
+                    box-shadow:0 6px 20px rgba(99,102,241,.25);"
+             title="Open the dedicated page for this signal">
+            Check full signal &rarr;
+          </a>
+        </div>
       `;
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
@@ -1635,7 +1654,14 @@
             streakSub.textContent = 'no resolved signals';
           }
 
-          // Signal table — store globally for pagination/search (newest first)
+          // Signal table — store globally for pagination/search (newest first by publish date).
+          // Each signal also gets _resolvedAt: last price_history timestamp, only set if resolved.
+          // Used by the "Resolved" column sorter.
+          (d.signals || []).forEach(s => {
+            const isResolved = s.status === 'WIN' || s.status === 'LOSS' || s.status === 'delisted';
+            const ph = s.price_history || [];
+            s._resolvedAt = (isResolved && ph.length) ? (ph[ph.length - 1].t || null) : null;
+          });
           window._allSignals = (d.signals || []).slice().sort((a, b) => {
             const da = a.published_at || '';
             const db = b.published_at || '';
@@ -1775,7 +1801,7 @@
         });
     }
 
-    const PAGE_SIZE = 25;
+    const PAGE_SIZE = 10;
 
     // Filter state
     window._statusFilter = 'all'; // 'all', 'resolved', 'pending'
@@ -1796,6 +1822,7 @@
         case 'gap': return (a.calibrated_gap_pct ?? a.gap_pct ?? 0) - (b.calibrated_gap_pct ?? b.gap_pct ?? 0);
         case 'confidence': return (CONF_ORDER[effectiveConfidence(a)] || 0) - (CONF_ORDER[effectiveConfidence(b)] || 0);
         case 'status': return (STATUS_ORDER[a.status] || 0) - (STATUS_ORDER[b.status] || 0);
+        case 'resolved_at': return (a._resolvedAt || '').localeCompare(b._resolvedAt || '');
         case 'close_date': return (a.close_date || '').localeCompare(b.close_date || '');
         default: return 0;
       }
@@ -1842,8 +1869,10 @@
       const mkt = s.market_price > 0 ? Math.round(s.market_price * 100) + '%' : '—';
       const ours = s.our_estimate > 0 ? Math.round(s.our_estimate * 100) + '%' : '—';
       const shadowMark = s.shadow ? ' <span style="color:#a78bfa;font-size:10px" title="Shadow signal — not posted to X">🕶</span>' : '';
+      // Every signal (live + shadow) deep-links to its /signals/sig-XXX page.
+      const numCell = `<a href="/signals/${(s.id || '').toLowerCase()}" class="signal-num" style="color:var(--accent);text-decoration:none" title="Open signal page" onclick="event.stopPropagation()">#${s.signal_number}</a>`;
       return `<tr data-signal-id="${s.id}" style="cursor:pointer">
-        <td><span class="signal-num">#${s.signal_number}</span>${shadowMark}</td>
+        <td>${numCell}${shadowMark}</td>
         <td>
           <div class="signal-title">${s.title}</div>
           <div class="signal-cat">${s.category}</div>
@@ -1854,6 +1883,7 @@
         <td>${gapPill(s.calibrated_gap_pct ?? s.gap_pct)}</td>
         <td>${confBadge(effectiveConfidence(s))}</td>
         <td>${statusBadge(s.status, s)}</td>
+        <td><span class="close-date">${s._resolvedAt ? s._resolvedAt.slice(0, 10) : '—'}</span></td>
         <td><span class="close-date">${s.close_date || '—'}</span></td>
       </tr>`;
     }
@@ -1902,7 +1932,7 @@
 
       if (!filtered.length) {
         const msg = window._searchQuery ? 'No signals match your search.' : 'No signals published yet.';
-        tbody.innerHTML = `<tr class="empty-row"><td colspan="9">${msg}</td></tr>`;
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="10">${msg}</td></tr>`;
         pagination.style.display = 'none';
         pageInfo.textContent = '';
         return;
@@ -2026,23 +2056,9 @@
       });
     });
 
-    // Visit counter — uses abacus.jasoncameron.dev (free, no signup).
-    // Replaced counterapi.dev: their v1 endpoint started returning 503 and v2
-    // requires a registered workspace. Abacus increments+returns on each GET.
-    (function() {
-      fetch('https://abacus.jasoncameron.dev/hit/probbrain-dashboard/visits')
-        .then(r => r.json())
-        .then(d => {
-          if (d && d.value != null) {
-            document.getElementById('visit-count').textContent = d.value.toLocaleString();
-            document.getElementById('visit-counter').classList.add('loaded');
-          }
-        })
-        .catch(() => {});
-    })();
-
     loadData();
     setInterval(loadData, 60000);
   </script>
+  <script src="/assets/page-pills.js" defer></script>
 </body>
 </html>
