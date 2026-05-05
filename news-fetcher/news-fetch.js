@@ -11,6 +11,7 @@ import { fetchHf } from './lib/fetch-hf.js';
 import { fetchGithubTrending } from './lib/fetch-github.js';
 import { fetchSitemap } from './lib/fetch-sitemap.js';
 import { fetchHtmlIndex } from './lib/fetch-html-index.js';
+import { fetchPageMeta } from './lib/fetch-title.js';
 import { summarize } from './lib/summarize.js';
 import { loadEnv, require_ } from './lib/env.js';
 import { formatPost, sendMessage } from './lib/telegram.js';
@@ -31,6 +32,7 @@ const LAST_POSTED_X = join(__dirname, 'last_posted_x.json');
 const DEFAULT_PER_SOURCE_KEEP = 30;
 const FEED_LIMIT = 60;
 const SUMMARY_MAX_PER_RUN = 8;
+const DESC_BACKFILL_MAX_PER_RUN = 12;
 const TELEGRAM_THROTTLE_MS = 1100;
 const TELEGRAM_MAX_PER_RUN = 30;
 const BSKY_THROTTLE_MS = 1100;
@@ -128,6 +130,33 @@ async function run() {
     vlog(`  ${source.id}: fetched=${raw.length} new=${added}`);
   }
 
+  // Backfill descriptions for sitemap/html-index items that predate
+  // og:description extraction. Newest-first so freshly visible items get
+  // their card filled in soonest.
+  const backfillCandidates = [...byId.values()]
+    .filter(it => !it.description)
+    .filter(it => {
+      const s = SOURCES.find(x => x.id === it.source_id);
+      return s && (s.type === 'sitemap' || s.type === 'html-index') && !s.skipDescription;
+    })
+    .sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''))
+    .slice(0, DESC_BACKFILL_MAX_PER_RUN);
+
+  for (const it of backfillCandidates) {
+    if (DRY_RUN) { vlog(`(dry) would backfill desc for ${it.id}`); continue; }
+    const s = SOURCES.find(x => x.id === it.source_id);
+    try {
+      const meta = await fetchPageMeta(it.url, s.title || {});
+      if (meta?.description) {
+        it.description = meta.description;
+        stats.descBackfilled = (stats.descBackfilled || 0) + 1;
+        vlog(`  ✓ desc backfilled ${it.id}`);
+      }
+    } catch (e) {
+      vlog(`  desc backfill failed ${it.id}: ${e.message}`);
+    }
+  }
+
   const toSummarize = [...byId.values()]
     .filter(it => it.summarize && !it.summarized)
     .sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''))
@@ -176,7 +205,7 @@ async function run() {
     log(`(dry) would write news.xml with ${Math.min(items.length, FEED_LIMIT)} items`);
   } else {
     await writeJsonAtomic(NEWS_JSON, out);
-    log(`wrote news.json: ${items.length} items (${stats.new} new, ${stats.summarized} summarized, ${stats.errors} fetch errors, ${stats.summarizeFails} summary errors)`);
+    log(`wrote news.json: ${items.length} items (${stats.new} new, ${stats.summarized} summarized, ${stats.descBackfilled || 0} desc backfilled, ${stats.errors} fetch errors, ${stats.summarizeFails} summary errors)`);
     const { writeFile } = await import('node:fs/promises');
     const xml = renderRssFeed(items.slice(0, FEED_LIMIT));
     await writeFile(NEWS_FEED, xml, 'utf8');

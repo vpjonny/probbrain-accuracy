@@ -1,6 +1,6 @@
 import { USER_AGENT, FETCH_TIMEOUT_MS } from '../sources.js';
 import { toUtcIso, canonicalUrl, cleanTitle, itemId } from './normalize.js';
-import { fetchTitle } from './fetch-title.js';
+import { fetchPageMeta } from './fetch-title.js';
 
 async function fetchText(url) {
   const ctrl = new AbortController();
@@ -46,14 +46,14 @@ export async function fetchSitemap(source, knownIds) {
     const url = canonicalUrl(e.url);
     const id = itemId(source.id, url);
     if (knownIds.has(id)) continue;
-    let title = null;
-    try { title = await fetchTitle(url, source.title || {}); } catch (err) { title = null; }
-    if (!title) continue;
+    let meta = null;
+    try { meta = await fetchPageMeta(url, source.title || {}); } catch (err) { meta = null; }
+    if (!meta?.title) continue;
     out.push({
-      title: cleanTitle(title),
+      title: cleanTitle(meta.title),
       url,
       published_at: toUtcIso(e.lastmod) || toUtcIso(new Date()),
-      description: '',
+      description: source.skipDescription ? '' : (meta.description || ''),
     });
   }
   return out;

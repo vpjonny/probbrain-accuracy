@@ -12,7 +12,10 @@ export const SOURCES = [
   { id: 'deepmind',     name: 'Google DeepMind',   type: 'rss',        url: 'https://deepmind.google/blog/rss.xml',                     category: 'lab',       summarize: false, hashtag: 'deepmind' },
   { id: 'meta-ai',      name: 'Meta AI',           type: 'html-index', url: 'https://ai.meta.com/blog/', urlPattern: '/blog/[^"\'/?#]+/?', excludeRe: ['/blog/(\\?|$|page=|#)'], limit: 20, category: 'lab', summarize: false, hashtag: 'meta' },
   { id: 'mistral',      name: 'Mistral',           type: 'sitemap',    url: 'https://mistral.ai/sitemap.xml', filter: ['/news/'], limit: 25, category: 'lab', summarize: false, hashtag: 'mistral', title: { clean: [' | Mistral AI'] } },
-  { id: 'xai',          name: 'xAI',               type: 'sitemap',    url: 'https://x.ai/sitemap.xml', filter: ['/news/'], limit: 25, category: 'lab', summarize: false, hashtag: 'xai', title: { prefer: ['headline', 'title', 'og', 'twitter'], clean: [' | xAI'] } },
+  // skipDescription: xai serves the same generic site-wide og:description on
+  // every news page ("xAI builds Grok…"), so showing it in the modal would be
+  // identical boilerplate on every item. Drop it.
+  { id: 'xai',          name: 'xAI',               type: 'sitemap',    url: 'https://x.ai/sitemap.xml', filter: ['/news/'], limit: 25, category: 'lab', summarize: false, hashtag: 'xai', skipDescription: true, title: { prefer: ['headline', 'title', 'og', 'twitter'], clean: [' | xAI'] } },
 
   { id: 'arxiv-cs.LG',  name: 'arXiv cs.LG',       type: 'rss',  url: 'https://rss.arxiv.org/rss/cs.LG',                          category: 'paper',     summarize: true,  hashtag: 'arxiv' },
   { id: 'arxiv-cs.CL',  name: 'arXiv cs.CL',       type: 'rss',  url: 'https://rss.arxiv.org/rss/cs.CL',                          category: 'paper',     summarize: true,  hashtag: 'arxiv' },

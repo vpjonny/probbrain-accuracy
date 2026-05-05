@@ -393,6 +393,100 @@
     .header-cta { padding: 6px 10px; font-size: 0.78rem; }
     .social-link { padding: 5px 9px; font-size: 0.75rem; }
   }
+
+  /* ─── News detail modal ─── */
+  .news-modal {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .news-modal[hidden] { display: none; }
+  .news-modal-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: modal-fade .15s ease-out;
+  }
+  .news-modal-card {
+    position: relative;
+    width: 100%; max-width: 580px;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 14px;
+    padding: 28px 28px 24px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(99,102,241,0.08);
+    animation: modal-pop .18s cubic-bezier(.2,.9,.3,1.1);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+  }
+  .news-modal-close {
+    position: absolute; top: 10px; right: 12px;
+    width: 32px; height: 32px;
+    background: transparent; border: 1px solid transparent;
+    color: #666;
+    font-size: 22px; line-height: 1; cursor: pointer;
+    border-radius: 8px;
+    transition: all .12s;
+  }
+  .news-modal-close:hover { color: #e8e8e8; border-color: #2a2a2a; background: #171717; }
+  .news-modal-meta {
+    font-size: 12px; color: #666;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .04em;
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 14px;
+    padding-right: 36px;
+  }
+  .news-modal-meta .emoji { font-size: 16px; }
+  .news-modal-meta .src { font-weight: 600; color: #a0a0a0; }
+  .news-modal-meta .src.lab       { color: #c7d2fe; }
+  .news-modal-meta .src.paper     { color: #a5f3fc; }
+  .news-modal-meta .src.code      { color: #ddd6fe; }
+  .news-modal-meta .src.writing   { color: #bfdbfe; }
+  .news-modal-meta .src.community { color: #fcd9a3; }
+  .news-modal-meta .dot { color: #2a2a2a; padding: 0 2px; }
+  .news-modal-meta .ago { color: #666; }
+  .news-modal-headline {
+    color: #fff;
+    font-size: 22px; line-height: 1.3;
+    font-weight: 700;
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+  }
+  .news-modal-desc {
+    color: #a0a0a0;
+    font-size: 14.5px; line-height: 1.6;
+    margin: 0 0 20px;
+  }
+  .news-modal-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 8px;
+    background: linear-gradient(110deg, #6366f1 0%, #3b82f6 45%, #8b5cf6 100%);
+    background-size: 220% 100%;
+    color: #fff !important; text-decoration: none;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.25),
+      0 4px 16px rgba(99,102,241,0.45);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .news-modal-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 6px 22px rgba(99,102,241,0.6);
+  }
+  @keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modal-pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @media (max-width: 640px) {
+    .news-modal { padding: 12px; }
+    .news-modal-card { padding: 22px 20px 20px; border-radius: 12px; }
+    .news-modal-headline { font-size: 19px; }
+    .news-modal-desc { font-size: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .news-modal-backdrop, .news-modal-card { animation: none; }
+  }
 </style>
 </head>
 
@@ -508,6 +602,7 @@ const state = {
   q: '',
   knownIds: new Set(),
   renderLimit: 15,
+  modalAnchor: null,
 };
 
 const INITIAL_RENDER = 15;
@@ -744,6 +839,85 @@ function buildMarquee(d) {
   prevSourceLatest = new Map(sorted.map(e => [e.source_id, e.latest_at]));
 }
 
+// ─── Modal: brief preview card (deep-link arrival + row click) ───
+function cleanDescription(raw) {
+  if (!raw) return '';
+  let s = String(raw)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (s.length > 320) s = s.slice(0, 319).replace(/\s+\S*$/, '') + '…';
+  return s;
+}
+function descIsRedundant(title, desc) {
+  if (!desc) return true;
+  const t = (title || '').toLowerCase().trim();
+  const d = desc.toLowerCase().trim();
+  if (!t || !d) return !d;
+  if (d.startsWith(t.slice(0, Math.min(50, t.length)))) return true;
+  if (t.startsWith(d.slice(0, Math.min(50, d.length)))) return true;
+  return false;
+}
+function openModal(item) {
+  if (!item) return;
+  state.modalAnchor = item.anchor;
+  const cat = item.category || 'lab';
+  const emoji = item.category_emoji || (CATS[cat]?.emoji || '');
+  const seenIso = item.discovered_at || item.published_at;
+  const ago = timeAgo(seenIso);
+  const stamp = item.discovered_at && item.published_at && item.discovered_at !== item.published_at
+    ? `seen ${localTime(item.discovered_at)} · published ${localTime(item.published_at)}`
+    : localTime(seenIso);
+  $('#news-modal-meta').innerHTML =
+    `<span class="emoji" aria-hidden="true">${emoji}</span>` +
+    `<span class="src ${cat}">${escHtml(item.source_name)}</span>` +
+    `<span class="dot">·</span>` +
+    `<span class="ago" title="${escHtml(stamp)}">${ago}</span>`;
+  $('#news-modal-headline').textContent = item.headline || item.title;
+  const cleaned = cleanDescription(item.description);
+  const descEl = $('#news-modal-desc');
+  if (cleaned && !descIsRedundant(item.headline || item.title, cleaned)) {
+    descEl.textContent = cleaned;
+    descEl.hidden = false;
+  } else {
+    descEl.textContent = '';
+    descEl.hidden = true;
+  }
+  $('#news-modal-cta').href = item.url;
+  $('#news-modal').hidden = false;
+  document.body.style.overflow = 'hidden';
+  if (location.hash !== '#' + item.anchor) {
+    history.pushState({ modal: item.anchor }, '', '#' + item.anchor);
+  }
+  setTimeout(() => $('.news-modal-close')?.focus(), 0);
+}
+function closeModal({ skipHistory = false } = {}) {
+  if (!state.modalAnchor) return;
+  state.modalAnchor = null;
+  $('#news-modal').hidden = true;
+  document.body.style.overflow = '';
+  if (skipHistory) return;
+  if (history.state?.modal) {
+    history.back();
+  } else {
+    writeHash();
+  }
+}
+// Event delegation — modal HTML lives further down in the document and
+// isn't in the DOM yet when this script runs.
+document.addEventListener('click', (ev) => {
+  if (ev.target.closest('[data-modal-close]')) closeModal();
+});
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape' && state.modalAnchor) closeModal();
+});
+
 let firstLoad = true;
 async function load() {
   try {
@@ -777,6 +951,11 @@ async function load() {
     state.knownIds = new Set(state.items.map(i => i.id));
 
     render(targetAnchor);
+
+    if (firstLoad && targetAnchor) {
+      const it = state.items.find(x => x.anchor === targetAnchor);
+      if (it) openModal(it);
+    }
 
     // flash newly-arrived items briefly (top of list)
     if (fresh.length) {
@@ -864,18 +1043,50 @@ window.addEventListener('hashchange', () => {
     resetRenderLimit();
     render(item);
   } else if (item) {
-    const el = document.getElementById(item);
-    if (el) {
-      el.classList.add('flash');
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(() => el.classList.remove('flash'), 1700);
+    const it = state.items.find(x => x.anchor === item);
+    if (it) {
+      openModal(it);
+    } else {
+      const el = document.getElementById(item);
+      if (el) {
+        el.classList.add('flash');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => el.classList.remove('flash'), 1700);
+      }
     }
+  } else if (state.modalAnchor) {
+    closeModal({ skipHistory: true });
   }
+});
+
+// Row click → modal. Modifier-clicks and middle-clicks fall through to the
+// row's href (source URL in a new tab) so power users keep "open original
+// directly" behavior.
+$('#news-list').addEventListener('click', (ev) => {
+  const row = ev.target.closest('.news-row');
+  if (!row) return;
+  if (ev.button !== 0) return;
+  if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+  const it = state.items.find(x => x.anchor === row.id);
+  if (!it) return;
+  ev.preventDefault();
+  openModal(it);
 });
 
 load();
 setInterval(load, REFRESH_MS);
 </script>
+<div id="news-modal" class="news-modal" hidden role="dialog" aria-modal="true" aria-labelledby="news-modal-headline">
+  <div class="news-modal-backdrop" data-modal-close></div>
+  <article class="news-modal-card">
+    <button type="button" class="news-modal-close" aria-label="Close" data-modal-close>×</button>
+    <div class="news-modal-meta" id="news-modal-meta"></div>
+    <h2 class="news-modal-headline" id="news-modal-headline"></h2>
+    <p class="news-modal-desc" id="news-modal-desc" hidden></p>
+    <a class="news-modal-cta" id="news-modal-cta" target="_blank" rel="noopener">Read original ↗</a>
+  </article>
+</div>
+
 <script src="/assets/page-pills.js" defer></script>
 </body>
 </html>

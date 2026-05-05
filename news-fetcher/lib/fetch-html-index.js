@@ -1,6 +1,6 @@
 import { USER_AGENT, FETCH_TIMEOUT_MS } from '../sources.js';
 import { toUtcIso, canonicalUrl, cleanTitle, itemId } from './normalize.js';
-import { fetchTitle } from './fetch-title.js';
+import { fetchPageMeta } from './fetch-title.js';
 
 async function fetchText(url) {
   const ctrl = new AbortController();
@@ -41,14 +41,14 @@ export async function fetchHtmlIndex(source, knownIds) {
   for (const url of picked) {
     const id = itemId(source.id, url);
     if (knownIds.has(id)) continue;
-    let title = null;
-    try { title = await fetchTitle(url, source.title || {}); } catch { title = null; }
-    if (!title) continue;
+    let meta = null;
+    try { meta = await fetchPageMeta(url, source.title || {}); } catch { meta = null; }
+    if (!meta?.title) continue;
     out.push({
-      title: cleanTitle(title),
+      title: cleanTitle(meta.title),
       url,
       published_at: now,
-      description: '',
+      description: source.skipDescription ? '' : (meta.description || ''),
     });
   }
   return out;
