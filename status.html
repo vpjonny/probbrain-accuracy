@@ -222,6 +222,85 @@
     color: #777; font-size: 11.5px;
   }
   .legend .item { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* ─── Pulse strip: tiny dots for every service at-a-glance ─── */
+  .pulse-strip {
+    display: flex; gap: 8px; align-items: center;
+    padding: 12px 16px;
+    background: rgba(17,17,17,.55);
+    border: 1px solid #1a1a1a; border-radius: 12px;
+    backdrop-filter: blur(6px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pulse-strip .ps-cell {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px; border-radius: 8px;
+    background: rgba(255,255,255,.015);
+    border: 1px solid #1a1a1a;
+    font-size: 11.5px; color: #c0c0c0;
+    white-space: nowrap; flex: 0 0 auto;
+    transition: border-color .2s, background .2s;
+  }
+  .pulse-strip .ps-cell.ok   { border-color: rgba(34,197,94,.35); }
+  .pulse-strip .ps-cell.warn { border-color: rgba(245,158,11,.35); }
+  .pulse-strip .ps-cell.bad  { border-color: rgba(239,68,68,.40); }
+  .pulse-strip .ps-cell.idle { border-color: rgba(160,160,160,.20); color: #888; }
+  .pulse-strip .ps-cell .dot { width: 7px; height: 7px; }
+  .pulse-strip .ps-cell .ps-name { font-weight: 600; }
+  .pulse-strip .ps-cell .ps-ago {
+    color: #888; font-size: 10.5px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── Live activity ticker (recent news headlines) ─── */
+  .activity-strip {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    background: rgba(17,17,17,.55);
+    backdrop-filter: blur(6px);
+    height: 40px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .activity-track {
+    display: flex; gap: 24px; align-items: center;
+    height: 100%; padding: 0 24px;
+    width: max-content;
+    animation: activity-slide 90s linear infinite;
+  }
+  .activity-strip:hover .activity-track { animation-play-state: paused; }
+  .activity-strip[data-empty="true"] .activity-track {
+    animation: none; padding-left: 16px;
+  }
+  .activity-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; color: #d8d8d8;
+    text-decoration: none; white-space: nowrap;
+    transition: color .15s;
+  }
+  .activity-item:hover { color: #fff; }
+  .activity-item .a-emoji { font-size: 14px; }
+  .activity-item .a-src {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #888; font-weight: 600;
+    letter-spacing: .04em;
+  }
+  .activity-item .a-sep { color: #2a2a2a; padding: 0 2px; }
+  .activity-item .a-ago {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; color: #666;
+  }
+  @keyframes activity-slide {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .activity-track { animation: none; }
+  }
+
 </style>
 </head>
 <body class="min-h-screen">
@@ -274,39 +353,25 @@
     </p>
     <div class="legend mt-3">
       <span class="item"><span class="dot ok"></span> healthy</span>
-      <span class="item"><span class="dot warn"></span> stale</span>
-      <span class="item"><span class="dot bad"></span> down</span>
+      <span class="item"><span class="dot warn"></span> quiet</span>
+      <span class="item"><span class="dot bad"></span> stalled</span>
       <span class="item"><span class="dot idle"></span> idle</span>
     </div>
   </div>
 
-  <section id="cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <section id="pulse-strip" class="pulse-strip" aria-label="Service health at a glance"></section>
+
+  <section id="cards" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
     <!-- populated by JS -->
   </section>
 
   <section class="mt-10">
-    <h2 class="text-[11px] uppercase tracking-wide text-fg-muted font-bold mb-3">Pipeline diagram</h2>
-    <pre class="text-[12px] leading-relaxed text-fg-dim bg-ink-900/60 border border-ink-700 rounded-xl p-4 overflow-x-auto">
-RSS / sitemaps / HN / HF / GH         Polymarket × Kalshi
-        │                                    │
-        ▼                                    ▼
-  [news-fetcher]  ───► news.json    [scanner] ───► opportunities.json
-        │                                    │
-        ├──► Telegram (@ProbBrain)           └──► /arbitrage page
-        ├──► Bluesky (@probbrain.bsky.social)
-        └──► /news page
-
-  Pollers: systemd user timers · 15-minute cadence
-  Posts: deep-link to probbrain.com/news#&lt;anchor&gt; (anchors pushed before notify)
-    </pre>
+    <h2 class="text-[11px] uppercase tracking-wide text-fg-muted font-bold mb-3">Live activity</h2>
+    <div id="activity-strip" class="activity-strip">
+      <div class="activity-track" id="activity-track"></div>
+    </div>
   </section>
 
-  <footer class="text-[11.5px] text-fg-muted leading-relaxed border-t border-ink-700 pt-4 mt-10 max-w-3xl">
-    Status reflects the most recent successful run of each service. Latency is measured from item-discovery to social-post timestamp,
-    aggregated over the last 24h. Source: <a href="/status.json" class="hover:underline" style="color:#a0a0a0">/status.json</a>,
-    <a href="/news.json" class="hover:underline" style="color:#a0a0a0">/news.json</a>,
-    <a href="/opportunities.json" class="hover:underline" style="color:#a0a0a0">/opportunities.json</a>.
-  </footer>
 </div>
 
 <script>
@@ -339,7 +404,6 @@ function localTime(iso) {
   return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
 }
 function ageMs(iso) { return iso ? Math.max(0, Date.now() - new Date(iso).getTime()) : Infinity; }
-function fmtSec(s) { if (s == null) return '—'; if (s < 60) return s + 's'; const m = Math.round(s/60); if (m < 60) return m + 'm'; return Math.round(m/60) + 'h'; }
 
 // Severity for cron-driven services: ok if last_run < 2× cadence, warn if 2–4×, else bad.
 function freshnessLevel(iso) {
@@ -347,15 +411,6 @@ function freshnessLevel(iso) {
   if (age === Infinity) return 'bad';
   if (age < 2 * CADENCE_SEC * 1000) return 'ok';
   if (age < 4 * CADENCE_SEC * 1000) return 'warn';
-  return 'bad';
-}
-// Severity for posters: green when latency is sub-minute, amber under 5m, red beyond.
-function latencyLevel(median, lastPostAt, fetcherIso, items) {
-  // No posts yet (fresh seeding) → idle (not failing)
-  if (lastPostAt == null) return 'idle';
-  if (median == null) return 'idle';
-  if (median <= 60) return 'ok';
-  if (median <= 300) return 'warn';
   return 'bad';
 }
 
@@ -428,38 +483,18 @@ function buildCards(news, opps, status, signals) {
     });
   }
 
-  // ── Telegram poster ─────────────────────────────────
+  // ── Site / dashboard ─────────────────────────────────
   {
-    const tg = status?.telegram || {};
-    const level = latencyLevel(tg.median_latency_sec, tg.last_post_at);
     cards.push({
-      level, icon: '✉️', name: 'Telegram poster',
-      badge: level === 'idle' ? 'Idle' : level === 'ok' ? 'Operational' : level === 'warn' ? 'Slow' : 'Degraded',
-      ago: tg.last_post_at ? timeAgo(tg.last_post_at) : '—',
-      agoSub: tg.last_post_at ? `last post ${localTime(tg.last_post_at)}` : (tg.seeded ? 'silent-seeded · awaiting first new item' : 'no data'),
+      level: 'ok', icon: '🌐', name: 'probbrain.com',
+      badge: 'Operational',
+      ago: 'live',
+      agoSub: 'static deploy via Vercel',
       metrics: [
-        { label: 'Posts (24h)', value: String(tg.posts_24h ?? 0) },
-        { label: 'Posts total', value: String(tg.posts_total ?? 0), dim: true },
-        { label: 'Median latency', value: fmtSec(tg.median_latency_sec) },
-        { label: 'p95 latency', value: fmtSec(tg.p95_latency_sec), dim: true },
-      ],
-    });
-  }
-
-  // ── Bluesky poster ──────────────────────────────────
-  {
-    const bs = status?.bluesky || {};
-    const level = latencyLevel(bs.median_latency_sec, bs.last_post_at);
-    cards.push({
-      level, icon: '🦋', name: 'Bluesky poster',
-      badge: level === 'idle' ? 'Idle' : level === 'ok' ? 'Operational' : level === 'warn' ? 'Slow' : 'Degraded',
-      ago: bs.last_post_at ? timeAgo(bs.last_post_at) : '—',
-      agoSub: bs.last_post_at ? `last skeet ${localTime(bs.last_post_at)}` : (bs.seeded ? 'silent-seeded · awaiting first new item' : 'no data'),
-      metrics: [
-        { label: 'Posts (24h)', value: String(bs.posts_24h ?? 0) },
-        { label: 'Posts total', value: String(bs.posts_total ?? 0), dim: true },
-        { label: 'Median latency', value: fmtSec(bs.median_latency_sec) },
-        { label: 'p95 latency', value: fmtSec(bs.p95_latency_sec), dim: true },
+        { label: 'Pages', value: '/  /news  /arbitrage  /kelly' },
+        { label: 'CDN', value: 'Vercel Edge', dim: true },
+        { label: 'Cache', value: 'JSON 300s · HTML SWR', dim: true },
+        { label: 'TLS', value: 'HSTS preload', dim: true },
       ],
     });
   }
@@ -486,29 +521,46 @@ function buildCards(news, opps, status, signals) {
     });
   }
 
-  // ── Site / dashboard ─────────────────────────────────
-  {
-    cards.push({
-      level: 'ok', icon: '🌐', name: 'probbrain.com',
-      badge: 'Operational',
-      ago: 'live',
-      agoSub: 'static deploy via Vercel',
-      metrics: [
-        { label: 'Pages', value: '/  /news  /arbitrage  /kelly' },
-        { label: 'CDN', value: 'Vercel Edge', dim: true },
-        { label: 'Cache', value: 'JSON 300s · HTML SWR', dim: true },
-        { label: 'TLS', value: 'HSTS preload', dim: true },
-      ],
-    });
-  }
-
   return cards;
 }
 
 function summarize(cards) {
-  if (cards.some(c => c.level === 'bad'))  return { level: 'bad',  label: 'Service degraded' };
-  if (cards.some(c => c.level === 'warn')) return { level: 'warn', label: 'Stale data on one or more services' };
+  if (cards.some(c => c.level === 'bad'))  return { level: 'bad',  label: 'Service stalled' };
+  if (cards.some(c => c.level === 'warn')) return { level: 'warn', label: 'One or more services quiet' };
   return { level: 'ok', label: 'All systems operational' };
+}
+
+function buildPulseStrip(cards) {
+  return cards.map(c => `<div class="ps-cell ${c.level}">
+    <span class="dot ${c.level}"></span>
+    <span class="ps-name">${escHtml(c.name)}</span>
+    <span class="ps-ago">${escHtml(c.ago)}</span>
+  </div>`).join('');
+}
+
+function buildActivity(news) {
+  const items = (news?.items || []).slice(0, 14);
+  if (!items.length) {
+    return { html: '<div class="activity-item" style="color:#666">no activity yet</div>', empty: true };
+  }
+  const renderOne = it => {
+    const emoji = it.category_emoji || '•';
+    const src = (it.source_name || '').slice(0, 22);
+    const head = (it.headline || it.title || '').slice(0, 90);
+    const ago = it.discovered_at ? timeAgo(it.discovered_at) : '';
+    const url = '/news#' + (it.anchor || '');
+    return `<a class="activity-item" href="${escHtml(url)}">
+      <span class="a-emoji">${escHtml(emoji)}</span>
+      <span class="a-src">${escHtml(src)}</span>
+      <span class="a-sep">·</span>
+      <span>${escHtml(head)}</span>
+      <span class="a-sep">·</span>
+      <span class="a-ago">${escHtml(ago)}</span>
+    </a>`;
+  };
+  // Duplicate the sequence so the CSS marquee can loop seamlessly.
+  const seq = items.map(renderOne).join('');
+  return { html: seq + seq, empty: false };
 }
 
 async function render() {
@@ -521,6 +573,12 @@ async function render() {
 
   const cards = buildCards(news, opps, status, signals);
   $('#cards').innerHTML = cards.map(cardHtml).join('');
+  $('#pulse-strip').innerHTML = buildPulseStrip(cards);
+
+  const activity = buildActivity(news);
+  const stripEl = $('#activity-strip');
+  $('#activity-track').innerHTML = activity.html;
+  stripEl.dataset.empty = activity.empty ? 'true' : 'false';
 
   const sum = summarize(cards);
   const overall = $('#overall');
