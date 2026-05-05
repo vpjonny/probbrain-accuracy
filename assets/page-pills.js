@@ -157,32 +157,51 @@
     .catch(() => {});
 
   // ── Status severity ────────────────────────────────────────────────────
-  if (statusPill) {
-    const CADENCE_MS = 15 * 60 * 1000;
-    const ageMs = iso => iso ? Math.max(0, Date.now() - new Date(iso).getTime()) : Infinity;
-    const fresh = iso => { const a = ageMs(iso); return a < 2 * CADENCE_MS ? 'ok' : a < 4 * CADENCE_MS ? 'warn' : 'bad'; };
-    const lat   = s => s == null ? 'idle' : s <= 60 ? 'ok' : s <= 300 ? 'warn' : 'bad';
+  // Severity is driven by the two cron-managed services that actually have a
+  // health signal: news fetcher (news.json) and arb scanner (opportunities.json).
+  // Telegram/Bluesky/X posters only fire when there's something new to post,
+  // so a quiet stretch isn't a failure — they were the source of the old
+  // false-amber pill across every page.
+  const CADENCE_MS = 15 * 60 * 1000;
+  const ageMs = iso => iso ? Math.max(0, Date.now() - new Date(iso).getTime()) : Infinity;
+  const fresh = iso => { const a = ageMs(iso); return a < 2 * CADENCE_MS ? 'ok' : a < 4 * CADENCE_MS ? 'warn' : 'bad'; };
 
-    Promise.all([
-      fetch('/news.json',          { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch('/opportunities.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch('/status.json',        { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
-    ]).then(([news, opps, status]) => {
-      const levels = [
-        fresh(news?.generated_at),
-        fresh(opps?.generated_at),
-        lat(status?.telegram?.median_latency_sec),
-        lat(status?.bluesky?.median_latency_sec),
-      ];
-      let level = 'ok';
-      if (levels.includes('bad')) level = 'bad';
-      else if (levels.includes('warn')) level = 'warn';
+  function updateHeaderPills(level) {
+    const colors = { ok: '#22c55e', warn: '#f59e0b', bad: '#ef4444' };
+    const labels = { ok: 'Live', warn: 'Quiet', bad: 'Down' };
+    document.querySelectorAll('.pulse-dot').forEach(dot => {
+      dot.style.background = colors[level];
+      const parent = dot.parentElement;
+      if (!parent) return;
+      // Replace the trailing "Live"/"Quiet"/"Down" text node next to the dot.
+      let node = dot.nextSibling;
+      while (node) {
+        if (node.nodeType === 3 && node.textContent.trim()) {
+          node.textContent = node.textContent.replace(/\S.*\S|\S/, labels[level]);
+          break;
+        }
+        node = node.nextSibling;
+      }
+    });
+  }
+
+  Promise.all([
+    fetch('/news.json',          { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch('/opportunities.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([news, opps]) => {
+    const levels = [fresh(news?.generated_at), fresh(opps?.generated_at)];
+    let level = 'ok';
+    if (levels.includes('bad')) level = 'bad';
+    else if (levels.includes('warn')) level = 'warn';
+
+    if (statusPill) {
       statusPill.classList.remove('ok', 'warn', 'bad');
       statusPill.classList.add(level);
       const sub = statusPill.querySelector('[data-pp-sub]');
-      if (sub) sub.textContent = level === 'ok' ? 'live' : level === 'warn' ? 'stale' : 'down';
-    }).catch(() => { /* keep default green */ });
-  }
+      if (sub) sub.textContent = level === 'ok' ? 'live' : level === 'warn' ? 'quiet' : 'down';
+    }
+    updateHeaderPills(level);
+  }).catch(() => { /* keep default green */ });
 
   // ── Bottom-left nav pill ───────────────────────────────────────────────
   // Methodology only — and only on /arbitrage, since that's the only page

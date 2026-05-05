@@ -444,7 +444,6 @@ function buildCards(news, opps, status, signals) {
   {
     const lastRun = opps?.generated_at;
     const level = freshnessLevel(lastRun);
-    const oppCount = opps?.opportunities?.length ?? opps?.stats?.tier1_count != null ? (opps.stats?.tier1_count + opps.stats?.tier2_count + opps.stats?.tier3_count) : null;
     const t1 = opps?.stats?.tier1_count, t2 = opps?.stats?.tier2_count, t3 = opps?.stats?.tier3_count;
     cards.push({
       level, icon: '🛰', name: 'Arbitrage scanner',
@@ -491,7 +490,7 @@ function buildCards(news, opps, status, signals) {
       ago: 'live',
       agoSub: 'static deploy via Vercel',
       metrics: [
-        { label: 'Pages', value: '/  /news  /arbitrage  /kelly' },
+        { label: 'Pages', value: '/  /news  /arbitrage  /kelly  /status' },
         { label: 'CDN', value: 'Vercel Edge', dim: true },
         { label: 'Cache', value: 'JSON 300s · HTML SWR', dim: true },
         { label: 'TLS', value: 'HSTS preload', dim: true },
@@ -500,6 +499,8 @@ function buildCards(news, opps, status, signals) {
   }
 
   // ── Trade signals ───────────────────────────────────
+  // Signals are published opportunistically (bursty), not on a schedule —
+  // so 'ok' if anything has shipped at all, 'idle' only when truly empty.
   {
     const list = Array.isArray(signals) ? signals : [];
     const posted = list.map(s => s.actually_posted_at).filter(Boolean).sort();
@@ -507,8 +508,9 @@ function buildCards(news, opps, status, signals) {
     const cutoff = now - 30 * 86400 * 1000;
     const recent = posted.filter(t => new Date(t).getTime() >= cutoff).length;
     const totalCount = list.length;
+    const level = last ? 'ok' : 'idle';
     cards.push({
-      level: 'idle', icon: '📈', name: 'Trade signals',
+      level, icon: '📈', name: 'Trade signals',
       badge: last ? 'Published' : 'Idle',
       ago: last ? timeAgo(last) : '—',
       agoSub: last ? `last signal ${localTime(last)}` : 'no signals',
