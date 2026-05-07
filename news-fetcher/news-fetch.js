@@ -14,8 +14,8 @@ import { fetchHtmlIndex } from './lib/fetch-html-index.js';
 import { fetchPageMeta } from './lib/fetch-title.js';
 import { summarize } from './lib/summarize.js';
 import { loadEnv, require_ } from './lib/env.js';
-import { formatPost, sendMessage } from './lib/telegram.js';
-import { createBlueskyClient, postNewsItem as postBskyItem } from './lib/bluesky.js';
+import { formatPost, formatDigest as formatTgDigest, sendMessage } from './lib/telegram.js';
+import { createBlueskyClient, postNewsItem as postBskyItem, postDigest as postBskyDigest } from './lib/bluesky.js';
 import { createXClient, pickDigestItems, postDigest as postXDigest } from './lib/x.js';
 import { generateSitemap } from './lib/sitemap.js';
 
@@ -423,6 +423,28 @@ async function postToTelegram(items) {
   }
   const batch = candidates.slice(0, TELEGRAM_MAX_PER_RUN);
 
+  // Digest path: when 2+ fresh items, send ONE rolled-up message instead of
+  // N individual messages so the channel doesn't get spammed.
+  if (batch.length > 1) {
+    const text = formatTgDigest(batch);
+    try {
+      await sendMessage({ ...creds, text });
+      const postedAt = toUtcIso(new Date());
+      for (const it of batch) posted[it.id] = postedAt;
+      await writeJsonAtomic(LAST_POSTED, { posted, updated_at: postedAt });
+      log(`telegram: sent 1 digest with ${batch.length} items posted_total=${Object.keys(posted).length}`);
+    } catch (e) {
+      log(`TG DIGEST ERR: ${e.message}`);
+      if (e.body && e.body.error_code === 429) {
+        const wait = (e.body.parameters?.retry_after || 30) * 1000;
+        log(`telegram 429 — sleeping ${wait}ms`);
+        await sleep(wait);
+      }
+    }
+    return;
+  }
+
+  // Single-item path: 1 fresh item → post normally.
   let sent = 0, failed = 0;
   for (let i = 0; i < batch.length; i++) {
     const it = batch[i];
@@ -488,6 +510,28 @@ async function postToBluesky(items) {
   }
   const batch = candidates.slice(0, BSKY_MAX_PER_RUN);
 
+  // Digest path: 2+ fresh items → one rolled-up post (Bluesky has a 300-char
+  // cap so the digest only includes as many items as fit; we still mark all
+  // batch items as posted so they don't try to repost individually next run).
+  if (batch.length > 1) {
+    try {
+      await postBskyDigest(session.agent, batch);
+      const postedAt = toUtcIso(new Date());
+      for (const it of batch) posted[it.id] = postedAt;
+      await writeJsonAtomic(LAST_POSTED_BSKY, { posted, updated_at: postedAt, handle: session.creds.handle });
+      log(`bluesky: sent 1 digest with ${batch.length} items posted_total=${Object.keys(posted).length}`);
+    } catch (e) {
+      log(`BSKY DIGEST ERR: ${e.message}`);
+      const status = e.status || e.statusCode;
+      if (status === 429) {
+        log(`bluesky 429 — sleeping 60s`);
+        await sleep(60_000);
+      }
+    }
+    return;
+  }
+
+  // Single-item path: 1 fresh item → post normally with per-item embed card.
   let sent = 0, failed = 0;
   for (let i = 0; i < batch.length; i++) {
     const it = batch[i];

@@ -70,6 +70,35 @@ export function formatPost(item) {
   return lines.join('\n\n');
 }
 
+// Build a single digest message bundling many items into one Telegram post.
+// Used when the run produces 2+ fresh items so the channel gets one rolled-up
+// message instead of N separate ones. Telegram's text limit is 4096 chars —
+// generous, but we still cap at MAX_DIGEST_ITEMS so a flood doesn't paste an
+// unreadable wall.
+const MAX_DIGEST_ITEMS = 12;
+
+export function formatDigest(items) {
+  const list = items.slice(0, MAX_DIGEST_ITEMS);
+  const lines = [`🆕 <b>AI news (last 15m):</b>`, ''];
+  for (const it of list) {
+    const head = (it.headline || it.title || '').trim();
+    if (!head) continue;
+    const src = (it.source_name || '').trim();
+    const emoji = it.category_emoji || '';
+    const anchor = itemAnchor(it.id);
+    const link = `${NEWS_PAGE}#${anchor}`;
+    const srcTag = src ? ` — ${emoji} <i>${escapeHtml(src)}</i>` : '';
+    lines.push(`• <a href="${link}"><b>${escapeHtml(head)}</b></a>${srcTag}`);
+  }
+  if (items.length > MAX_DIGEST_ITEMS) {
+    lines.push('');
+    lines.push(`<i>+${items.length - MAX_DIGEST_ITEMS} more on probbrain.com/news</i>`);
+  }
+  lines.push('');
+  lines.push(`→ <a href="${NEWS_PAGE}">probbrain.com/news</a>`);
+  return lines.join('\n');
+}
+
 export async function sendMessage({ token, chat_id, text }) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), SEND_TIMEOUT_MS);
