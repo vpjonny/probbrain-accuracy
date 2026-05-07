@@ -503,7 +503,7 @@ function buildCards(news, opps, status, signals) {
   // so 'ok' if anything has shipped at all, 'idle' only when truly empty.
   {
     const list = Array.isArray(signals) ? signals : [];
-    const posted = list.map(s => s.actually_posted_at).filter(Boolean).sort();
+    const posted = list.map(s => s.actually_posted_at || s.published_at).filter(Boolean).sort();
     const last = posted[posted.length - 1];
     const cutoff = now - 30 * 86400 * 1000;
     const recent = posted.filter(t => new Date(t).getTime() >= cutoff).length;
