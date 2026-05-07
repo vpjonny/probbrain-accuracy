@@ -138,6 +138,22 @@
     70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); transform: scale(1.05); }
     100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); transform: scale(1); }
   }
+  .header-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border-radius: 6px;
+    background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(139,92,246,.12));
+    border: 1px solid rgba(99,102,241,.32);
+    color: #e8e8e8; text-decoration: none; font-size: 0.82rem; font-weight: 600;
+    transition: border-color .15s, background .15s;
+  }
+  .header-cta:hover { border-color: rgba(99,102,241,.6); background: linear-gradient(135deg, rgba(99,102,241,.28), rgba(139,92,246,.18)); }
+  .social-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border-radius: 6px;
+    border: 1px solid #2a2a2a; background: #1a1a1a; color: #e8e8e8;
+    text-decoration: none; font-size: 0.82rem; font-weight: 500;
+  }
+  .social-link svg { width: 13px; height: 13px; }
 
   /* ─── Inputs ─── */
   input[type="number"], select, input[type="range"] { background: #1a1a1a; color: #e8e8e8; border: 1px solid #222; }
@@ -360,17 +376,25 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
   <!-- Header -->
-  <header class="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-ink-600">
-    <div class="flex items-center gap-3">
-      <div class="text-xl font-extrabold tracking-tight">Prob<span class="text-accent">Brain</span></div>
-      <div class="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/40 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-accent">🧮 Tool</div>
-      <div class="inline-flex items-center gap-1.5 bg-[#0f2010] border border-[#1a4020] rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-ok">
+  <header class="flex items-center flex-wrap gap-3 pb-4 border-b border-ink-600">
+    <div class="flex items-center gap-2">
+      <a class="header-cta" href="/news">📰 News</a>
+      <a class="header-cta" href="/arbitrage">⚖ Arbitrage</a>
+      <a class="header-cta" href="/signals">📊 Signals</a>
+    </div>
+    <div class="flex items-center justify-center gap-3 flex-1 basis-full md:basis-auto order-first md:order-none">
+      <a href="/" class="text-xl font-extrabold tracking-tight">Prob<span class="text-accent">Brain</span></a>
+      <span class="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/40 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-accent">🧮 Tool</span>
+      <span class="inline-flex items-center gap-1.5 bg-[#0f2010] border border-[#1a4020] rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase text-ok">
         <span class="pulse-dot"></span>Live
-      </div>
+      </span>
     </div>
     <div class="flex items-center gap-2">
-      <a href="https://probbrain.com/arbitrage" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">⚖ Arbitrage</a>
-      <a href="./" class="text-sm text-fg-dim hover:text-fg border border-ink-600 hover:border-accent rounded-md px-3 py-1.5 transition-colors">← back to dashboard</a>
+      <a class="header-cta" href="/kelly">🧮 Kelly Calculator</a>
+      <a class="social-link" href="https://x.com/ProbBrain" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
     </div>
   </header>
 
