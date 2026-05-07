@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XJEDNGMEV6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XJEDNGMEV6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<meta name="theme-color" content="#6366f1">
+<title>All Signals — ProbBrain Polymarket Tracker (101 live calls)</title>
+<meta name="description" content="Browse all 101 ProbBrain Polymarket signals — live calls, market vs our estimate, calibrated gap, and resolution status. 37 resolved, 16 correct.">
+<meta property="og:title" content="All ProbBrain Signals — Polymarket Tracker">
+<meta property="og:description" content="Browse all 101 ProbBrain Polymarket signals — live calls, market vs our estimate, calibrated gap, and resolution status. 37 resolved, 16 correct.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://probbrain.com/signals">
+<meta property="og:image" content="https://probbrain.com/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ProbBrain">
+<meta name="twitter:image" content="https://probbrain.com/og-card.png">
+<link rel="canonical" href="https://probbrain.com/signals">
+<link rel="alternate" type="application/rss+xml" title="ProbBrain Signal Feed" href="https://probbrain.com/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          ink:    { 950: '#0a0a0a', 900: '#111111', 800: '#171717', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a' },
+          fg:     { DEFAULT: '#e8e8e8', dim: '#a0a0a0', muted: '#666666' },
+          ok:     '#22c55e',
+          warn:   '#f59e0b',
+          bad:    '#ef4444',
+          accent: '#6366f1',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CollectionPage", "name": "All ProbBrain Signals", "description": "Browse all 101 ProbBrain Polymarket signals — live calls, market vs our estimate, calibrated gap, and resolution status. 37 resolved, 16 correct.", "url": "https://probbrain.com/signals", "isPartOf": {"@id": "https://probbrain.com/#dataset"}, "dateModified": "2026-05-07"}</script>
+<style>
+  body { background:#0a0a0a; color:#e8e8e8; font-family:'Inter',system-ui,sans-serif;
+         -webkit-font-smoothing:antialiased;
+         font-feature-settings:'cv11' 1,'ss01' 1; }
+  .num { font-family:'JetBrains Mono',ui-monospace,monospace; font-feature-settings:'tnum' 1,'zero' 1; }
+  .signal-card {
+    display:block; padding:14px 16px;
+    background:#111; border:1px solid #222; border-radius:8px;
+    text-decoration:none; transition:border-color .15s, transform .15s, background-color .15s;
+  }
+  .signal-card:hover { border-color:#6366f1; background:#141420; transform:translateY(-1px); }
+  .text-ok { color:#22c55e; } .text-warn { color:#f59e0b; } .text-bad { color:#ef4444; }
+  .text-accent { color:#6366f1; }
+  .text-fg-dim { color:#a0a0a0; } .text-fg-muted { color:#666; }
+</style>
+</head>
+<body class="min-h-screen">
+  <header class="border-b border-ink-600 bg-ink-900/80 backdrop-blur sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <a href="/" class="text-fg font-bold tracking-tight text-lg">Prob<span class="text-accent">Brain</span></a>
+      <nav class="flex items-center gap-3 text-xs text-fg-dim">
+        <a href="/" class="hover:text-fg">Dashboard</a>
+        <a href="/arbitrage" class="hover:text-fg">Arbitrage</a>
+        <a href="/kelly" class="hover:text-fg">Kelly</a>
+        <a href="/methodology" class="hover:text-fg">Methodology</a>
+        <a href="/news" class="hover:text-fg">News</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    <div class="mb-8">
+      <div class="text-xs text-fg-dim mb-2"><a href="/" class="hover:text-fg">Dashboard</a> / <span class="text-fg">All signals</span></div>
+      <h1 class="text-2xl md:text-3xl font-bold text-fg mb-3">All ProbBrain Signals</h1>
+      <p class="text-fg-dim text-sm leading-relaxed max-w-2xl">
+        Every Polymarket signal we've ever published — live calls, calibrated edge,
+        and verifiable resolution. Click any signal for the full record (evidence,
+        counter-evidence, market price history, Polymarket link).
+      </p>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-xs">
+        <span class="text-fg-muted">Total <span class="num text-fg font-semibold">101</span></span>
+        <span class="text-fg-muted">Pending <span class="num text-warn font-semibold">64</span></span>
+        <span class="text-fg-muted">Resolved <span class="num text-fg font-semibold">37</span></span>
+        <span class="text-fg-muted">Correct <span class="num text-ok font-semibold">16</span></span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <a href="/signals/sig-110" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-110</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">finance</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Fed rate hike in 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">4%</span></span>
+            <span>Gap <span class="num text-fg">+5.2pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-09</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-109" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-109</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Paloma Valencia win the 2026 Colombian presidential election?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">20%</span></span>
+            <span>Gap <span class="num text-fg">+0.2pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-21</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-108" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-108</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">science</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the US confirm that aliens exist before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">100%</span></span>
+            <span>Gap <span class="num text-fg">+6.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-107" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-107</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran diplomatic meeting by May 15, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">21%</span></span>
+            <span>Gap <span class="num text-fg">+0.2pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-106" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-106</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will JD Vance win the 2028 US Presidential Election?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">21%</span></span>
+            <span>Gap <span class="num text-fg">+0.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2028-11-07</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-105" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-105</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Miguel Díaz-Canel out as leader of Cuba by June 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">18%</span></span>
+            <span>Gap <span class="num text-fg">+3.3pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-104" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-104</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran permanent peace deal by May 31, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">18%</span></span>
+            <span>Gap <span class="num text-fg">+3.4pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-103" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-103</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Jordan Bardella win the 2027 French presidential election?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">22%</span></span>
+            <span>Gap <span class="num text-fg">+0.2pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2027-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-102" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-102</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Édouard Philippe win the 2027 French presidential election?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">20%</span></span>
+            <span>Gap <span class="num text-fg">+1.1pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2027-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-101" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-101</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Marco Rubio win the 2028 Republican presidential nomination?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">22%</span></span>
+            <span>Gap <span class="num text-fg">+0.1pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2028-11-07</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-100" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-100</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/40 border border-violet-500/40 text-violet-300 uppercase tracking-wider">shadow</span>
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">SHADOW</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Delcy Rodríguez be the leader of Venezuela end of 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">17%</span></span>
+            <span>Gap <span class="num text-fg">+3.4pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-099" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-099</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">tech</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will GitLab be acquired before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">23%</span></span>
+            <span>Ours <span class="num text-fg">5%</span></span>
+            <span>Gap <span class="num text-fg">+18.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-098" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-098</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">finance</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will BP be acquired before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">3%</span></span>
+            <span>Gap <span class="num text-fg">+17.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-097" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-097</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran permanent peace deal by April 30, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">28%</span></span>
+            <span>Ours <span class="num text-fg">5%</span></span>
+            <span>Gap <span class="num text-fg">+22.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-096" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-096</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran agrees to surrender enriched uranium stockpile by June 30, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">32%</span></span>
+            <span>Ours <span class="num text-fg">7%</span></span>
+            <span>Gap <span class="num text-fg">+24.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-095" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-095</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">JD Vance diplomatic meeting with Iran by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">72%</span></span>
+            <span>Ours <span class="num text-fg">85%</span></span>
+            <span>Gap <span class="num text-fg">+13.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-094" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-094</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">crypto</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Bitcoin dip to $55,000 in April?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">16%</span></span>
+            <span>Ours <span class="num text-fg">5%</span></span>
+            <span>Gap <span class="num text-fg">+10.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-093" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-093</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran ceasefire by May 15?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">44%</span></span>
+            <span>Ours <span class="num text-fg">15%</span></span>
+            <span>Gap <span class="num text-fg">+29.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-092" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-092</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Trump out as President by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">2%</span></span>
+            <span>Ours <span class="num text-fg">0%</span></span>
+            <span>Gap <span class="num text-fg">+1.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-091" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-091</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">commodities</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will WTI Crude Oil (WTI) hit (HIGH) $200 in April?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">4%</span></span>
+            <span>Ours <span class="num text-fg">2%</span></span>
+            <span>Gap <span class="num text-fg">+2.4pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-090" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-090</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Kharg Island no longer under Iranian control by April 15?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">13%</span></span>
+            <span>Ours <span class="num text-fg">4%</span></span>
+            <span>Gap <span class="num text-fg">+9.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-089" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-089</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">commodities</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will WTI Crude Oil (WTI) hit (HIGH) $160 in April?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">14%</span></span>
+            <span>Ours <span class="num text-fg">5%</span></span>
+            <span>Gap <span class="num text-fg">+8.6pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-088" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-088</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">commodities</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will WTI Crude Oil (WTI) hit (LOW) $70 in April?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">7%</span></span>
+            <span>Ours <span class="num text-fg">1%</span></span>
+            <span>Gap <span class="num text-fg">+6.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-087" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-087</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US-Iran nuclear deal by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">9%</span></span>
+            <span>Ours <span class="num text-fg">2%</span></span>
+            <span>Gap <span class="num text-fg">+7.7pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-086" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-086</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Kharg Island no longer under Iranian control by May 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">26%</span></span>
+            <span>Ours <span class="num text-fg">10%</span></span>
+            <span>Gap <span class="num text-fg">+16.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-085" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-085</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran leadership change by June 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">19%</span></span>
+            <span>Ours <span class="num text-fg">8%</span></span>
+            <span>Gap <span class="num text-fg">+11.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-084" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-084</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US-Iran nuclear deal by June 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">26%</span></span>
+            <span>Ours <span class="num text-fg">6%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-083" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-083</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the Kharg Island oil terminal be hit by April 15?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">23%</span></span>
+            <span>Ours <span class="num text-fg">13%</span></span>
+            <span>Gap <span class="num text-fg">+10.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-082" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-082</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Trump announces end of military operations against Iran by April 15th?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">14%</span></span>
+            <span>Ours <span class="num text-fg">7%</span></span>
+            <span>Gap <span class="num text-fg">+7.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-081" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-081</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran leadership change by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">11%</span></span>
+            <span>Ours <span class="num text-fg">3%</span></span>
+            <span>Gap <span class="num text-fg">+8.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-080" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-080</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">commodities</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will WTI Crude Oil (WTI) hit (LOW) $80 in April?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">24%</span></span>
+            <span>Ours <span class="num text-fg">5%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-01</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-079" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-079</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran meeting by April 30, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">30%</span></span>
+            <span>Ours <span class="num text-fg">18%</span></span>
+            <span>Gap <span class="num text-fg">+11.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-078" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-078</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US strike on Cuba by December 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">20%</span></span>
+            <span>Gap <span class="num text-fg">+13.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-077" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-077</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">other</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Canada recession before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">40%</span></span>
+            <span>Ours <span class="num text-fg">27%</span></span>
+            <span>Gap <span class="num text-fg">+13.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-076" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-076</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US obtains Iranian enriched uranium by May 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">14%</span></span>
+            <span>Ours <span class="num text-fg">4%</span></span>
+            <span>Gap <span class="num text-fg">+10.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-075" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-075</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Israel launch a ground operation in Iran by April 30, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">30%</span></span>
+            <span>Ours <span class="num text-fg">10%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-074" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-074</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will UAE strike Iran by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">24%</span></span>
+            <span>Ours <span class="num text-fg">6%</span></span>
+            <span>Gap <span class="num text-fg">+17.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-073" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-073</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran leadership change by December 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">40%</span></span>
+            <span>Ours <span class="num text-fg">18%</span></span>
+            <span>Gap <span class="num text-fg">+21.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-072" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-072</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Strait of Hormuz traffic returns to normal by end of May?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">30%</span></span>
+            <span>Ours <span class="num text-fg">11%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-070" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-070</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Kharg Island no longer under Iranian control by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">8%</span></span>
+            <span>Gap <span class="num text-fg">+11.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-069" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-069</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran x Israel/US conflict ends by June 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">55%</span></span>
+            <span>Ours <span class="num text-fg">30%</span></span>
+            <span>Gap <span class="num text-fg">+24.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-068" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-068</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran x Israel/US conflict ends by May 15?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">28%</span></span>
+            <span>Ours <span class="num text-fg">8%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-067" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-067</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Trump announces end of military operations against Iran by June 30th?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">69%</span></span>
+            <span>Ours <span class="num text-fg">55%</span></span>
+            <span>Gap <span class="num text-fg">+14.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-066" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-066</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Trump announces end of military operations against Iran by April 30th?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">22%</span></span>
+            <span>Gap <span class="num text-fg">+11.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-065" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-065</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran ceasefire by December 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">70%</span></span>
+            <span>Ours <span class="num text-fg">55%</span></span>
+            <span>Gap <span class="num text-fg">+14.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-064" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-064</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US × Iran ceasefire by June 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">46%</span></span>
+            <span>Ours <span class="num text-fg">30%</span></span>
+            <span>Gap <span class="num text-fg">+16.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-063" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-063</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran ceasefire by May 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">18%</span></span>
+            <span>Gap <span class="num text-fg">+16.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-062" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-062</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran ceasefire before Oil hits $120?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">18%</span></span>
+            <span>Ours <span class="num text-fg">7%</span></span>
+            <span>Gap <span class="num text-fg">+10.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-061" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-061</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Trump be impeached by end of 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">12%</span></span>
+            <span>Ours <span class="num text-fg">3%</span></span>
+            <span>Gap <span class="num text-fg">+9.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-060" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-060</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Erdoğan out by December 31, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">16%</span></span>
+            <span>Ours <span class="num text-fg">7%</span></span>
+            <span>Gap <span class="num text-fg">+9.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-059" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-059</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the next Prime Minister of Hungary be Péter Magyar?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">66%</span></span>
+            <span>Ours <span class="num text-fg">82%</span></span>
+            <span>Gap <span class="num text-fg">+15.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-12</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-058" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-058</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will TISZA win the most seats in the next Hungarian parliamentary election?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">70%</span></span>
+            <span>Ours <span class="num text-fg">82%</span></span>
+            <span>Gap <span class="num text-fg">+12.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-12</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-057" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-057</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will a province schedule a referendum to leave Canada before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">74%</span></span>
+            <span>Ours <span class="num text-fg">95%</span></span>
+            <span>Gap <span class="num text-fg">+20.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-052" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-052</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will China invade Taiwan by end of 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">10%</span></span>
+            <span>Ours <span class="num text-fg">2%</span></span>
+            <span>Gap <span class="num text-fg">+7.9pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-051" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-051</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the Iranian regime fall by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">55%</span></span>
+            <span>Ours <span class="num text-fg">20%</span></span>
+            <span>Gap <span class="num text-fg">+34.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-050" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-050</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will US forces enter Iran by December 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">74%</span></span>
+            <span>Ours <span class="num text-fg">92%</span></span>
+            <span>Gap <span class="num text-fg">+17.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-049" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-049</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Russia-Ukraine ceasefire be reached before GTA VI releases?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">54%</span></span>
+            <span>Ours <span class="num text-fg">20%</span></span>
+            <span>Gap <span class="num text-fg">+33.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-09-04</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-048" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-048</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">crypto</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Bitcoin hit $1M before GTA VI?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">49%</span></span>
+            <span>Ours <span class="num text-fg">0%</span></span>
+            <span>Gap <span class="num text-fg">+48.4pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-08-22</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-047" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-047</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will China invade Taiwan before GTA VI releases?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">52%</span></span>
+            <span>Ours <span class="num text-fg">15%</span></span>
+            <span>Gap <span class="num text-fg">+37.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-07-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-045" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-045</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Billionaire one-time wealth tax passes in California election 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">45%</span></span>
+            <span>Gap <span class="num text-fg">+11.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-11-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-044" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-044</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">general</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Houthi strike on Israel by March 31, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">18%</span></span>
+            <span>Ours <span class="num text-fg">100%</span></span>
+            <span>Gap <span class="num text-fg">+81.9pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-03-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-043" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-043</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">general</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Predators vs. Lightning</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">36%</span></span>
+            <span>Ours <span class="num text-fg">38%</span></span>
+            <span>Gap <span class="num text-fg">+2.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-03-29T21:00:00+00:00</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-041" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-041</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the U.S. invade Cuba in 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">24%</span></span>
+            <span>Ours <span class="num text-fg">45%</span></span>
+            <span>Gap <span class="num text-fg">+21.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-040" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-040</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Strait of Hormuz traffic returns to normal by end of April?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">24%</span></span>
+            <span>Ours <span class="num text-fg">11%</span></span>
+            <span>Gap <span class="num text-fg">+12.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-039" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-039</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the U.S. invade Iran before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">64%</span></span>
+            <span>Ours <span class="num text-fg">4%</span></span>
+            <span>Gap <span class="num text-fg">+59.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-038" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-038</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Mavericks vs. Bucks?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">31%</span></span>
+            <span>Ours <span class="num text-fg">48%</span></span>
+            <span>Gap <span class="num text-fg">+17.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-01-25</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-037" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-037</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Zelenskyy out as Ukraine president by end of 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">8%</span></span>
+            <span>Gap <span class="num text-fg">+11.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-036" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-036</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the Republican Party control the House after the 2026 Midterm elections?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">16%</span></span>
+            <span>Ours <span class="num text-fg">31%</span></span>
+            <span>Gap <span class="num text-fg">+15.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-11-03</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-035" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-035</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the Democratic Party control the House after the 2026 Midterm elections?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">84%</span></span>
+            <span>Ours <span class="num text-fg">69%</span></span>
+            <span>Gap <span class="num text-fg">+15.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-11-03</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-034" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-034</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">general</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Tennessee Volunteers vs. Michigan Wolverines</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">22%</span></span>
+            <span>Ours <span class="num text-fg">26%</span></span>
+            <span>Gap <span class="num text-fg">+3.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-03-29T16:00:00+00:00</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-033" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-033</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Billionaire one-time wealth tax passes in California election 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">36%</span></span>
+            <span>Ours <span class="num text-fg">22%</span></span>
+            <span>Gap <span class="num text-fg">+13.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-11-03</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-032" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-032</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">general</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Trump out as President before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">18%</span></span>
+            <span>Ours <span class="num text-fg">2%</span></span>
+            <span>Gap <span class="num text-fg">+15.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-031" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-031</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the US acquire any part of Greenland in 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">16%</span></span>
+            <span>Ours <span class="num text-fg">5%</span></span>
+            <span>Gap <span class="num text-fg">+11.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-030" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-030</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the Iranian regime fall by June 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">20%</span></span>
+            <span>Ours <span class="num text-fg">8%</span></span>
+            <span>Gap <span class="num text-fg">+12.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-029" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-029</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US × Iran ceasefire by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">40%</span></span>
+            <span>Ours <span class="num text-fg">15%</span></span>
+            <span>Gap <span class="num text-fg">+25.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-028" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-028</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US × Iran ceasefire by April 15?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">28%</span></span>
+            <span>Ours <span class="num text-fg">9%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-027" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-027</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US × Iran ceasefire by April 7?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">14%</span></span>
+            <span>Ours <span class="num text-fg">3%</span></span>
+            <span>Gap <span class="num text-fg">+11.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-07</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-026" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-026</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US × Iran ceasefire by April 7?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">14%</span></span>
+            <span>Ours <span class="num text-fg">3%</span></span>
+            <span>Gap <span class="num text-fg">+10.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-07</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-024" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-024</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the DHS shutdown end after March 31, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">46%</span></span>
+            <span>Ours <span class="num text-fg">65%</span></span>
+            <span>Gap <span class="num text-fg">+18.9pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-03-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-023" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-023</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Keir Starmer be out as UK PM by June 30, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">44%</span></span>
+            <span>Ours <span class="num text-fg">20%</span></span>
+            <span>Gap <span class="num text-fg">+24.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-022" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-022</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US forces enter Iran by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">64%</span></span>
+            <span>Ours <span class="num text-fg">38%</span></span>
+            <span>Gap <span class="num text-fg">+25.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-021" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-021</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran ceasefire by April 30?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">44%</span></span>
+            <span>Ours <span class="num text-fg">8%</span></span>
+            <span>Gap <span class="num text-fg">+36.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-020" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-020</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US x Iran ceasefire by April 15?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">8%</span></span>
+            <span>Gap <span class="num text-fg">+25.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-019" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-019</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the Colorado Avalanche win the 2026 NHL Stanley Cup?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">19%</span></span>
+            <span>Ours <span class="num text-fg">28%</span></span>
+            <span>Gap <span class="num text-fg">+8.8pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-018" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-018</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Shai Gilgeous-Alexander win the 2025–26 NBA MVP?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">82%</span></span>
+            <span>Ours <span class="num text-fg">94%</span></span>
+            <span>Gap <span class="num text-fg">+12.3pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-10</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-017" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-017</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the next Prime Minister of Hungary be Viktor Orbán?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">36%</span></span>
+            <span>Ours <span class="num text-fg">55%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-12</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-016" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-016</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-ok border-ok/40 bg-ok/10 font-semibold uppercase tracking-wider">WIN</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">US forces enter Iran by March 31?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">26%</span></span>
+            <span>Ours <span class="num text-fg">13%</span></span>
+            <span>Gap <span class="num text-fg">+12.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-03-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-015" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-015</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">business</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Paramount close Warner Bros. acquisition by end of 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">71%</span></span>
+            <span>Ours <span class="num text-fg">82%</span></span>
+            <span>Gap <span class="num text-fg">+10.2pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-014" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-014</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">politics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the DHS shutdown end after March 31, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">68%</span></span>
+            <span>Ours <span class="num text-fg">80%</span></span>
+            <span>Gap <span class="num text-fg">+32.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-03-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-013" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-013</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Sweden qualify for the 2026 FIFA World Cup?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">16%</span></span>
+            <span>Gap <span class="num text-fg">+19.0pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-12</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-012" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-012</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will the Iranian regime fall before 2027?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">18%</span></span>
+            <span>Gap <span class="num text-fg">+15.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-010" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-010</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Aston Villa win the 2025–26 UEFA Europa League?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">26%</span></span>
+            <span>Gap <span class="num text-fg">+8.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-24</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-009" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-009</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Arsenal win the 2025–26 English Premier League?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">88%</span></span>
+            <span>Ours <span class="num text-fg">96%</span></span>
+            <span>Gap <span class="num text-fg">+8.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-27</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-008" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-008</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Kon Knueppel win the 2025–26 NBA Rookie of the Year award?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">53%</span></span>
+            <span>Ours <span class="num text-fg">65%</span></span>
+            <span>Gap <span class="num text-fg">+12.1pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-05-18</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-007" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-007</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">PENDING</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Netanyahu cease to be PM of Israel by Dec 31, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">50%</span></span>
+            <span>Ours <span class="num text-fg">28%</span></span>
+            <span>Gap <span class="num text-fg">+21.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-006" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-006</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran x Israel/US conflict ends by April 30, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">44%</span></span>
+            <span>Ours <span class="num text-fg">18%</span></span>
+            <span>Gap <span class="num text-fg">+26.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-30</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-005" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-005</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-bad border-bad/40 bg-bad/10 font-semibold uppercase tracking-wider">LOSS</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Iran x Israel/US conflict ends by April 15, 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">30%</span></span>
+            <span>Ours <span class="num text-fg">10%</span></span>
+            <span>Gap <span class="num text-fg">+19.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-04-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-004" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-004</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">crypto</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will Bitcoin hit $1M before GTA VI?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">49%</span></span>
+            <span>Ours <span class="num text-fg">2%</span></span>
+            <span>Gap <span class="num text-fg">+46.7pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-07-01</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-003" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-003</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">sports</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will OKC win the NBA Western Conference Finals?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-ok font-semibold">YES underpriced</span></span>
+            <span>Market <span class="num text-fg">50%</span></span>
+            <span>Ours <span class="num text-fg">60%</span></span>
+            <span>Gap <span class="num text-fg">+9.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-06-15</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-002" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-002</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Will China invade Taiwan before GTA VI?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">52%</span></span>
+            <span>Ours <span class="num text-fg">4%</span></span>
+            <span>Gap <span class="num text-fg">+47.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-07-01</span></span>
+          </div>
+        </a>
+
+        <a href="/signals/sig-001" class="signal-card group">
+          <div class="flex items-baseline justify-between gap-3 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="num text-xs text-fg-muted">SIG-001</span>
+              <span class="text-[10px] uppercase tracking-wider text-fg-dim">geopolitics</span>
+              
+            </div>
+            <span class="text-[11px] px-2 py-0.5 rounded border text-warn border-warn/40 bg-warn/10 font-semibold uppercase tracking-wider">NOT_PUBLISHED</span>
+          </div>
+          <h2 class="text-fg group-hover:text-accent transition-colors text-base font-semibold leading-snug mb-2">Russia x Ukraine ceasefire by end of 2026?</h2>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-fg-dim">
+            <span><span class="text-bad font-semibold">NO underpriced</span></span>
+            <span>Market <span class="num text-fg">34%</span></span>
+            <span>Ours <span class="num text-fg">19%</span></span>
+            <span>Gap <span class="num text-fg">+15.5pp</span></span>
+            <span>Closes <span class="num text-fg-muted">2026-12-31</span></span>
+          </div>
+        </a>
+    </div>
+
+    <div class="mt-10 pt-6 border-t border-ink-600 text-xs text-fg-muted flex flex-wrap items-center gap-3 justify-between">
+      <div>Updated <span class="num">2026-05-07</span> · Not financial advice.</div>
+      <div>
+        <a href="/feed.xml" class="text-warn font-semibold hover:underline">📡 RSS</a>
+        <span class="mx-2">·</span>
+        <a href="https://t.me/ProbBrain" target="_blank" rel="noopener" class="text-accent font-semibold hover:underline">📨 Telegram</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
