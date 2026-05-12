@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T04:03:11Z",
+  "generated_at": "2026-05-12T04:18:24Z",
   "items": [
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08098",
@@ -181,14 +181,14 @@
         "arxiv"
       ],
       "title": "The Safety-Aware Denoiser for Text Diffusion Models",
-      "headline": "The Safety-Aware Denoiser for Text Diffusion Models",
+      "headline": "Safety-Aware Denoiser framework reduces unsafe text generation in diffusion models via inference-time guidance without retraining.",
       "url": "https://arxiv.org/abs/2605.08116",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08116v1 Announce Type: new Abstract: Recent work on text diffusion models offers a promising alternative to autoregressive generation, but controlling their safety remains underexplored. Existing safety approaches are geared toward autoregressive models and typically rely on post-hoc filtering or inference-time interventions. These are inadequate for effectively addressing safety risks in text diffusion models. We propose the Safety-Aware Denoiser (SAD), a safety-guidance framework in text diffusion models. The SAD modifies the iterative denoising process such that the text sample at the final denoising step is steered toward provably safe regions of the text space. This inference-time method can integrate safety constraints into the denoiser, avoiding computationally expensive retraining of the underlying diffusion model and enabling flexible, lightweight safety guidance. We evaluate the safety of the generated text using the SAD, with respect to hazard taxonomy, memorization, and jailbreak. Experimental results show that SAD substantially reduces unsafe generations while preserving generation quality, diversity, and fluency, outperforming existing methods. These results demonstrate that our safety guidance during denoising provides an effective and scalable mechanism for enforcing safety in text diffusion models.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:16:54Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08119",
@@ -202,14 +202,14 @@
         "arxiv"
       ],
       "title": "Feature Repulsion and Spectral Lock-in: An Empirical Study of Two-Layer Network Grokking",
-      "headline": "Feature Repulsion and Spectral Lock-in: An Empirical Study of Two-Layer Network Grokking",
+      "headline": "Research validates repulsion theorem for grokking features but finds spectral signature depends on activation function.",
       "url": "https://arxiv.org/abs/2605.08119",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08119v1 Announce Type: new Abstract: Tian (2025) proves a repulsion theorem (Theorem 6) for the matrix $ B = (\\widetilde{F}^\\top \\widetilde{F} + \\eta I)^{-1} $ during the interactive feature-learning stage of grokking: similar features have negative off-diagonal entries $ B_{j\\ell} $, producing an effective repulsive force that drives them apart. However, the theorem does not specify when this mechanism becomes empirically observable, nor whether it leaves a measurable spectral signature in the parameter updates. We test this directly on Tian's modular addition setup ($ M = 71 $, $ K = 2048 $, MSE loss) and observe a clear structure-mechanism dissociation. The predicted sign rule holds robustly on the top-200 most-similar feature pairs across activations (empirical sign-match rising from 0.865 to 0.985 on $ \\sigma = x^2 $ across 5 seeds, and saturating at 1.000 on $ \\sigma = \\operatorname{ReLU} $). However, the spectral signature in the parameter updates is strongly activation-dependent. With $ \\sigma = x^2 $, a simple slope detector on the rolling eigengap $ \\sigma_2 / \\sigma_3 $ of $ \\Delta W $ fires in 15/15 grokking seeds at epoch 174 (IQR [173,174]) and in 0/15 non-grokking controls, with 229$ \\times $ late-stage magnitude separation; the spectrum is rank-2. In contrast, with $ \\sigma = \\operatorname{ReLU} $, the detector never fires and the spectrum remains effectively rank-1. This dissociation aligns with Tian's Theorem 5 distinction between focused (power-law) and spreading (ReLU) memorization: while the sign structure of $ B $ depends only on $ \\widetilde{F}^\\top \\widetilde{F} $, how feature repulsion translates into weight updates critically depends on the activation derivative $ \\sigma' $.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:17:05Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08123",
@@ -223,14 +223,14 @@
         "arxiv"
       ],
       "title": "Block-Wise Differentiable Sinkhorn Attention: Tail-Refinement Gradients with a Gap-Aware Dustbin Bridge",
-      "headline": "Block-Wise Differentiable Sinkhorn Attention: Tail-Refinement Gradients with a Gap-Aware Dustbin Bridge",
+      "headline": "Researchers present efficient block-wise Sinkhorn attention for long-context processing on TPU hardware using tail-refinement gradients.",
       "url": "https://arxiv.org/abs/2605.08123",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08123v1 Announce Type: new Abstract: We study long-context balanced entropic optimal transport (OT) attention on TPU hardware through a stopped-base, fixed-depth tail-refinement surrogate. After a stopped $T$-step Sinkhorn solve, we unroll a short refinement tail and differentiate that surrogate exactly. For the production $R=2$ case, the backward pass contains four staircase plan factors. We prove an exact one-reference-tile schedule: the $R=2$ score cotangent is a single reference plan tile times an explicit modifier field built from vector cotangents and dual differences. This yields block-wise cost $O((T+R)LW)$, $O(Ld)$ input storage, and $O(L)$ additional HBM usage for fixed head dimension $d$ and band width $W$. We also formalize the current \\texttt{dustbin\\_block} path as the same balanced surrogate on an augmented support, so the schedule lifts to the gap-aware transport path used in our TPU runs. We provide a local surrogate-bias bound, an a posteriori bias certificate, and a projective contraction certificate for strictly positive active blocks. On synthetic masked problems, the optimized kernel matches exact autodiff of the same centered surrogate to within $10^{-5}$--$10^{-10}$. On TPU v6e-8, a four-configuration Pfam screen completes end-to-end, and a promoted balanced $R=2$ run sustains roughly $8.5$ examples per second through a three-hour budget, reaching step $1437$. Held-out Pfam test shards improve reconstruction from $3.17$ to $0.99$ and sparse CE from $5.86$ to $5.69$ relative to step $0$. These results support exact fixed-depth backward theory, a theorem-matching gap-aware bridge, and trainability evidence for the production path.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:17:15Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08128",
@@ -244,14 +244,14 @@
         "arxiv"
       ],
       "title": "Towards Universal Gene Regulatory Network Inference: Unlocking Generalizable Regulatory Knowledge in Single-cell Foundation Models",
-      "headline": "Towards Universal Gene Regulatory Network Inference: Unlocking Generalizable Regulatory Knowledge in Single-cell Foundation Models",
+      "headline": "Novel methods extract regulatory knowledge from single-cell foundation models to improve gene regulatory network inference on unseen genes and datasets.",
       "url": "https://arxiv.org/abs/2605.08128",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08128v1 Announce Type: new Abstract: Gene Regulatory Network (GRN) inference is essential for understanding complex cellular mechanisms, rendered tractable through single-cell transcriptomic data. With the emergence of single-cell Foundation Models (scFMs), enhanced transcriptomic encoding is widely expected to revolutionize GRN inference. However, we observe that their performance remains far from satisfactory. The primary reason is that the standard reconstruction-based pre-training objectives often fail to explicitly capture latent regulatory signals. To bridge this gap, we first introduce a GRN generalization benchmark designed to evaluate regulatory predictions on unseen genes and datasets, which relies on the zero-shot capabilities of scFMs and is inherently challenging for traditional methods. Furthermore, to unlock the regulatory knowledge within the foundation models, we propose two novel methods, Virtual Value Perturbation and Gradient Trajectory, to distill implicit regulatory information from scFMs into highly generalizable inter-gene features. Extensive experiments demonstrate that our approach significantly outperforms existing methods, establishing a new paradigm for leveraging the potential of scFMs in universal GRN inference.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:17:27Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08129",
@@ -265,14 +265,14 @@
         "arxiv"
       ],
       "title": "Towards Customized Multimodal Role-Play",
-      "headline": "Towards Customized Multimodal Role-Play",
+      "headline": "Researchers develop UniCharacter framework enabling multimodal models to generate consistent text and images for customized character personas from few-shot examples.",
       "url": "https://arxiv.org/abs/2605.08129",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08129v1 Announce Type: new Abstract: Unified multimodal understanding and generation models enable richer human-AI interaction. Yet jointly customizing a character's persona, dialogue style, and visual identity while maintaining output consistency across modalities remains largely unexplored. To mitigate this gap, we introduce a new task, Customized Multimodal Role-Play (CMRP). We construct the RoleScape-20 dataset comprising 20 characters, including training and evaluation data that cover persona, stylistic descriptions, visual/expressive cues, and text-image interactions. Building on a unified model, we devise UniCharacter, a two-stage training framework containing Unified Supervised Finetuning (Unified-SFT) and character-specific group relative policy optimization (Character-GRPO). Given only 10 images plus corresponding interaction examples, the model acquires the target character and exhibits coherent persona, style, and visual identity in both generated text and images. This process takes about 100 GPU hours. Experiments on the RoleScape-20 dataset show that the proposed method substantially outperforms prior approaches. Ablation studies further validate the effectiveness of our cross-modal consistency design and few-shot customization strategy. We argue that CMRP, coupled with unified modeling, provides a basis for next-generation characterful and immersive interactive agents.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:17:38Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08130",
@@ -286,14 +286,14 @@
         "arxiv"
       ],
       "title": "Additive Atomic Forests for Symbolic Function and Antiderivative Discovery",
-      "headline": "Additive Atomic Forests for Symbolic Function and Antiderivative Discovery",
+      "headline": "Framework discovers symbolic functions and their antiderivatives from data using derivative algebra and atomic forests.",
       "url": "https://arxiv.org/abs/2605.08130",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08130v1 Announce Type: new Abstract: We present a framework for the simultaneous symbolic recovery of a function and its antiderivative from data. The framework rests on three ideas. First, a derivative algebra: the observation that the product rule $\\frac{d}{dx}[f \\cdot g] = f'g + fg'$ and the chain rule, applied to a seed set of elementary functions, generate a self-expanding system of function-derivative pairs -- a living library that grows each time a new function is discovered. Second, two complementary primitives -- EML$\\,(e^u - \\ln v)$, which is theoretically complete for all elementary functions, and SOL$\\,(\\sin u - \\cos v)$, introduced here, which makes trigonometric atoms available at depth~1 instead of depth~$\\sim$8 -- that seed the library with core atoms cheaply. Third, additive atomic forests: finite sums of primitive trees, optionally composed via multiplicative nodes, whose derivatives are fitted to data by continuous optimisation or by exhaustive search over the library. Because differentiation of each atom is determined by construction, the forest simultaneously encodes a symbolic expression $F$ and its derivative $F'$; no symbolic integration step is required. The library is not a fixed object: it self-constructs from a small seed set by recursive application of the product rule, chain rule, and the two primitives, and it can grow as newly discovered functions are folded back in. The larger the library, the richer the expressible class of candidate functions. We give conditional completeness, additive-depth, and analytic simultaneous-recovery results for the framework. Empirically, in our reported runs on 17 classification benchmarks, sparse atom combinations match or exceed XGBoost on 13 datasets while producing interpretable formulas.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:17:51Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08131",
@@ -307,14 +307,14 @@
         "arxiv"
       ],
       "title": "Interactive Inverse Reinforcement Learning of Interaction Scenarios via Bi-level Optimization",
-      "headline": "Interactive Inverse Reinforcement Learning of Interaction Scenarios via Bi-level Optimization",
+      "headline": "BISIRL uses bi-level optimization to enable active learner-expert interaction for inferring expert reward functions in interactive inverse reinforcement learning.",
       "url": "https://arxiv.org/abs/2605.08131",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08131v1 Announce Type: new Abstract: Inverse reinforcement learning (IRL) learns a reward function and a corresponding policy that best fit the demonstration data of an expert. However, in the current IRL setting, the learner is isolated from the expert and can only passively observe the expert demonstrations. This limits the applicability of IRL to interactive settings, where the learner actively interacts with the expert and needs to infer the expert's reward function from the interactions. To bridge the gap, this paper studies interactive IRL (IIRL) where a learner aims to learn the reward function of an expert and a policy to interact with the expert during its interactions with the expert. We formulate IIRL as a stochastic bi-level optimization problem where the lower level learns a reward function to explain the behaviors of the expert, and the upper level learns a policy to interact with the expert. We develop a double-loop algorithm, Bi-level Interactive Scenarios Inverse Reinforcement Learning (BISIRL), which solves the lower-level problem in the inner loop and the upper-level problem in the outer loop. We formally guarantee that BISIRL converges and validate our algorithm through extensive experiments.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:18:10Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08134",
@@ -328,14 +328,14 @@
         "arxiv"
       ],
       "title": "DARE: Diffusion Language Model Activation Reuse for Efficient Inference",
-      "headline": "DARE: Diffusion Language Model Activation Reuse for Efficient Inference",
+      "headline": "DARE reuses redundant attention activations in diffusion LLMs to reduce per-layer latency by 1.20x with minimal performance degradation.",
       "url": "https://arxiv.org/abs/2605.08134",
       "published_at": "2026-05-12T04:00:00Z",
       "discovered_at": "2026-05-12T04:01:18Z",
       "description": "arXiv:2605.08134v1 Announce Type: new Abstract: Diffusion Large Language Models (dLLMs) have emerged as a promising alternative to auto-regressive (AR) models, offering greater expressive capacity and potential for parallel generation and faster inference. However, open-source dLLMs remain immature, lagging behind AR models in both efficiency and quality. We identify an underexplored property of dLLMs: *token-wise redundancy* in bi-directional self-attention. Self-attention activations are highly correlated across tokens, and temporal changes in query representations can predict redundancy in corresponding key, value, and output activations. We introduce DARE, with two complementary mechanisms: DARE-KV, which reuses cached key-value (KV) activations, and DARE-O, which reuses output activations to reduce redundant computation while preserving quality. DARE achieves up to 1.20x per-layer latency reduction and reuses up to 87% of attention activations, with negligible degradation on reasoning and code-generation benchmarks. DARE-KV and DARE-O incur average performance drops of only 2.0% and 1.2%, respectively. Combined with techniques such as prefix caching and Fast-dLLM, DARE provides additive gains without retraining. These results establish token-wise reuse as an effective strategy for improving the efficiency of diffusion-based LLMs while preserving generation fidelity. Code: https://github.com/enyac-group/DARE",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-12T04:18:24Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.08135",
