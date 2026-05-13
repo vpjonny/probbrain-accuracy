@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T04:13:47Z",
+  "generated_at": "2026-05-13T04:28:58Z",
   "items": [
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.10947",
@@ -181,14 +181,14 @@
         "arxiv"
       ],
       "title": "TMPO: Trajectory Matching Policy Optimization for Diverse and Efficient Diffusion Alignment",
-      "headline": "TMPO: Trajectory Matching Policy Optimization for Diverse and Efficient Diffusion Alignment",
+      "headline": "TMPO aligns diffusion models via trajectory-level reward distribution matching instead of scalar maximization, reducing reward hacking and mode collapse.",
       "url": "https://arxiv.org/abs/2605.10983",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.10983v1 Announce Type: new Abstract: Reinforcement learning (RL) has shown extraordinary potential in aligning diffusion models to downstream tasks, yet most of them still suffer from significant reward hacking, which degrades generative diversity and quality by inducing visual mode collapse and amplifying unreliable rewards. We identify the root cause as the mode-seeking nature of these methods, which maximize expected reward without effectively constraining probability distribution over acceptable trajectories, causing concentration on a few high-reward paths. In contrast, we propose Trajectory Matching Policy Optimization (TMPO), which replaces scalar reward maximization with trajectory-level reward distribution matching. Specifically, TMPO introduces a Softmax Trajectory Balance (Softmax-TB) objective to match the policy probabilities of K trajectories to a reward-induced Boltzmann distribution. We prove that this objective inherits the mode-covering property of forward KL divergence, preserving coverage over all acceptable trajectories while optimizing reward. To further reduce multi-trajectory training time on large-scale flow-matching models, TMPO incorporates Dynamic Stochastic Tree Sampling, where trajectories share denoising prefixes and branch at dynamically scheduled steps, reducing redundant computation while improving training effectiveness. Extensive results across diverse alignment tasks such as human preference, compositional generation and text rendering show that TMPO improves generative diversity over state-of-the-art methods by 9.1%, and achieves competitive performance in all downstream and efficiency metrics, attaining the optimal trade-off between reward and diversity.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:27:38Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.10985",
@@ -202,14 +202,14 @@
         "arxiv"
       ],
       "title": "Structural Interpretations of Protein Language Model Representations via Differentiable Graph Partitioning",
-      "headline": "Structural Interpretations of Protein Language Model Representations via Differentiable Graph Partitioning",
+      "headline": "SoftBlobGIN framework enhances protein language model interpretability by projecting representations onto contact graphs and learning functional residue substructures.",
       "url": "https://arxiv.org/abs/2605.10985",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.10985v1 Announce Type: new Abstract: Protein language models such as ESM-2 learn rich residue representations that achieve strong performance on protein function prediction, but their features remain difficult to interpret as structural $\\&$ evolutionary signals are encoded in dense latent spaces. We propose a plug-$\\&$-play framework that projects ESM-2 representations onto protein contact graphs $\\&$ applies $\\textbf{SoftBlobGIN}$, a lightweight Graph Isomorphism Network with differentiable Gumbel-softmax substructure pooling, to perform structure-aware message passing $\\&$ learn coarse functional substructures for downstream prediction tasks. Across enzyme classification, SoftBlobGIN achieves 92.8\\% accuracy $\\&$ 0.898 macro-F1. Unlike post hoc analysis of protein language models alone, our method produces directly auditable structural explanations: GNNExplainer recovers biologically meaningful active-site residues, spatially localized functional clusters, $\\&$ catalytic contact patterns. On binding-site detection, SoftBlobGIN improves residue AUROC from $0.885$ using an ESM-2 linear probe to $0.983$, indicating that these structural explanations are not recoverable from language-model features alone. Learned blob partitions provide an additional layer of interpretability by automatically grouping residues into functional substructures, with blobs containing annotated active-site residues showing $1.85\\times$ higher importance than other blobs ($\\rho{=}0.339$, $p{=}0.009$), without any active-site supervision. Our framework requires no retraining of the language model, adds only $\\sim$1.1M parameters, $\\&$ generalises across ProteinShake tasks, achieving $F_{\\max}$ of $0.733$ on Gene Ontology prediction $\\&$ AUROC of $0.969$ on binding-site detection. We position this as an interpretable structural companion to protein language models that makes their predictions more transparent $\\&$ auditable.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:27:51Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.10987",
@@ -223,14 +223,14 @@
         "arxiv"
       ],
       "title": "AESOP: Adversarial Execution-path Selection to Overload Deep Learning Pipelines",
-      "headline": "AESOP: Adversarial Execution-path Selection to Overload Deep Learning Pipelines",
+      "headline": "AESOP framework demonstrates adversarial attacks exploiting ML pipeline routing achieve 2407x FLOP inflation, 20x more effective than single-model attacks.",
       "url": "https://arxiv.org/abs/2605.10987",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.10987v1 Announce Type: new Abstract: Modern machine learning deployments increasingly compose specialized models into dynamic inference pipelines, where upstream components produce intermediate predictions that determine the workload and inputs of downstream components. The cost of processing an input is therefore not determined by any single model, but by two coupled factors: the per-inference cost of each invoked component and its workload volume. Because these pipelines run under hard real-time constraints, efficiency is a fundamental requirement for system availability. We show that this structure creates an efficiency-attack surface that existing methods targeting single models cannot exploit: on identical inputs and budgets, path-aware targeting inflates FLOPs by $2,407\\times$ while the strongest single-model baseline achieves $117\\times$ -- a $20\\times$ gap attributable entirely to where the attack is directed. We formalize this as the adversarial path-selection problem and present AESOP, a framework combining vulnerability-guided path ranking with adaptive loss weighting. We evaluate AESOP on five pipelines plus a production-realistic deployment variant with batching, bounded buffering, and confidence-threshold defenses. AESOP achieves up to $2,407\\times$ FLOPs and $419\\times$ latency inflation in white-box setting and 58$\\times$ FLOPs / 17$\\times$ latency in gray-box settings. Under system-level defenses, the attack is not neutralized but redirected: pipelines are forced to choose between throughput collapse ($0.578 \\to 0.006$ input/s) and $96.7\\%$ data loss to sustain throughput.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:28:03Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.10988",
@@ -244,14 +244,14 @@
         "arxiv"
       ],
       "title": "Seeing the Needle in the Haystack: Towards Weakly-Supervised Log Instance Anomaly Localization via Counterfactual Perturbation",
-      "headline": "Seeing the Needle in the Haystack: Towards Weakly-Supervised Log Instance Anomaly Localization via Counterfactual Perturbation",
+      "headline": "LogMILP, a weakly-supervised framework, localizes anomalies in logs at instance level using only bag-level labels via prototype-guided modeling and counterfactual perturbation.",
       "url": "https://arxiv.org/abs/2605.10988",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.10988v1 Announce Type: new Abstract: Log anomaly detection is a critical task for system operations and security assurance. However, in networked systems at scale, log data are generated at massive scale while instance-level annotations are prohibitively expensive, posing great difficulties to fine-grained anomaly localization. To address this challenge, we propose LogMILP (Log anomaly localization based on Multi-Instance Learning enhanced by prototypes and Perturbation), a weakly supervised framework that enables both bag-level anomaly detection and instance-level anomaly localization using only bag-level labels. Our method guides the model to pinpoint the critical log entries using prototype-guided structural modeling with counterfactual perturbation consistency regularization, thereby improving localization reliability and interpretability under coarse-grained supervision. Experimental results on three public datasets demonstrate that LogMILP achieves competitive detection performance while yielding significantly more reliable instance-level localization. Our code is open-sourced at https://github.com/YUK1207/LogMILP.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:28:14Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.10989",
@@ -265,14 +265,14 @@
         "arxiv"
       ],
       "title": "SURGE: Surrogate Gradient Adaptation in Binary Neural Networks",
-      "headline": "SURGE: Surrogate Gradient Adaptation in Binary Neural Networks",
+      "headline": "SURGE proposes learnable gradient compensation framework for binary neural networks training, addressing gradient mismatch in binarization operations.",
       "url": "https://arxiv.org/abs/2605.10989",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.10989v1 Announce Type: new Abstract: The training of Binary Neural Networks (BNNs) is fundamentally based on gradient approximation for non-differentiable binarization operations (e.g., sign function). However, prevailing methods including the Straight-Through Estimator (STE) and its improved variants, rely on hand-crafted designs that suffer from gradient mismatch problem and information loss induced by fixed-range gradient clipping. To address this, we propose SURrogate GradiEnt Adaptation (SURGE), a novel learnable gradient compensation framework with theoretical grounding. SURGE mitigates gradient mismatch through auxiliary backpropagation. Specifically, we design a Dual-Path Gradient Compensator (DPGC) that constructs a parallel full-precision auxiliary branch for each binarized layer, decoupling gradient flow via output decomposition during backpropagation. DPGC enables bias-reduced gradient estimation by leveraging the full-precision branch to estimate components beyond STE's first-order approximation. To further enhance training stability, we introduce an Adaptive Gradient Scaler (AGS) based on an optimal scale factor to dynamically balance inter-branch gradient contributions via norm-based scaling. Experiments on image classification, object detection, and language understanding tasks demonstrate that SURGE performs best over state-of-the-art methods.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:28:25Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.10991",
@@ -286,14 +286,14 @@
         "arxiv"
       ],
       "title": "Test-Time Personalization: A Diagnostic Framework and Probabilistic Fix for Scaling Failures",
-      "headline": "Test-Time Personalization: A Diagnostic Framework and Probabilistic Fix for Scaling Failures",
+      "headline": "Researchers develop a framework for test-time personalization in LLMs that diagnoses reward model failures and proposes a probabilistic fix for improved scaling.",
       "url": "https://arxiv.org/abs/2605.10991",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.10991v1 Announce Type: new Abstract: Existing approaches to LLM personalization focus on constructing better personalized models or inputs, while treating inference as a single-shot process. In this work, we study Test-Time Personalization (TTP) along an unexplored axis: scaling inference-time computation by sampling N candidates from a personalized policy model and selecting the best with a personalized reward model. We prove that oracle selection yields expected utility growing logarithmically with the number of sampled candidates, establishing a theoretical ceiling for test-time scaling. However, standard reward models fail to realize this potential. To diagnose why, we derive a unified scaling law that decomposes any reward model's Best-of-N curve into four measurable quantities and reveals two failure modes, user-level collapse (near-constant prediction for some users) and query-level reward hacking (negative correlation with true quality for some queries). Guided by this law, we propose a probabilistic personalized reward model whose learned variance effectively mitigates both failure modes. Experiments confirm both elements of our framework: TTP delivers consistent scaling across multiple policy models and personalized text generation tasks, and our scaling law closely matches observed scaling curves across reward-model variants.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:28:33Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.10999",
@@ -307,14 +307,14 @@
         "arxiv"
       ],
       "title": "SkillGen: Verified Inference-Time Agent Skill Synthesis",
-      "headline": "SkillGen: Verified Inference-Time Agent Skill Synthesis",
+      "headline": "SkillGen synthesizes reusable agent skills from successful and failed trajectories with empirical verification of performance impact.",
       "url": "https://arxiv.org/abs/2605.10999",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.10999v1 Announce Type: new Abstract: Skills are a promising way to improve LLM agent capabilities without retraining, while keeping the added procedure reusable and controllable. However, high-quality skills are still largely written by hand. We introduce SkillGen, a multi-agent framework that synthesizes a single auditable skill from trajectories generated by a base agent. The output is a human-readable artifact that can be inspected before use. Rather than merely summarizing trajectories, SkillGen leverages contrastive induction over both successful and failed trajectories to identify reusable success patterns, recurring failure modes, and behaviors that appear in nearby successes but are missing from failures. SkillGen then generates candidate skills and iteratively refines the skill. A key novelty in SkillGen is that we model agent skills as interventions to empirically verify the net effect of skills on the overall performance. Specifically, we compare outcomes on the same instances with and without the skill, so that we account for both repairs (cases where the skill fixes a baseline failure) and regressions (cases where the skill breaks a baseline success). Across a broad range of agents and datasets, SkillGen consistently improves held-out performance, outperforms existing skill-generation baselines, and produces skills that transfer across models.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:28:45Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.11001",
@@ -328,14 +328,14 @@
         "arxiv"
       ],
       "title": "Finite Volume-Informed Neural Network Framework for 2D Shallow Water Equations: Rugged Loss Landscapes and the Importance of Data Guidance",
-      "headline": "Finite Volume-Informed Neural Network Framework for 2D Shallow Water Equations: Rugged Loss Landscapes and the Importance of Data Guidance",
+      "headline": "Data-guided finite-volume neural networks overcome training failures in physics-informed models for shallow water equations, achieving 22× error reduction with sparse measurements.",
       "url": "https://arxiv.org/abs/2605.11001",
       "published_at": "2026-05-13T04:00:00Z",
       "discovered_at": "2026-05-13T04:12:07Z",
       "description": "arXiv:2605.11001v1 Announce Type: new Abstract: Physics-informed neural networks (PINNs) are a simple surrogate-modelling paradigm for partial differential equations, but their standard strong-form residual formulation is ill suited to the shallow water equations (SWE). It cannot enforce local conservation, handle discontinuities, or leverage the boundary-conforming unstructured meshes used in real-world applications. We introduce ``Data-Guided FVM-PINN'', a framework that replaces the strong-form residual with a differentiable, well-balanced Roe Riemann-solver finite-volume (FVM) loss evaluated on unstructured meshes. The major finding is that physics-only FVM-PINN training often fails on realistic 2D problems: the network collapses to a trivial low-momentum state that nearly satisfies the FVM-PINN residual but bears no resemblance to the true flow. A loss-landscape diagnostic shows that the FVM-PINN loss at zero momentum is only about $7\\times$ larger than at the trained solution, a shallow basin that an ordinary optimizer falls into; adding even sparse data turns this into a $310\\times$ separation, breaking the degeneracy. On a 2D block-in-channel benchmark, just $200$ random velocity measurements drop the velocity-field $L_2$ error by $22\\times$ versus physics-only; $50$ measurements still deliver a $7\\times$ reduction. A controlled ablation isolates the contribution of the FVM-PINN loss: it reduces velocity-field $L_2$ by $\\sim$$23\\%$ in the sparse-data regime and is essentially neutral when dense reference data is available. On a real-world Savannah River reach ($1306$ cells, $3600$~s simulation, five Manning zones), the framework constructs an accurate surrogate from SRH-2D anchor data, with time-window decomposition reducing error monotonically via progressive initial-condition handoff.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-13T04:28:58Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.11005",
