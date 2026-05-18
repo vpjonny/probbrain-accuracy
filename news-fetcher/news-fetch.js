@@ -611,6 +611,11 @@ async function postToX(items) {
   } catch (e) {
     log(`X ERR: ${e.message}`);
     if (e.data) log(`  details: ${JSON.stringify(e.data).slice(0, 300)}`);
+    // Burn the 2h slot on failure too, so we don't hammer X every 15min
+    // when last_digest_at would otherwise stay frozen at the last success.
+    // Spamming attempts almost certainly is what trips X's per-app cap.
+    const failedAt = toUtcIso(new Date());
+    await writeJsonAtomic(LAST_POSTED_X, { posted, last_digest_at: failedAt, updated_at: failedAt });
   }
 }
 
