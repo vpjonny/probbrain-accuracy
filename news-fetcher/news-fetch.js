@@ -16,7 +16,7 @@ import { summarize } from './lib/summarize.js';
 import { loadEnv, require_ } from './lib/env.js';
 import { formatPost, formatDigest as formatTgDigest, sendMessage } from './lib/telegram.js';
 import { createBlueskyClient, postNewsItem as postBskyItem, postDigest as postBskyDigest } from './lib/bluesky.js';
-import { createXClient, pickDigestItems, postDigest as postXDigest } from './lib/x.js';
+import { createXClient, pickAllRecent, postThread as postXThread } from './lib/x.js';
 import { generateSitemap } from './lib/sitemap.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -585,29 +585,20 @@ async function postToX(items) {
     return;
   }
 
-  const cutoff = now - X_DIGEST_WINDOW_MS;
-  const candidates = items.filter(it => {
-    if (it.id in posted) return false;
-    // Use discovered_at (not published_at) so HN/arXiv items with old original
-    // publish times still qualify — matches Telegram/Bluesky behavior.
-    const t = it.discovered_at ? new Date(it.discovered_at).getTime() : 0;
-    return t >= cutoff;
-  });
+  const picked = pickAllRecent(items, X_DIGEST_WINDOW_MS, posted);
 
-  if (candidates.length < X_DIGEST_MIN_ITEMS) {
-    vlog(`x: skip (${candidates.length} unposted items in past 2h, need ≥${X_DIGEST_MIN_ITEMS})`);
+  if (picked.length < X_DIGEST_MIN_ITEMS) {
+    vlog(`x: skip (${picked.length} unposted items in past 2h, need ≥${X_DIGEST_MIN_ITEMS})`);
     return;
   }
 
-  const picked = pickDigestItems(candidates, X_DIGEST_PICK);
-
   try {
-    const result = await postXDigest(client, picked);
+    const result = await postXThread(client, picked);
     const postedAt = toUtcIso(new Date());
-    for (const it of picked) posted[it.id] = postedAt;
+    const postedCount = result.ids.filter(Boolean).length;
+    for (const it of picked.slice(0, postedCount)) posted[it.id] = postedAt;
     await writeJsonAtomic(LAST_POSTED_X, { posted, last_digest_at: postedAt, updated_at: postedAt });
-    log(`x: posted digest with ${picked.length} items (tweet_id=${result.id})`);
-    vlog(`  tweet text:\n${result.text}`);
+    log(`x: posted thread with ${postedCount} items (first tweet_id=${result.ids[0]})`);
   } catch (e) {
     log(`X ERR: ${e.message}`);
     if (e.data) log(`  details: ${JSON.stringify(e.data).slice(0, 300)}`);
