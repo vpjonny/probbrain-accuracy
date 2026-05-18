@@ -18,6 +18,21 @@ const TOPLEVEL_META = { priority: '0.6', changefreq: 'weekly' };
 
 const EXCLUDE_TOPLEVEL = new Set(['404.html']);
 
+// Signals with these statuses are drafts or internal paper-trades — keep them
+// out of the sitemap so Google doesn't waste crawl budget on content we don't
+// want indexed. WIN/LOSS/PENDING are real public calls and stay in.
+const EXCLUDE_SIGNAL_STATUSES = new Set(['NOT_PUBLISHED', 'SHADOW']);
+
+function readSignalStatus(filePath) {
+  try {
+    const html = readFileSync(filePath, 'utf8');
+    const m = html.match(/Status:\s*([A-Z_]+)/);
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
+}
+
 function htmlToUrl(file) {
   if (file === 'index.html') return '/';
   return '/' + file.replace(/\.html$/, '');
@@ -38,10 +53,14 @@ export function generateSitemap(repoRoot) {
   const signalsDir = join(repoRoot, 'signals');
   let signalsExist = false;
   try { signalsExist = statSync(signalsDir).isDirectory(); } catch {}
+  let skipped = 0;
   if (signalsExist) {
     for (const f of readdirSync(signalsDir).sort()) {
       if (!f.endsWith('.html')) continue;
-      const stat = statSync(join(signalsDir, f));
+      const path = join(signalsDir, f);
+      const status = readSignalStatus(path);
+      if (status && EXCLUDE_SIGNAL_STATUSES.has(status)) { skipped++; continue; }
+      const stat = statSync(path);
       entries.push({ url: '/signals/' + f.replace(/\.html$/, ''), lastmod: fmtDate(stat.mtime), ...SIGNAL_META });
     }
   }
@@ -60,5 +79,5 @@ export function generateSitemap(repoRoot) {
   let prev = '';
   try { prev = readFileSync(path, 'utf8'); } catch {}
   if (prev !== xml) writeFileSync(path, xml, 'utf8');
-  return { count: entries.length, changed: prev !== xml };
+  return { count: entries.length, changed: prev !== xml, skipped };
 }
