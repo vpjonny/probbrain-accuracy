@@ -588,7 +588,9 @@ async function postToX(items) {
   const cutoff = now - X_DIGEST_WINDOW_MS;
   const candidates = items.filter(it => {
     if (it.id in posted) return false;
-    const t = it.published_at ? new Date(it.published_at).getTime() : 0;
+    // Use discovered_at (not published_at) so HN/arXiv items with old original
+    // publish times still qualify — matches Telegram/Bluesky behavior.
+    const t = it.discovered_at ? new Date(it.discovered_at).getTime() : 0;
     return t >= cutoff;
   });
 
