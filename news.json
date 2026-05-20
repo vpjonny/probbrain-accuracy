@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T23:50:22Z",
+  "generated_at": "2026-05-20T00:05:24Z",
   "items": [
     {
       "id": "xai|https://x.ai/news/grok-openclaw",
@@ -18,6 +18,27 @@
       "published_at": "2026-05-22T00:00:00Z",
       "discovered_at": "2026-05-19T20:01:52Z",
       "description": "",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "simonw|https://simonwillison.net/2026/May/19/llm-gemini-2",
+      "anchor": "5f8544c1b2",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "llm-gemini 0.32",
+      "headline": "llm-gemini 0.32",
+      "url": "https://simonwillison.net/2026/May/19/llm-gemini-2",
+      "published_at": "2026-05-19T23:46:27Z",
+      "discovered_at": "2026-05-20T00:03:36Z",
+      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/simonw/llm-gemini/releases/tag/0.32\">llm-gemini 0.32</a></p> <blockquote> <ul> <li>New model <code>gemini-3.5-flash</code> for <a href=\"https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/\">Gemini 3.5 Flash</a>.</li> </ul> </blockquote> <p>See also my <a href=\"https://simonwillison.net/2026/May/19/gemini-35-flash/\">notes on Gemini 3.5 Flash</a>, and <a href=\"https://simonwillison.net/2026/May/19/gemini-35-flash/#a-pelican-on-a-bicycle\">the pelican</a> I drew using this upgrade to the plugin.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/gemini\">gemini</a>, <a href=\"https://simonwillison.net/tags/llm\">llm</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -60,6 +81,69 @@
       "published_at": "2026-05-19T22:40:25Z",
       "discovered_at": "2026-05-19T22:48:06Z",
       "description": "<p>Today at Google I/O, Google <a href=\"https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/\">released Gemini 3.5 Flash</a>. This one skipped the <code>-preview</code> modifier and went straight to general availability, and Google appear to be using it for a whole lot of their key products:</p> <blockquote> <p>3.5 Flash is available today to billions of people globally:</p> <ul> <li>For everyone via the Gemini app and AI Mode in <a href=\"https://blog.google/products-and-platforms/products/search/search-io-2026\">Google Search</a> </li> <li>For developers in our agent-first development platform Google Antigravity and Gemini API in Google AI Studio and Android Studio</li> <li>For enterprises in Gemini Enterprise Agent Platform and Gemini Enterprise.</li> </ul> </blockquote> <p>As usual with Gemini, the most interesting details are tucked away in the <a href=\"https://ai.google.dev/gemini-api/docs/whats-new-gemini-3.5\">What's new in Gemini 3.5 Flash</a> developer documentation. It mostly has the same set of platform features as the previous Gemini 3.x series, albeit with no <a href=\"https://ai.google.dev/gemini-api/docs/computer-use\">computer use</a>. The model ID is <code>gemini-3.5-flash</code>. The knowledge cut-off is January 2025, and it supports 1,048,576 input tokens and 65,536 maximum output tokens.</p> <p>Google are also pushing a new <a href=\"https://ai.google.dev/gemini-api/docs/interactions\">Interactions API</a>, currently in beta, which looks to me like their version of the patterns introduced by <a href=\"https://developers.openai.com/api/reference/responses/overview\">OpenAI Responses</a> - in particular server-side history management.</p> <h4 id=\"the-price-has-gone-up\">The price has gone up</h4> <p>Gemini 3.5 Flash is accompanied by a notable price bump. The previous models in the \"Flash\" family were <a href=\"https://ai.google.dev/gemini-api/docs/models/gemini-3-flash-preview\">Gemini 3 Flash Preview</a> and <a href=\"https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite\">Gemini 3.1 Flash-Lite</a>. The new 3.5 Flash is 3x the price of 3 Flash Preview and 6x the price of 3.1 Flash-Lite (see <a href=\"https://www.llm-prices.com/#sel=gemini-3-flash-preview%2Cgemini-3.5-flash%2Cgemini-3.1-flash-lite-preview\">price comparison here</a>).</p> <p>At $1.50/million input and $9/million output it's getting close in price to Google's Gemini 3.1 Pro, which is $2 and $12.</p> <p>The Gemini team promise that 3.5 Pro will roll out \"next month\" - presumably at an even higher price.</p> <p>This fits a trend: OpenAI's GPT-5.5 was 2x the price of GPT-5.4, and Claude Opus 4.7 is around 1.46x the price of 4.6 when you take the <a href=\"https://simonwillison.net/2026/Apr/20/claude-token-counts/\">new tokenizer into account</a>.</p> <p>Given the price increase it's interesting to see Google roll it out for so many of their own free-to-consumer products. It feels like all three of the major AI labs are starting to probe the price tolerance of their API customers.</p> <p>Artificial Analysis publish the cost to run their proprietary benchmark against models, which is a useful way to take things like tokenization and increased volume of reasoning tokens into account. Some numbers worth comparing:</p> <ul> <li> <a href=\"https://artificialanalysis.ai/models/gemini-3-5-flash\">Gemini 3.5 Flash (high)</a>: $1,551.60</li> <li> <a href=\"https://artificialanalysis.ai/models/gemini-3-1-pro-preview\">Gemini 3.1 Pro Preview</a>: $892.28</li> <li> <a href=\"https://artificialanalysis.ai/models/gemini-3-flash-reasoning\">Gemini 3 Flash Preview (Reasoning)</a>: $278.26</li> <li> <a href=\"https://artificialanalysis.ai/models/gemini-3-1-flash-lite-preview\">Gemini 3.1 Flash-Lite Preview</a>: $93.60</li> </ul> <p>Running the benchmark for 3.5 Flash (high) cost significantly more than 3.1 Pro Preview!</p> <p>Here are some numbers from other vendors:</p> <ul> <li> <a href=\"https://artificialanalysis.ai/models/claude-opus-4-7\">Claude Opus 4.7 (Adaptive Reasoning, Max Effort)</a>: $5,117.14</li> <li> <a href=\"https://artificialanalysis.ai/models/claude-opus-4-7-non-reasoning\">Claude Opus 4.7 (Non-reasoning, High Effort)</a>: $1,217.23</li> <li> <a href=\"https://artificialanalysis.ai/models/gpt-5-5\">GPT-5.5 (xhigh)</a>: $3,357.00</li> <li> <a href=\"https://artificialanalysis.ai/models/gpt-5-5-medium\">GPT-5.5 (medium)</a>: $1,199.14</li> </ul> <h4 id=\"a-pelican-on-a-bicycle\">A pelican on a bicycle</h4> <p>I ran \"Generate an SVG of a pelican riding a bicycle\" <a href=\"https://gist.github.com/simonw/09cc5a5545d7e75b33b75ffa92a34601\">against the Gemini API</a> and got back this pelican, which is a <em>lot</em>:</p> <p><img src=\"https://static.simonwillison.net/static/2026/gemini-3.5-flash.png\" alt=\"Black background, bats in the sky against a stylized moon. Pelican is funky looking. Very good beak. Bicycle frame is a bit twisted, and the bar from pedals to back wheel is missing. Bike lamp illuminates the road in front. Quite stylish.\" style=\"max-width: 100%;\" /></p> <p>From the code comments: <code>&lt;!-- Pelican Eye / Sunglasses (Cool Retro Aviators) --&gt;</code></p> <p><a href=\"https://news.ycombinator.com/item?id=48196570#48198275\">hedgehog on Hacker News</a>:</p> <blockquote> <p>That pelican looks like it's in Miami for a crypto conference.</p> </blockquote> <p>That one cost me 11 input tokens and 14,403 output tokens, for a total cost of <a href=\"https://www.llm-prices.com/#it=11&amp;ot=14403&amp;sel=gemini-3.5-flash\">just under 13 cents</a>.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/google\">google</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/gemini\">gemini</a>, <a href=\"https://simonwillison.net/tags/llm-pricing\">llm-pricing</a>, <a href=\"https://simonwillison.net/tags/pelican-riding-a-bicycle\">pelican-riding-a-bicycle</a>, <a href=\"https://simonwillison.net/tags/llm-release\">llm-release</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "simonw|https://simonwillison.net/2026/May/19/datasette-llm-accountant",
+      "anchor": "502335fc8d",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "datasette-llm-accountant 0.1a4",
+      "headline": "datasette-llm-accountant 0.1a4",
+      "url": "https://simonwillison.net/2026/May/19/datasette-llm-accountant",
+      "published_at": "2026-05-19T20:45:43Z",
+      "discovered_at": "2026-05-20T00:03:36Z",
+      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/datasette/datasette-llm-accountant/releases/tag/0.1a4\">datasette-llm-accountant 0.1a4</a></p> <blockquote> <ul> <li>Fixed bug tracking chains of responses. Refs <a href=\"https://github.com/datasette/datasette-llm/issues/7\">datasette-llm#7</a></li> </ul> </blockquote> <p>Tags: <a href=\"https://simonwillison.net/tags/llm\">llm</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "simonw|https://simonwillison.net/2026/May/19/llm-gemini",
+      "anchor": "4a92c2dbd4",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "llm-gemini 0.32a0",
+      "headline": "llm-gemini 0.32a0",
+      "url": "https://simonwillison.net/2026/May/19/llm-gemini",
+      "published_at": "2026-05-19T20:36:23Z",
+      "discovered_at": "2026-05-20T00:03:36Z",
+      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/simonw/llm-gemini/releases/tag/0.32a0\">llm-gemini 0.32a0</a></p> <blockquote> <ul> <li>Compatible with <code>llm&gt;=0.32a0</code> alpha - adds the ability to stream reasoning tokens.</li> </ul> </blockquote> <p>Tags: <a href=\"https://simonwillison.net/tags/gemini\">gemini</a>, <a href=\"https://simonwillison.net/tags/llm\">llm</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "simonw|https://simonwillison.net/2026/May/19/datasette-llm",
+      "anchor": "0a7f8cf73f",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "datasette-llm 0.1a8",
+      "headline": "datasette-llm 0.1a8",
+      "url": "https://simonwillison.net/2026/May/19/datasette-llm",
+      "published_at": "2026-05-19T20:28:16Z",
+      "discovered_at": "2026-05-20T00:03:36Z",
+      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/datasette/datasette-llm/releases/tag/0.1a8\">datasette-llm 0.1a8</a></p> <blockquote> <ul> <li>Fix for bug where <code>llm_prompt_context()</code> hook did not fully collect chains of responses. #7</li> </ul> </blockquote>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -5920,26 +6004,6 @@
       "summarized_at": null
     },
     {
-      "id": "simonw|https://simonwillison.net/2026/Apr/25/romain-huet",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "Quoting Romain Huet",
-      "headline": "Quoting Romain Huet",
-      "url": "https://simonwillison.net/2026/Apr/25/romain-huet",
-      "published_at": "2026-04-25T12:06:55Z",
-      "description": "<blockquote cite=\"https://twitter.com/romainhuet/status/2047955381578838357\"><p>Since GPT-5.4, we’ve unified Codex and the main model into a single system, so there’s no separate coding line anymore.</p> <p>GPT-5.5 takes this further, with strong gains in agentic coding, computer use, and any task on a computer.</p></blockquote> <p class=\"cite\">&mdash; <a href=\"https://twitter.com/romainhuet/status/2047955381578838357\">Romain Huet</a>, confirming OpenAI won't release a GPT-5.5-Codex model</p> <p>Tags: <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/gpt\">gpt</a>, <a href=\"https://simonwillison.net/tags/openai\">openai</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null,
-      "anchor": "5f0bc863ef"
-    },
-    {
       "id": "huggingface|https://huggingface.co/SeeSee21/Z-Anime",
       "anchor": "81e30bd5d5",
       "source_id": "huggingface",
@@ -5979,46 +6043,6 @@
       "summarized": false,
       "summarized_at": null,
       "anchor": "a598ae61dc"
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Apr/25/gpt-5-5-prompting-guide",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "GPT-5.5 prompting guide",
-      "headline": "GPT-5.5 prompting guide",
-      "url": "https://simonwillison.net/2026/Apr/25/gpt-5-5-prompting-guide",
-      "published_at": "2026-04-25T04:13:36Z",
-      "description": "<p><strong><a href=\"https://developers.openai.com/api/docs/guides/prompt-guidance?model=gpt-5.5\">GPT-5.5 prompting guide</a></strong></p> Now that GPT-5.5 is <a href=\"https://developers.openai.com/api/docs/models/gpt-5.5\">available in the API</a>, OpenAI have released a wealth of useful tips on how best to prompt the new model.</p> <p>Here's a neat trick they recommend for applications that might spend considerable time thinking before returning a user-visible response:</p> <blockquote> <p><code>Before any tool calls for a multi-step task, send a short user-visible update that acknowledges the request and states the first step. Keep it to one or two sentences.</code></p> </blockquote> <p>I've already noticed their Codex app doing this, and it does make longer running tasks feel less like the model has crashed.</p> <p>OpenAI suggest running the following in Codex to upgrade your existing code using advice embedded in their <code>openai-docs</code> skill:</p> <blockquote> <p><code>$openai-docs migrate this project to gpt-5.5</code></p> </blockquote> <p>The upgrade guide the coding agent will follow <a href=\"https://github.com/openai/skills/blob/724cd511c96593f642bddf13187217aa155d2554/skills/.curated/openai-docs/references/upgrade-guide.md#model-string--light-prompt-rewrite\">is this one</a>, which even includes light instructions on how to rewrite prompts to better fit the model.</p> <p>Also relevant is the <a href=\"https://developers.openai.com/api/docs/guides/latest-model\">Using GPT-5.5 guide</a>, which opens with this warning:</p> <blockquote> <p>To get the most out of GPT-5.5, treat it as a new model family to tune for, not a drop-in replacement for <code>gpt-5.2</code> or <code>gpt-5.4</code>. Begin migration with a fresh baseline instead of carrying over every instruction from an older prompt stack. Start with the smallest prompt that preserves the product contract, then tune reasoning effort, verbosity, tool descriptions, and output format against representative examples.</p> </blockquote> <p>Interesting to see OpenAI recommend starting from scratch rather than trusting that existing prompts optimized for previous models will continue to work effectively with GPT-5.5. <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/openai\">openai</a>, <a href=\"https://simonwillison.net/tags/prompt-engineering\">prompt-engineering</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/gpt\">gpt</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null,
-      "anchor": "20ac9c8df0"
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Apr/24/llm",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "llm 0.31",
-      "headline": "llm 0.31",
-      "url": "https://simonwillison.net/2026/Apr/24/llm",
-      "published_at": "2026-04-24T23:35:07Z",
-      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/simonw/llm/releases/tag/0.31\">llm 0.31</a></p> <blockquote> <ul> <li>New GPT-5.5 OpenAI model: <code>llm -m gpt-5.5</code>. <a href=\"https://github.com/simonw/llm/issues/1418\">#1418</a></li> <li>New option to set the <a href=\"https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_new_params_and_tools#1-verbosity-parameter\">text verbosity level</a> for GPT-5+ OpenAI models: <code>-o verbosity low</code>. Values are <code>low</code>, <code>medium</code>, <code>high</code>.</li> <li>New option for setting the <a href=\"https://developers.openai.com/api/docs/guides/images-vision#choose-an-image-detail-level\">image detail level</a> used for image attachments to OpenAI models: <code>-o image_detail low</code> - values are <code>low</code>, <code>high</code> and <code>auto</code>, and GPT-5.4 and 5.5 also accept <code>original</code>.</li> <li>Models listed in <code>extra-openai-models.yaml</code> are now also registered as asynchronous. <a href=\"https://github.com/simonw/llm/issues/1395\">#1395</a></li> </ul> </blockquote> <p>Tags: <a href=\"https://simonwillison.net/tags/gpt\">gpt</a>, <a href=\"https://simonwillison.net/tags/openai\">openai</a>, <a href=\"https://simonwillison.net/tags/llm\">llm</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null,
-      "anchor": "25aaaf51e4"
     },
     {
       "id": "anthropic|https://www.anthropic.com/news/anthropic-amazon-compute",
@@ -6079,26 +6103,6 @@
       "summarized": false,
       "summarized_at": null,
       "anchor": "aae5c7e03e"
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Apr/24/deepseek-v4",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "DeepSeek V4 - almost on the frontier, a fraction of the price",
-      "headline": "DeepSeek V4 - almost on the frontier, a fraction of the price",
-      "url": "https://simonwillison.net/2026/Apr/24/deepseek-v4",
-      "published_at": "2026-04-24T06:01:04Z",
-      "description": "<p>Chinese AI lab DeepSeek's last model release was V3.2 (and V3.2 Speciale) <a href=\"https://simonwillison.net/2025/Dec/1/deepseek-v32/\">last December</a>. They just dropped the first of their hotly anticipated V4 series in the shape of two preview models, <a href=\"https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro\">DeepSeek-V4-Pro</a> and <a href=\"https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash\">DeepSeek-V4-Flash</a>.</p> <p>Both models are 1 million token context Mixture of Experts. Pro is 1.6T total parameters, 49B active. Flash is 284B total, 13B active. They're using the standard MIT license.</p> <p>I think this makes DeepSeek-V4-Pro the new largest open weights model. It's larger than Kimi K2.6 (1.1T) and GLM-5.1 (754B) and more than twice the size of DeepSeek V3.2 (685B).</p> <p>Pro is 865GB on Hugging Face, Flash is 160GB. I'm hoping that a lightly quantized Flash will run on my 128GB M5 MacBook Pro. It's <em>possible</em> the Pro model may run on it if I can stream just the necessary active experts from disk.</p> <p>For the moment I tried the models out via <a href=\"https://openrouter.ai/\">OpenRouter</a>, using <a href=\"https://github.com/simonw/llm-openrouter\">llm-openrouter</a>:</p> <pre><code>llm install llm-openrouter llm openrouter refresh llm -m openrouter/deepseek/deepseek-v4-pro 'Generate an SVG of a pelican riding a bicycle' </code></pre> <p>Here's the pelican <a href=\"https://gist.github.com/simonw/4a7a9e75b666a58a0cf81495acddf529\">for DeepSeek-V4-Flash</a>:</p> <p><img src=\"https://static.simonwillison.net/static/2026/deepseek-v4-flash.png\" alt=\"Excellent bicycle - good frame shape, nice chain, even has a reflector on the front wheel. Pelican has a mean looking expression but has its wings on the handlebars and feet on the pedals. Pouch is a little sharp.\" style=\"max-width: 100%;\" /></p> <p>And <a href=\"https://gist.github.com/simonw/9e8dfed68933ab752c9cf27a03250a7c\">for DeepSeek-V4-Pro</a>:</p> <p><img src=\"https://static.simonwillison.net/static/2026/deepseek-v4-pro.png\" alt=\"Another solid bicycle, albeit the spokes are a little jagged and the frame is compressed a bit. Pelican has gone a bit wrong - it has a VERY large body, only one wing, a weirdly hairy backside and generally loos like it was drown be a different artist from the bicycle.\" style=\"max-width: 100%;\" /></p> <p>For comparison, take a look at the pelicans I got from <a href=\"https://simonwillison.net/2025/Dec/1/deepseek-v32/\">DeepSeek V3.2 in December</a>, <a href=\"https://simonwillison.net/2025/Aug/22/deepseek-31/\">V3.1 in August</a>, and <a href=\"https://simonwillison.net/2025/Mar/24/deepseek/\">V3-0324 in March 2025</a>.</p> <p>So the pelicans are pretty good, but what's really notable here is the <em>cost</em>. DeepSeek V4 is a very, very inexpensive model.</p> <p>This is <a href=\"https://api-docs.deepseek.com/quick_start/pricing\">DeepSeek's pricing page</a>. They're charging $0.14/million tokens input and $0.28/million tokens output for Flash, and $1.74/million input and $3.48/million output for Pro.</p> <p>Here's a comparison table with the frontier models from Gemini, OpenAI and Anthropic:</p> <center> <table> <thead> <tr> <th>Model</th> <th>Input ($/M)</th> <th>Output ($/M)</th> </tr> </thead> <tbody> <tr> <td><strong>DeepSeek V4 Flash</strong></td> <td>$0.14</td> <td>$0.28</td> </tr> <tr> <td>GPT-5.4 Nano</td> <td>$0.20</td> <td>$1.25</td> </tr> <tr> <td>Gemini 3.1 Flash-Lite</td> <td>$0.25</td> <td>$1.50</td> </tr> <tr> <td>Gemini 3 Flash Preview</td> <td>$0.50</td> <td>$3</td> </tr> <tr> <td>GPT-5.4 Mini</td> <td>$0.75</td> <td>$4.50</td> </tr> <tr> <td>Claude Haiku 4.5</td> <td>$1</td> <td>$5</td> </tr> <tr> <td><strong>DeepSeek V4 Pro</strong></td> <td>$1.74</td> <td>$3.48</td> </tr> <tr> <td>Gemini 3.1 Pro</td> <td>$2</td> <td>$12</td> </tr> <tr> <td>GPT-5.4</td> <td>$2.50</td> <td>$15</td> </tr> <tr> <td>Claude Sonnet 4.6</td> <td>$3</td> <td>$15</td> </tr> <tr> <td>Claude Opus 4.7</td> <td>$5</td> <td>$25</td> </tr> <tr> <td>GPT-5.5</td> <td>$5</td> <td>$30</td> </tr> </tbody> </table> </center> <p>DeepSeek-V4-Flash is the cheapest of the small models, beating even OpenAI's GPT-5.4 Nano. DeepSeek-V4-Pro is the cheapest of the larger frontier models.</p> <p>This note from <a href=\"https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/blob/main/DeepSeek_V4.pdf\">the DeepSeek paper</a> helps explain why they can price these models so low - they've focused a great deal on efficiency with this release, especially for longer context prompts:</p> <blockquote> <p>In the scenario of 1M-token context, even DeepSeek-V4-Pro, which has a larger number of activated parameters, attains only 27% of the single-token FLOPs (measured in equivalent FP8 FLOPs) and 10% of the KV cache size relative to DeepSeek-V3.2. Furthermore, DeepSeek-V4-Flash, with its smaller number of activated parameters, pushes efficiency even further: in the 1M-token context setting, it achieves only 10% of the single-token FLOPs and 7% of the KV cache size compared with DeepSeek-V3.2.</p> </blockquote> <p>DeepSeek's self-reported benchmarks <a href=\"https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/blob/main/DeepSeek_V4.pdf\">in their paper</a> show their Pro model competitive with those other frontier models, albeit with this note:</p> <blockquote> <p>Through the expansion of reasoning tokens, DeepSeek-V4-Pro-Max demonstrates superior performance relative to GPT-5.2 and Gemini-3.0-Pro on standard reasoning benchmarks. Nevertheless, its performance falls marginally short of GPT-5.4 and Gemini-3.1-Pro, suggesting a developmental trajectory that trails state-of-the-art frontier models by approximately 3 to 6 months.</p> </blockquote> <p>I'm keeping an eye on <a href=\"https://huggingface.co/unsloth/models\">huggingface.co/unsloth/models</a> as I expect the Unsloth team will have a set of quantized versions out pretty soon. It's going to be very interesting to see how well that Flash model runs on my own machine.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/llm\">llm</a>, <a href=\"https://simonwillison.net/tags/llm-pricing\">llm-pricing</a>, <a href=\"https://simonwillison.net/tags/pelican-riding-a-bicycle\">pelican-riding-a-bicycle</a>, <a href=\"https://simonwillison.net/tags/deepseek\">deepseek</a>, <a href=\"https://simonwillison.net/tags/llm-release\">llm-release</a>, <a href=\"https://simonwillison.net/tags/openrouter\">openrouter</a>, <a href=\"https://simonwillison.net/tags/ai-in-china\">ai-in-china</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null,
-      "anchor": "87fb3bbba9"
     },
     {
       "id": "latentspace|https://www.latent.space/p/ainews-gpt-55-and-openai-codex-superapp",
