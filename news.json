@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T04:29:54Z",
+  "generated_at": "2026-05-21T04:45:34Z",
   "items": [
     {
       "id": "xai|https://x.ai/news/grok-openclaw",
@@ -370,14 +370,14 @@
         "arxiv"
       ],
       "title": "Residual Paving: Diagnosing the Routing Bottleneck in Selective Refusal Editing",
-      "headline": "Residual Paving: Diagnosing the Routing Bottleneck in Selective Refusal Editing",
+      "headline": "Residual Paving improves selective refusal editing by separating routing from edits, reducing edit refusal from 88.6% to 4% while preserving benign and harmful behavior.",
       "url": "https://arxiv.org/abs/2605.20262",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20262v1 Announce Type: new Abstract: We study selective refusal editing as a three-way control problem: induce non-refusal on designated edit prompts while preserving benign behavior and harmful refusals outside the edit set. We introduce Residual Paving, a routed residual editing method for frozen instruction-tuned transformers that separates route selectivity, whether to intervene, from residual-edit capacity, what edit to apply. An early-layer router predicts a scalar gate and expert mixture; when active, prompt-conditioned bottleneck residual experts apply later-layer residual updates while leaving the backbone unchanged. This decomposition supports an oracle-routing diagnostic where only the learned scalar gate is replaced with the held-out edit/keep label, leaving the residual editor and frozen backbone fixed. On the primary Gemma-3-4B-IT held-out split, learned Residual Paving reduces edit refusal from 88.6% to 4.0%, with 95.5% benign distribution preservation and 87.3% harmful distribution preservation. Same-protocol one-direction steering controls are much weaker on edit success, leaving edit refusal at 86.8% for Edit-target ActAdd and 78.9% for DIM-style refusal steering. The remaining failure is off-target harmful-keep degradation: harmful refusal remains below the frozen-base rate, 65.3% vs. 81.6%. Across six backbones, oracle routing improves the keep-side diagnostic score on every reported row, with median gain +12.9 pp, supporting the interpretation that learned route selectivity is the main observed bottleneck. Trajectory diagnostics on two backbones further suggest directed movement toward edit-target continuations rather than generic refusal suppression.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:43:52Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20268",
@@ -391,14 +391,14 @@
         "arxiv"
       ],
       "title": "Chronicle: A Multimodal Foundation Model for Joint Language and Time Series Understanding",
-      "headline": "Chronicle: A Multimodal Foundation Model for Joint Language and Time Series Understanding",
+      "headline": "Chronicle jointly pretrains a 324M-parameter transformer on natural language and time series, matching dedicated foundation models on language understanding and temporal tasks.",
       "url": "https://arxiv.org/abs/2605.20268",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20268v1 Announce Type: new Abstract: Real-world time series come with text: metadata, descriptions, news, reports. Yet time series foundation models process numerical sequences in isolation, and the multimodal text-and-time-series models that attempt to bridge the two all adapt a pretrained language model post hoc, inheriting representations shaped without ever seeing temporal data. These models are also evaluated almost exclusively against other multimodal baselines, not against the strongest unimodal foundation models in either domain, leaving open whether joint training is needed at all. We present Chronicle, a compact 324M-parameter decoder-only transformer trained from scratch on natural language and time series within a single unified architecture. Both modalities share the same transformer blocks, attention mechanism, and residual stream; the bulk of pretraining uses unimodal batches so cross-modal capability emerges purely from shared parameters, with a short alignment stage that interleaves the two. To our knowledge, Chronicle is the first model jointly pretrained on text and time series from scratch, and the first multimodal model evaluated against dedicated foundation models in both domains. It matches Gemma-3-270M-PT on 19 NLU tasks, sets a new bar for frozen-embedding time series classification on 24 UCR/UEA datasets, and produces multimodal forecasts on Time-MMD that beat every supervised fusion baseline, all from a single backbone.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:44:03Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20269",
@@ -412,14 +412,14 @@
         "arxiv"
       ],
       "title": "Catching a Moving Subspace: Low-Rank Bandits Beyond Stationarity",
-      "headline": "Catching a Moving Subspace: Low-Rank Bandits Beyond Stationarity",
+      "headline": "Researchers develop bandit algorithms that exploit low-rank structure while adapting to drifting subspaces, improving regret bounds in recommendation systems.",
       "url": "https://arxiv.org/abs/2605.20269",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20269v1 Announce Type: new Abstract: Many bandit deployments (recommendation, clinical dosing, ad targeting) share two facts prior work handles only in isolation: rewards live on a low-dimensional latent subspace, and that subspace drifts. Stationary low-rank bandits exploit rank but break under subspace change; non-stationary linear bandits adapt to drift but pay ambient rate $\\widetilde{O}(d\\sqrt{T})$. We study piecewise-stationary low-rank linear contextual bandits with scalar feedback: $\\theta_t = B_k^\\star w_t$ with rank-$r$ factor $B_k^\\star\\in\\mathbb{R}^{d\\times r}$ constant within each of $K$ unknown segments and able to shift at boundaries. Our results are tight along three axes. (i) Identification boundary. With single-play scalar rewards, the moving subspace is recoverable through quadratic functionals of rewards iff three probe-side conditions hold: known noise variance, bounded state-noise coupling, and full-dimensional probe support. Each is necessary in the unrestricted-second-moment problem, and jointly they are sufficient, characterizing the boundary of the solvable region. (ii) Algorithm and dynamic regret. SPSC interleaves isotropic probes with windowed projected ridge-UCB exploitation inside the learned $r$-dimensional subspace; a CUSUM-style variant discovers segment boundaries online. The costed dynamic regret is $\\widetilde{O}(r\\sqrt{T})+\\widetilde{O}(T^{2/3})+O(W\\,V_{\\mathrm{in}})$, replacing the ambient $d\\sqrt{T}$ rate with the intrinsic rank. (iii) Empirics. On eleven benchmarks spanning synthetic, UCI/MovieLens, semi-synthetic clinical, and ZOZOTOWN production-log data, SPSC outperforms non-stationary and low-rank baselines whenever $d-r\\gtrsim T^{1/6}$, matching the analytical crossover. To our knowledge, this is the first work to characterize the identification boundary and attain the intrinsic-rank dynamic-regret rate in this setting.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:44:25Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20270",
@@ -433,14 +433,14 @@
         "arxiv"
       ],
       "title": "Conformal Selective Acting: Anytime-Valid Risk Control for RLVR-Trained LLMs",
-      "headline": "Conformal Selective Acting: Anytime-Valid Risk Control for RLVR-Trained LLMs",
+      "headline": "Conformal Selective Acting provides per-round selective risk control for fine-tuned language models without cross-deployment data pooling.",
       "url": "https://arxiv.org/abs/2605.20270",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20270v1 Announce Type: new Abstract: A local specialist LLM, fine-tuned with reinforcement learning from verifiable rewards (RLVR) on operator-local data, is installed in a regulated organization with per-deployment error budget $\\alpha$. The operator needs a safety certificate for this deployment's stream at every round: no pooling across deployments, no waiting for a long-run average. Existing wrappers cannot deliver this on adaptive, online-updated streams: offline conformal-risk methods require exchangeability; online-conformal methods bound only long-run averages; non-exchangeable extensions are marginally valid; and the closest anytime wrapper, A-RCPS, controls marginal rather than selective risk. Using a (test statistic, validity guarantee, deployment rule) framework, we identify one empty cell forced by deployment requirements: e-process per threshold, selective risk, anytime-pathwise validity, max-certified-threshold rule. Conformal Selective Acting (CSA) fills it as a per-round wrapper maintaining a Ville-type e-process per threshold on a Bonferroni grid, evaluated against the RLVR filtration. Under predictable updates and isotonic-calibrated monotone risk we prove (i) an anytime-pathwise selective-risk bound $R_T^{\\mathrm{act}}\\le\\alpha+O(N_T^{-1/2})$, (ii) rate-optimal certification matching $\\Theta(\\bar\\eta^{-2}\\log(1/\\delta))$, and (iii) a horizon-independent release-rate gap. Across eight specialist benchmarks ($480$ streams), sixteen adversarial distribution-shift cells ($160$ streams), and five live Expert-Iteration RLVR cells with online LoRA over four base models in three architecture families ($10{,}300$ rounds), CSA is the only method among ten compared that satisfies pathwise validity and non-refusing deployment on every cell. We do not propose a new LLM, training algorithm, or policy class; CSA is the deployment-side complement, orthogonal to the model, for operators who cannot use a frontier API.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:44:40Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20272",
@@ -454,14 +454,14 @@
         "arxiv"
       ],
       "title": "Smaller Abstract State Spaces Enable Cross-Scale Generalization in Reinforcement Learning",
-      "headline": "Smaller Abstract State Spaces Enable Cross-Scale Generalization in Reinforcement Learning",
+      "headline": "Theoretical analysis shows smaller abstract state spaces enable reinforcement learning agents to achieve out-of-distribution generalization across tasks of varying complexity.",
       "url": "https://arxiv.org/abs/2605.20272",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20272v1 Announce Type: new Abstract: While humans readily generalize abstract concepts to more complex or larger tasks, building Reinforcement Learning (RL) systems with this ability remains elusive. Here, we present the first theoretical model of how such Out-of-Distribution (OOD) generalization can be achieved in RL agents. Our approach considers Partially Observable Markov Decision Processes (POMDPs) and assumes that an intelligent agent uses an abstraction function to determine which experiences can be treated as equivalent and which must be distinguished. First, we extend the existing state abstraction framework and proof techniques to POMDPs. Then, we define a successor-weighted model reduction, a model reduction variant that enables compression into smaller abstract spaces than prior definitions allow. We derive a bound on the agent's OOD test performance, thereby defining the conditions under which OOD generalization is achievable. This bound decomposes an agent's performance loss into approximation and estimation errors, revealing how reducing an agent's abstract state space size improves test performance and OOD generalization. Our analysis suggests that constraining an agent to operate over a small, finite set of abstract states is necessary for achieving generalization to more complex tasks. Our results motivate further research into learning RL architectures that scale across tasks of varying complexity levels.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:44:52Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20273",
@@ -475,14 +475,14 @@
         "arxiv"
       ],
       "title": "Modality-Decoupled Online Recursive Editing",
-      "headline": "Modality-Decoupled Online Recursive Editing",
+      "headline": "M-ORE enables efficient online editing of multimodal models by maintaining separate text and visual statistics to reduce cross-modal conflict.",
       "url": "https://arxiv.org/abs/2605.20273",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20273v1 Announce Type: new Abstract: Online model editing for multimodal large language models (MLLMs) requires assimilating a stream of corrections under tight compute and memory budgets. Yet editors developed for text-only LLMs often degrade on MLLMs: visually dominant activations skew the statistics that shape updates, causing cross-modal conflict, while sequential writes become entangled in a shared edit space and amplify long-horizon interference, causing inter-edit interference. To address these, we propose M-ORE, a modality-decoupled online recursive editor for lifelong MLLM adaptation. M-ORE is derived from a unified proximal-projection formulation and admits a closed-form update with a Sherman-Morrison recursion, yielding constant per-edit overhead. It maintains module-wise locality statistics for the text stack and the visual projector to avoid visually dominated update shaping and performs continual updates in a fixed orthogonal low-rank edit subspace via a Sherman-Morrison recursion to mitigate long-horizon interference. Experiments on multiple MLLM backbones and online editing benchmarks show that our M-ORE method consistently improves reliability, generality, and locality over strong baselines, while achieving favorable quality-efficiency scaling. Our code is publicly available at https://github.com/lab-klc/M-ORE.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:45:10Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20276",
@@ -496,14 +496,14 @@
         "arxiv"
       ],
       "title": "OmniISR: A Unified Framework for Centralized and Federated Learning via Intermediate Supervision and Regularization",
-      "headline": "OmniISR: A Unified Framework for Centralized and Federated Learning via Intermediate Supervision and Regularization",
+      "headline": "OmniISR proposes a unified framework for centralized and federated learning using intermediate supervision and regularization signals.",
       "url": "https://arxiv.org/abs/2605.20276",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20276v1 Announce Type: new Abstract: The global deployment of edge intelligence operates across heterogeneous legal frameworks. While some regions permit centralized learning (CL) via cloud data aggregation, others enforce strict data localization, necessitating federated learning (FL). This operational dichotomy introduces two incompatible optimization regimes (i.e., unbiased global gradients yet coupled with internal covariate shift in CL versus biased, drift-prone local updates in FL), resulting in that any naive integration of the two lacks rigorous theoretical guarantees. To fill this gap, we propose OmniISR, a unified framework that fuses pure CL, pure FL, and hybrid CL-FL training modes via equipping intermediate supervision and regularization (ISR) signals at multiple hidden layers. Specifically, we propose (i) to use mutual-information (MI) as intermediate supervision to align shifting internal covariate in CL and client-drifting representations in FL, and (ii) to adopt negative-entropy (NE) as intermediate regularizer to penalize overconfident prediction, preserve representational uncertainty, and avoid device-specific collapse. On the theory side, we derive (i) a unified, ISR-agnostic, and non-asymptotic O(1/sqrt(T)) convergence bound that shows the introduced ISR does not violate standard SGD convergence, (ii) a federated drift-bound that quantifies the ISR-reduced client drift, (iii) a gradient-alignment guarantee that ensures non-conflicting CL and FL updates under mild bias, and (iv) an explicit escape-time bound that indicates that CL-FL hybrid mixing enlarges effective stochasticity and accelerates escape from strict saddles. Extensive experiments demonstrate that OmniISR consistently improves model performance in both centralized and federated paradigms, reduces the CL-FL gap by 22.60%, and yields 37/48 paired metric wins across multiple FL algorithms.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:45:24Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20278",
@@ -517,14 +517,14 @@
         "arxiv"
       ],
       "title": "ClaimDiff-RL: Fine-Grained Caption Reinforcement Learning through Visual Claim Comparison",
-      "headline": "ClaimDiff-RL: Fine-Grained Caption Reinforcement Learning through Visual Claim Comparison",
+      "headline": "ClaimDiff-RL uses atomic claim differences as RL rewards to separately tune hallucination and missing facts in image captioning.",
       "url": "https://arxiv.org/abs/2605.20278",
       "published_at": "2026-05-21T04:00:00Z",
       "discovered_at": "2026-05-21T04:13:02Z",
       "description": "arXiv:2605.20278v1 Announce Type: new Abstract: Long-form image captioning exposes a reward granularity problem in RL: captions are judged as whole sequences, while the important errors occur at the level of individual visual claims. A good dense caption should be both faithful and informative, avoiding hallucination without omitting salient details. Yet pairwise preferences, reference-based metrics, and holistic scalar rewards compress these local errors into a single sequence-level signal, obscuring the tradeoff between factuality and coverage. We introduce ClaimDiff-RL, a framework that uses reference-conditioned atomic claim differences as the reward unit for caption RL. Given an image, an actor caption, and a reference caption, a multimodal judge enumerates visually grounded differences, verifies each difference against the image, assigns open-vocabulary error types and severity levels, and produces per-difference statistics for reward composition. This makes hallucinated claims and omitted salient facts separately measurable and tunable. Experiments show that holistic scalar rewards can reduce hallucination by increasing missing facts, while ClaimDiff-RL exposes this faithfulness and coverage tradeoff and enables more balanced operating points. On a 160-image human-labeled diagnostic benchmark, public captioning benchmarks, and VQA benchmarks, ClaimDiff-RL improves the hallucination--missing-fact balance, preserves general capability, and even surpasses Gemini-3-Pro-Preview on several fine-grained Capability dimensions such as object counting, spatial relations, and scene recognition. These results suggest that typed, verifiable claim differences are an effective reward unit for fine-grained and diagnosable caption RL.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-05-21T04:45:34Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2605.20285",
