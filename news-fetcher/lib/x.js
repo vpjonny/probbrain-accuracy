@@ -116,15 +116,38 @@ export function formatThreadTweets(items) {
   });
 }
 
-export async function postThread(client, items) {
+// Post tweet 1 with optional quote of an earlier tweet. If the quote target
+// is gone/protected/otherwise rejected, retry once as a plain tweet so a stale
+// state file never blocks the digest from going out.
+async function postFirstTweet(client, text, quoteTweetId) {
+  const opts = quoteTweetId ? { quote_tweet_id: quoteTweetId } : undefined;
+  try {
+    return await client.v2.tweet(text, opts);
+  } catch (e) {
+    if (!quoteTweetId) throw e;
+    console.error(`x: quote of ${quoteTweetId} failed (${e.message}); retrying tweet 1 without quote`);
+    return await client.v2.tweet(text);
+  }
+}
+
+export async function postThread(client, items, quoteTweetId = null) {
   const capped = items.slice(0, THREAD_MAX);
   const texts = formatThreadTweets(capped);
   if (texts.length === 0) throw new Error('postThread: no items');
-  if (texts.length === 1) {
-    const r = await client.v2.tweet(texts[0]);
-    return { ids: [r.data?.id], texts };
-  }
-  const results = await client.v2.tweetThread(texts);
-  const ids = results.map(r => r.data?.id);
+
+  const first = await postFirstTweet(client, texts[0], quoteTweetId);
+  const firstId = first.data?.id;
+  const ids = [firstId];
+  if (texts.length === 1) return { ids, texts };
+
+  // Reply-chain the rest off tweet 1. tweetThread auto-links each next reply
+  // to the previous tweet, so we only need to set the in_reply_to on slot 0.
+  const restInputs = texts.slice(1).map((text, i) =>
+    i === 0
+      ? { text, reply: { in_reply_to_tweet_id: firstId } }
+      : text
+  );
+  const restResults = await client.v2.tweetThread(restInputs);
+  for (const r of restResults) ids.push(r.data?.id);
   return { ids, texts };
 }

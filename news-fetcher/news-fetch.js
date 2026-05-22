@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { homedir } from 'node:os';
+import { mkdir } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { SOURCES, CATEGORIES, ARXIV_INTERVAL_MS } from './sources.js';
 import { itemId, itemAnchor, buildHashtags, toUtcIso } from './lib/normalize.js';
@@ -29,6 +31,10 @@ const PUBLISHED_SIGNALS = join(REPO_ROOT, 'data', 'published_signals.json');
 const LAST_POSTED = join(__dirname, 'last_posted.json');
 const LAST_POSTED_BSKY = join(__dirname, 'last_posted_bsky.json');
 const LAST_POSTED_X = join(__dirname, 'last_posted_x.json');
+// Shared with the Python signal publisher (pipeline/x_publisher.py) so every
+// outbound tweet — news digest or signal thread — quotes whatever this account
+// posted last, regardless of which subsystem sent it.
+const LAST_X_TWEET = join(homedir(), '.config', 'probbrain', 'last_x_tweet.json');
 const DEFAULT_PER_SOURCE_KEEP = 30;
 const FEED_LIMIT = 60;
 const SUMMARY_MAX_PER_RUN = 8;
@@ -592,13 +598,16 @@ async function postToX(items) {
     return;
   }
 
+  const quoteTarget = await readLastTweetId();
+
   try {
-    const result = await postXThread(client, picked);
+    const result = await postXThread(client, picked, quoteTarget);
     const postedAt = toUtcIso(new Date());
     const postedCount = result.ids.filter(Boolean).length;
     for (const it of picked.slice(0, postedCount)) posted[it.id] = postedAt;
     await writeJsonAtomic(LAST_POSTED_X, { posted, last_digest_at: postedAt, updated_at: postedAt });
-    log(`x: posted thread with ${postedCount} items (first tweet_id=${result.ids[0]})`);
+    if (result.ids[0]) await writeLastTweetId(result.ids[0]);
+    log(`x: posted thread with ${postedCount} items (first tweet_id=${result.ids[0]}, quote_of=${quoteTarget || '—'})`);
   } catch (e) {
     log(`X ERR: ${e.message}`);
     if (e.data) log(`  details: ${JSON.stringify(e.data).slice(0, 300)}`);
@@ -608,6 +617,21 @@ async function postToX(items) {
     const failedAt = toUtcIso(new Date());
     await writeJsonAtomic(LAST_POSTED_X, { posted, last_digest_at: failedAt, updated_at: failedAt });
   }
+}
+
+async function readLastTweetId() {
+  const state = await readJson(LAST_X_TWEET, null);
+  if (!state) return null;
+  const tid = String(state.tweet_id || '').trim();
+  return tid || null;
+}
+
+async function writeLastTweetId(tweetId) {
+  await mkdir(dirname(LAST_X_TWEET), { recursive: true });
+  await writeJsonAtomic(LAST_X_TWEET, {
+    tweet_id: String(tweetId),
+    posted_at: toUtcIso(new Date()),
+  });
 }
 
 // Migrate legacy {posted_ids:[]} to {posted:{id:postedAt}} on read. Legacy
