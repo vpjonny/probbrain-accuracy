@@ -741,13 +741,17 @@
               date language ("by spring", "by end of Q2", "around June") are
               auto-routed to shadow, regardless of category.</li>
             <li><strong>Gate 2 — NO low-estimate autoshadow.</strong> NO_UNDERPRICED
-              with raw our_estimate &lt; 0.25 requires ≥ 2 strong evidence items
-              to publish live; otherwise routes to shadow.</li>
+              with raw our_estimate &lt; 0.22 routes to shadow unless one of two
+              overrides applies: (a) ≥ 2 strong evidence items support the call,
+              or (b) <em>agreement carve-out</em> — our estimate plus market
+              price is below 0.35 (we and the market are both saying "unlikely",
+              so this isn't a contrarian bet) and we have ≥ 2 evidence items.</li>
             <li><strong>Gate 3 — low-band calibration shrinkage.</strong> For
               raw our_estimate &lt; 0.25, the calibrated value becomes
-              <code>max(0.22, raw × 0.6 + market × 0.4)</code>. The "this is
-              very unlikely" voice no longer gets full weight; it gets pulled
-              part-way toward the market with a 0.22 floor.</li>
+              <code>max(0.20, raw × 0.65 + market × 0.35)</code>. The "this is
+              very unlikely" voice gets pulled part-way toward the market with
+              a 0.20 floor — without overcorrecting on the upper tail where
+              the model is well-calibrated.</li>
           </ul>
 
           <p><strong>Backtest on 47 resolved signals:</strong> live universe
