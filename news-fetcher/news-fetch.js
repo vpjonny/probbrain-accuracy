@@ -301,7 +301,7 @@ function gitPushStatus() {
     const msg = staged.includes('sitemap.xml') ? `status + sitemap: ${toUtcIso(new Date())}` : `status: ${toUtcIso(new Date())}`;
     execFileSync('git', ['commit', '-m', msg], opts);
     try {
-      execFileSync('git', ['pull', '--rebase', 'origin', 'main'], opts);
+      execFileSync('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], opts);
     } catch (e) {
       try { execFileSync('git', ['rebase', '--abort'], { ...opts, stdio: 'ignore' }); } catch {}
       throw e;
@@ -324,7 +324,7 @@ function gitPushNews(newCount) {
     // Rebase before push — the arb scanner pushes opportunities.json to this
     // same remote every 15 min, so a plain push gets rejected as non-fast-fwd.
     try {
-      execFileSync('git', ['pull', '--rebase', 'origin', 'main'], opts);
+      execFileSync('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], opts);
     } catch (e) {
       try { execFileSync('git', ['rebase', '--abort'], { ...opts, stdio: 'ignore' }); } catch {}
       throw e;

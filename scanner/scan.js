@@ -97,7 +97,7 @@ function gitPush(message) {
     // accuracy.json to this same remote, so a plain push gets rejected as
     // non-fast-forward whenever a dashboard update lands between our scans.
     try {
-      execFileSync('git', ['pull', '--rebase', 'origin', 'main'], opts);
+      execFileSync('git', ['pull', '--rebase', '--autostash', 'origin', 'main'], opts);
     } catch (e) {
       try { execFileSync('git', ['rebase', '--abort'], { ...opts, stdio: 'ignore' }); } catch {}
       throw e;
