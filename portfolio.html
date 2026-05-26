@@ -62,20 +62,78 @@
   a:hover { text-decoration: underline; }
   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
-  /* Top warning ticker */
-  .ticker { background: var(--yellow-dim); border-bottom: 1px solid var(--yellow); overflow: hidden; }
-  .ticker-track { display: flex; gap: 48px; padding: 8px 0; white-space: nowrap;
-    animation: tickerScroll 60s linear infinite; }
-  .ticker-text { font-size: 12px; color: #fde68a; font-weight: 500; }
-  @keyframes tickerScroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+  /* Ticker (mirrors index.html — muted info + yellow warn segments) */
+  .ticker-bar {
+    overflow: hidden; background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 6px 0; white-space: nowrap; position: relative;
+  }
+  .ticker-track { display: flex; width: max-content;
+    animation: ticker 30s linear infinite; }
+  .ticker-segment { display: flex; align-items: center; flex-shrink: 0; }
+  .ticker-text { font-size: 0.78rem; font-weight: 500; color: var(--muted);
+    letter-spacing: 0.02em; text-transform: uppercase; }
+  .ticker-text.ticker-warn { color: #eab308; }
+  .ticker-sep { color: var(--muted2); margin: 0 24px; font-size: 0.6rem; }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 
+  /* Atmospheric blobs + money glyphs (mirrors index.html) */
+  .bg-blobs {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    filter: blur(80px) saturate(1.3); opacity: 0.32;
+  }
+  .bg-blob {
+    position: absolute; border-radius: 50%;
+    width: 36vmin; height: 36vmin; will-change: transform;
+  }
+  .bg-blob.win    { background: radial-gradient(circle, rgba(34,197,94,1) 0%, rgba(34,197,94,0) 65%);
+                    top: -12vmin; left: -12vmin;
+                    animation: blob-a 24s ease-in-out infinite alternate; }
+  .bg-blob.loss   { background: radial-gradient(circle, rgba(239,68,68,1) 0%, rgba(239,68,68,0) 65%);
+                    top: -12vmin; right: -12vmin;
+                    animation: blob-b 28s ease-in-out infinite alternate; }
+  .bg-blob.pending { background: radial-gradient(circle, rgba(99,102,241,1) 0%, rgba(99,102,241,0) 65%);
+                     bottom: -12vmin; left: -12vmin;
+                     animation: blob-c 26s ease-in-out infinite alternate; }
+  .bg-blob.shadow { background: radial-gradient(circle, rgba(167,139,250,1) 0%, rgba(167,139,250,0) 65%);
+                    bottom: -12vmin; right: -12vmin;
+                    animation: blob-d 30s ease-in-out infinite alternate; }
+  @keyframes blob-a { 0% { transform: translate(0,0)     scale(1);    }
+                      50%{ transform: translate(40vw,28vh)scale(1.15);}
+                      100%{ transform: translate(62vw,52vh)scale(0.88);} }
+  @keyframes blob-b { 0% { transform: translate(0,0)     scale(0.92); }
+                      50%{ transform: translate(-50vw,36vh)scale(1.18);}
+                      100%{ transform: translate(-26vw,60vh)scale(1.02);} }
+  @keyframes blob-c { 0% { transform: translate(0,0)     scale(1.08); }
+                      50%{ transform: translate(46vw,-32vh)scale(0.92);}
+                      100%{ transform: translate(22vw,-56vh)scale(1.15);} }
+  @keyframes blob-d { 0% { transform: translate(0,0)     scale(1);    }
+                      50%{ transform: translate(-42vw,-26vh)scale(0.86);}
+                      100%{ transform: translate(-66vw,-46vh)scale(1.12);} }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-blob { animation: none !important; transform: none !important; }
+    .bg-blobs { opacity: 0.2; }
+  }
+  .bg-money { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    overflow: hidden; user-select: none; }
+  .money-glyph {
+    position: absolute; font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 800; letter-spacing: -0.06em; line-height: 1; white-space: nowrap;
+    text-shadow: 0 0 60px currentColor; will-change: transform;
+  }
+  .money-glyph.g1 { top: 6vh;  left: 4vw;   font-size: clamp(140px,18vw,280px); transform: rotate(-12deg); color: rgba(34,197,94,1);  opacity: .055; }
+  .money-glyph.g2 { top: 16vh; right: 10vw; font-size: clamp(80px,10vw,160px);  transform: rotate(8deg);   color: rgba(99,102,241,1); opacity: .04; }
+  .money-glyph.g3 { top: 46vh; left: 24vw;  font-size: clamp(60px,8vw,130px);   transform: rotate(-6deg);  color: rgba(167,139,250,1); opacity: .06; }
+  .money-glyph.g4 { top: 56vh; right: 6vw;  font-size: clamp(200px,24vw,380px); transform: rotate(14deg);  color: rgba(59,130,246,1); opacity: .045; }
+  .money-glyph.g5 { bottom: 6vh; left: 12vw; font-size: clamp(110px,13vw,220px); transform: rotate(-20deg); color: rgba(239,68,68,1); opacity: .05; }
+  .money-glyph.g6 { top: 30vh; left: 52vw;  font-size: clamp(60px,6vw,100px);   transform: rotate(4deg);   color: rgba(34,197,94,1); opacity: .05; }
+  .money-glyph.g7 { top: 72vh; left: 42vw;  font-size: clamp(80px,9vw,140px);   transform: rotate(-8deg);  color: rgba(99,102,241,1); opacity: .04; }
+  @media (prefers-reduced-motion: reduce) { .money-glyph { animation: none !important; } }
+
   /* Layout */
-  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px 80px; }
-  .page-title { font-size: 28px; font-weight: 700; margin: 24px 0 8px;
-    letter-spacing: -0.02em; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px 80px; position: relative; }
 
   /* Unified header (mirrors index.html / arbitrage.html) */
   .header {
@@ -164,42 +222,85 @@
     .header-cta::before { animation: none; opacity: 0; }
   }
 
-  .subtitle { color: var(--muted); font-size: 14px; margin: 0 0 20px; max-width: 760px; }
   .rule-stamp { display: inline-flex; gap: 8px; align-items: center;
     background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
     padding: 6px 10px; font-size: 11px; color: var(--muted); margin: 4px 0 20px; }
   .rule-stamp .mono { color: var(--text); }
 
-  /* KPI strip */
+  /* Page hero (mirrors index.html) */
+  .page-hero { margin: 0 0 28px; padding: 0; }
+  .page-hero h1 {
+    font-size: clamp(1.4rem, 2.6vw, 1.95rem); font-weight: 800;
+    letter-spacing: -0.01em; color: var(--text);
+    margin: 0 0 8px; line-height: 1.2;
+  }
+  .page-hero p {
+    font-size: 0.92rem; line-height: 1.55; color: var(--muted);
+    max-width: 760px; margin: 0;
+  }
+  .page-hero p strong { color: var(--text); font-weight: 600; }
+
+  /* KPI grid (mirrors index.html — top accent bar, larger numerals) */
   .kpi-strip {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
-    margin: 20px 0 24px;
+    gap: 12px;
+    margin: 20px 0 36px;
   }
   .kpi-card {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
-    padding: 12px 14px;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; position: relative; overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease;
   }
-  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.05em; font-weight: 600; }
-  .kpi-value { font-size: 22px; font-weight: 700; margin-top: 4px;
-    font-variant-numeric: tabular-nums; }
-  .kpi-value.pos { color: var(--green); }
-  .kpi-value.neg { color: var(--red); }
+  .kpi-card:hover { transform: translateY(-1px); border-color: var(--border2); }
+  .kpi-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: var(--border2);
+  }
+  .kpi-card.accent-green::before  { background: var(--green); }
+  .kpi-card.accent-red::before    { background: var(--red); }
+  .kpi-card.accent-yellow::before { background: var(--yellow); }
+  .kpi-card.accent-blue::before   { background: var(--blue); }
+  .kpi-label {
+    font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Dashboard naming */
+  .kpi-value.green  { color: var(--green); }
+  .kpi-value.red    { color: var(--red); }
+  .kpi-value.yellow { color: var(--yellow); }
+  .kpi-value.blue   { color: var(--blue); }
+  .kpi-value.muted  { color: var(--muted); }
+  /* Aliases used by portfolio.js */
+  .kpi-value.pos  { color: var(--green); }
+  .kpi-value.neg  { color: var(--red); }
   .kpi-value.warm { color: var(--muted); }
-  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px;
-    font-variant-numeric: tabular-nums; }
+  .kpi-sub {
+    margin-top: 6px; font-size: 0.72rem; color: var(--muted);
+    display: flex; align-items: center; gap: 4px;
+    font-variant-numeric: tabular-nums;
+  }
   .kpi-sub.warm { color: var(--yellow); }
 
-  /* Sections */
-  section { margin: 36px 0; }
-  section h2 { font-size: 18px; font-weight: 700; margin: 0 0 4px;
-    letter-spacing: -0.01em; }
-  section h2 .count { color: var(--muted); font-weight: 400; font-size: 14px;
-    margin-left: 8px; }
-  section p.hint { font-size: 13px; color: var(--muted); margin: 0 0 14px;
-    max-width: 760px; }
+  /* Sections (match dashboard section-title cadence) */
+  section { margin: 36px 0; position: relative; }
+  section h2 {
+    font-size: 1.1rem; font-weight: 700; margin: 0 0 6px;
+    letter-spacing: -0.01em; color: var(--text);
+  }
+  section h2 .count {
+    color: var(--muted); font-weight: 500; font-size: 0.78rem;
+    letter-spacing: 0.06em; text-transform: uppercase; margin-left: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  section p.hint {
+    font-size: 0.85rem; line-height: 1.55; color: var(--muted);
+    margin: 0 0 14px; max-width: 760px;
+  }
 
   /* Equity chart */
   .chart-wrap { background: var(--bg2); border: 1px solid var(--border);
@@ -315,7 +416,8 @@
 
   @media (max-width: 640px) {
     .container { padding: 16px 12px 60px; }
-    .page-title { font-size: 22px; }
+    .page-hero h1 { font-size: 1.5rem; }
+    .kpi-value { font-size: 1.6rem; }
     .kpi-strip { grid-template-columns: repeat(2, 1fr); }
     table.ledger thead { display: none; }
     table.ledger tbody td { display: block; padding: 4px 10px; white-space: normal; }
@@ -352,23 +454,58 @@
     </div>
   </header>
 
-  <div class="ticker">
+  <div class="ticker-bar">
     <div class="ticker-track">
-      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
-      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
-      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
-      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
+      <div class="ticker-segment">
+        <span class="ticker-text ticker-warn">⚠ Simulated portfolio — not financial advice</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">$10,000 paper bankroll, Kelly-staked, P&amp;L lands at resolution</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text ticker-warn">⚠ Past performance ≠ future</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Math is open source · /assets/portfolio.js</span>
+        <span class="ticker-sep">&bull;</span>
+      </div>
+      <div class="ticker-segment">
+        <span class="ticker-text ticker-warn">⚠ Simulated portfolio — not financial advice</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">$10,000 paper bankroll, Kelly-staked, P&amp;L lands at resolution</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text ticker-warn">⚠ Past performance ≠ future</span>
+        <span class="ticker-sep">&bull;</span>
+        <span class="ticker-text">Math is open source · /assets/portfolio.js</span>
+        <span class="ticker-sep">&bull;</span>
+      </div>
     </div>
   </div>
 
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="bg-blob win"></div>
+    <div class="bg-blob loss"></div>
+    <div class="bg-blob pending"></div>
+    <div class="bg-blob shadow"></div>
+  </div>
+
+  <div class="bg-money" aria-hidden="true">
+    <div class="money-glyph g1">$</div>
+    <div class="money-glyph g2">$</div>
+    <div class="money-glyph g3">$</div>
+    <div class="money-glyph g4">$</div>
+    <div class="money-glyph g5">$</div>
+    <div class="money-glyph g6">$</div>
+    <div class="money-glyph g7">$</div>
+  </div>
+
   <div class="container">
-    <h1 class="page-title">Virtual Portfolio</h1>
-    <p class="subtitle">
-      Simulated $10,000 bankroll Kelly-staked on every published ProbBrain Polymarket signal.
-      Bet sizes use fractional Kelly with a per-bet cap; fills include linear-impact slippage;
-      P&L lands at resolution. Every trade is in the ledger below. Every rejected market
-      candidate is in the funnel below. <a href="/assets/portfolio.js">Open-source math.</a>
-    </p>
+    <section class="page-hero">
+      <h1>Virtual Portfolio</h1>
+      <p>
+        <strong>Simulated $10,000 bankroll</strong> Kelly-staked on every published ProbBrain Polymarket signal.
+        Bet sizes use fractional Kelly with a per-bet cap; fills include linear-impact slippage;
+        P&amp;L lands at resolution. Every trade is in the ledger below. Every rejected market
+        candidate is in the funnel below. <a href="/assets/portfolio.js">Open-source math.</a>
+      </p>
+    </section>
     <div class="rule-stamp">
       rule&nbsp;<span class="mono" id="rule-sha">…</span>
       &middot; generated <span class="mono" id="generated-at">…</span>
