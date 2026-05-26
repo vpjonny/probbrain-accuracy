@@ -706,6 +706,63 @@
       </details>
     </section>
 
+    <section>
+      <details class="method">
+        <summary>What changed 2026-05-26 — publication rule v1.1</summary>
+        <div class="body">
+          <p>After 47 resolved signals, a failure autopsy on the dataset surfaced
+          three loud patterns that the original v1.0 rule didn't catch. We added
+          three calibration gates and bumped the rule version. Every signal
+          published from 2026-05-26 onward carries the v1.1 SHA in its audit
+          trail. See
+          <a href="https://github.com/vpjonny/probbrain-accuracy/blob/main/PUBLICATION_RULE.md">PUBLICATION_RULE.md §6</a>
+          for the full code-level spec.</p>
+
+          <p><strong>Failure categories observed on the first 47 resolved signals:</strong></p>
+          <ul>
+            <li><strong>Calibration inversion at the low end.</strong> When we said
+              "this has &lt; 10% chance", the market resolved YES 64% of the
+              time (n=11). The "this won't happen" voice was systematically
+              wrong. Same shape at 0.1–0.2 (55% realized) and 0.3–0.4 (75%).</li>
+            <li><strong>NO_UNDERPRICED + low estimate is the dominant loss shape.</strong>
+              13 of 24 losses were signals saying "this date-bounded event
+              won't happen" with our_estimate &lt; 0.25. Resolved 23% (date-bounded)
+              and 17% (non-date). The model has a "this won't happen on time"
+              bias that didn't hold up.</li>
+            <li><strong>Fuzzy-date prompt ambiguity.</strong> Markets resolving
+              "by spring", "by end of Q2", "around June" resolved
+              non-deterministically. Strict "by April 30, 2026" markets are
+              unaffected.</li>
+          </ul>
+
+          <p><strong>Three new gates, effective 2026-05-26:</strong></p>
+          <ul>
+            <li><strong>Gate 5 — fuzzy-date autoshadow.</strong> Questions with vague
+              date language ("by spring", "by end of Q2", "around June") are
+              auto-routed to shadow, regardless of category.</li>
+            <li><strong>Gate 2 — NO low-estimate autoshadow.</strong> NO_UNDERPRICED
+              with raw our_estimate &lt; 0.25 requires ≥ 2 strong evidence items
+              to publish live; otherwise routes to shadow.</li>
+            <li><strong>Gate 3 — low-band calibration shrinkage.</strong> For
+              raw our_estimate &lt; 0.25, the calibrated value becomes
+              <code>max(0.22, raw × 0.6 + market × 0.4)</code>. The "this is
+              very unlikely" voice no longer gets full weight; it gets pulled
+              part-way toward the market with a 0.22 floor.</li>
+          </ul>
+
+          <p><strong>Backtest on 47 resolved signals:</strong> live universe
+          accuracy moves from 45.5% → 47.6% (+2.1pp). 5 signals would have been
+          demoted to shadow (2 losses caught + 3 wins also blocked — the gates
+          aren't free). Recomputed automatically as more signals resolve.</p>
+
+          <p><strong>What's NOT changed:</strong> the upstream cron gates
+          (volume, gap, days-to-close, top-N) are unchanged. The Claude decide
+          prompt is unchanged. The shadowed-category list is unchanged
+          (geopolitics, conflict, politics, culture). Rate limits unchanged.</p>
+        </div>
+      </details>
+    </section>
+
   </div>
 
 <script type="module">
