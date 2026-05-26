@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XJEDNGMEV6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XJEDNGMEV6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#6366f1">
+<title>Virtual Portfolio — ProbBrain</title>
+<meta name="description" content="Simulated $10,000 bankroll Kelly-staked on every published ProbBrain Polymarket signal. Live equity curve, profit factor, Sortino, Calmar, expectancy, max drawdown, bet-by-bet ledger with CSV+JSON export, and the full rejection-reasons funnel. All math open source.">
+<meta property="og:title" content="Virtual Portfolio — ProbBrain">
+<meta property="og:description" content="Simulated $10k Kelly-staked on every published signal. Equity curve, full ledger, rejection-reasons funnel, all math open source.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://probbrain.com/portfolio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ProbBrain">
+<meta name="twitter:image" content="https://probbrain.com/og-card.png">
+<meta property="og:image" content="https://probbrain.com/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="canonical" href="https://probbrain.com/portfolio">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #1a1a1a;
+    --border: #222222;
+    --border2: #2a2a2a;
+    --text: #e8e8e8;
+    --muted: #888;
+    --muted2: #555;
+    --green: #22c55e;
+    --green-dim: #14532d;
+    --yellow: #eab308;
+    --yellow-dim: #713f12;
+    --red: #ef4444;
+    --red-dim: #7f1d1d;
+    --blue: #3b82f6;
+    --accent: #6366f1;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px; line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  /* Top warning ticker */
+  .ticker { background: var(--yellow-dim); border-bottom: 1px solid var(--yellow); overflow: hidden; }
+  .ticker-track { display: flex; gap: 48px; padding: 8px 0; white-space: nowrap;
+    animation: tickerScroll 60s linear infinite; }
+  .ticker-text { font-size: 12px; color: #fde68a; font-weight: 500; }
+  @keyframes tickerScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Layout */
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px 80px; }
+  .page-title { font-size: 28px; font-weight: 700; margin: 24px 0 8px;
+    letter-spacing: -0.02em; }
+
+  /* Unified header (mirrors index.html / arbitrage.html) */
+  .header {
+    max-width: 1280px; margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .header-left  { display: flex; align-items: center; gap: 12px; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .header-center {
+    display: flex; align-items: center; gap: 10px;
+    flex: 1 1 auto; justify-content: center;
+  }
+  .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+  .logo span { color: var(--accent); }
+  .logo a { color: inherit; text-decoration: none; }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: #0f2010; border: 1px solid #1a4020; border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.72rem; font-weight: 600; color: var(--green);
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    animation: pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.6), 0 0 0 0 rgba(34,197,94,0.4); transform: scale(1); }
+    70%  { box-shadow: 0 0 0 10px rgba(34,197,94,0), 0 0 0 16px rgba(34,197,94,0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0),    0 0 0 0 rgba(34,197,94,0);    transform: scale(1); }
+  }
+  .social-link {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 6px;
+    border: 1px solid var(--border2); background: var(--bg3);
+    color: var(--text); text-decoration: none;
+    font-size: 0.8rem; font-weight: 500;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .social-link:hover { border-color: var(--accent); background: #16172a; }
+  .social-link svg   { width: 15px; height: 15px; flex-shrink: 0; }
+  .header-cta {
+    position: relative; display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 8px;
+    background: linear-gradient(110deg, #6366f1 0%, #3b82f6 45%, #8b5cf6 100%);
+    background-size: 220% 100%;
+    color: #fff; text-decoration: none;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.25),
+      inset 0 0 0 1px rgba(255,255,255,0.08),
+      0 1px 2px rgba(0,0,0,0.4),
+      0 4px 16px rgba(99,102,241,0.45),
+      0 8px 32px rgba(99,102,241,0.18);
+    overflow: hidden; isolation: isolate;
+    animation: cta-shift 7s ease-in-out infinite;
+    transition: transform 0.2s ease, box-shadow 0.25s ease;
+  }
+  .header-cta::before {
+    content: ''; position: absolute; top: -10%; left: -60%; width: 50%; height: 120%;
+    background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.35) 50%, transparent 75%);
+    transform: skewX(-20deg);
+    animation: cta-shimmer 4.5s ease-in-out infinite;
+    pointer-events: none; z-index: 1;
+  }
+  .header-cta > * { position: relative; z-index: 2; }
+  .header-cta:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      inset 0 0 0 1px rgba(255,255,255,0.15),
+      0 2px 4px rgba(0,0,0,0.4),
+      0 6px 28px rgba(99,102,241,0.7),
+      0 14px 56px rgba(99,102,241,0.35);
+  }
+  @keyframes cta-shift   { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  @keyframes cta-shimmer { 0% { left: -60%; } 55% { left: 160%; } 100% { left: 160%; } }
+  @media (prefers-reduced-motion: reduce) {
+    .header-cta { animation: none; }
+    .header-cta::before { animation: none; opacity: 0; }
+  }
+
+  .subtitle { color: var(--muted); font-size: 14px; margin: 0 0 20px; max-width: 760px; }
+  .rule-stamp { display: inline-flex; gap: 8px; align-items: center;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; font-size: 11px; color: var(--muted); margin: 4px 0 20px; }
+  .rule-stamp .mono { color: var(--text); }
+
+  /* KPI strip */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 20px 0 24px;
+  }
+  .kpi-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.05em; font-weight: 600; }
+  .kpi-value { font-size: 22px; font-weight: 700; margin-top: 4px;
+    font-variant-numeric: tabular-nums; }
+  .kpi-value.pos { color: var(--green); }
+  .kpi-value.neg { color: var(--red); }
+  .kpi-value.warm { color: var(--muted); }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px;
+    font-variant-numeric: tabular-nums; }
+  .kpi-sub.warm { color: var(--yellow); }
+
+  /* Sections */
+  section { margin: 36px 0; }
+  section h2 { font-size: 18px; font-weight: 700; margin: 0 0 4px;
+    letter-spacing: -0.01em; }
+  section h2 .count { color: var(--muted); font-weight: 400; font-size: 14px;
+    margin-left: 8px; }
+  section p.hint { font-size: 13px; color: var(--muted); margin: 0 0 14px;
+    max-width: 760px; }
+
+  /* Equity chart */
+  .chart-wrap { background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; }
+  .chart-wrap svg { width: 100%; height: 280px; display: block; }
+  .chart-grid { stroke: var(--border); stroke-width: 1; }
+  .chart-baseline { stroke: var(--muted2); stroke-width: 1; stroke-dasharray: 4 4; }
+  .chart-line { fill: none; stroke-width: 2; }
+  .chart-line.primary { stroke: var(--blue); }
+  .chart-line.ghost { stroke: var(--muted2); stroke-dasharray: 3 3; opacity: 0.8; }
+  .chart-label { fill: var(--muted); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+  .chart-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px;
+    font-size: 12px; color: var(--muted); }
+  .chart-legend .key { width: 12px; height: 2px; display: inline-block;
+    vertical-align: middle; margin-right: 6px; }
+
+  /* Controls */
+  .controls { display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+    margin: 12px 0 18px; padding: 12px 14px;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; }
+  .controls label { font-size: 12px; color: var(--muted); display: inline-flex;
+    align-items: center; gap: 6px; }
+  .controls select, .controls input[type=number] {
+    background: var(--bg3); color: var(--text); border: 1px solid var(--border2);
+    border-radius: 4px; padding: 4px 8px; font: inherit; font-size: 12px;
+    font-family: 'JetBrains Mono', monospace; }
+  .controls input[type=checkbox] { accent-color: var(--accent); }
+
+  /* Ledger table */
+  table.ledger {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  table.ledger thead th {
+    text-align: left; padding: 8px 10px; background: var(--bg2);
+    color: var(--muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border2);
+    position: sticky; top: 0;
+  }
+  table.ledger tbody td {
+    padding: 8px 10px; border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  table.ledger tbody td.q { white-space: normal; max-width: 320px;
+    color: var(--text); }
+  table.ledger tbody td.pos { color: var(--green); }
+  table.ledger tbody td.neg { color: var(--red); }
+  table.ledger tbody tr:hover { background: var(--bg2); }
+  .ledger-wrap { background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden; max-height: 520px; overflow-y: auto; }
+  .export-row { display: flex; gap: 10px; justify-content: flex-end;
+    margin: 10px 0 18px; }
+  .btn { background: var(--bg2); color: var(--text); border: 1px solid var(--border2);
+    padding: 6px 12px; border-radius: 6px; font: inherit; font-size: 12px;
+    font-weight: 500; cursor: pointer; }
+  .btn:hover { background: var(--bg3); border-color: var(--accent); }
+
+  /* Funnel / rejection table */
+  table.funnel { width: 100%; border-collapse: collapse; font-size: 12px;
+    font-variant-numeric: tabular-nums; }
+  table.funnel th, table.funnel td { padding: 8px 10px; text-align: left;
+    border-bottom: 1px solid var(--border); }
+  table.funnel th { color: var(--muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.04em; background: var(--bg2); }
+  table.funnel td.bar-cell { width: 30%; }
+  .funnel-bar { height: 8px; background: var(--accent); border-radius: 2px;
+    display: inline-block; vertical-align: middle; }
+  .funnel-wrap { background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden; }
+
+  /* Publication premium */
+  .premium-card { background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 18px; display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .premium-card .label { color: var(--muted); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .premium-card .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .premium-card .sub { color: var(--muted); font-size: 11px; margin-top: 2px;
+    font-variant-numeric: tabular-nums; }
+  .sig-pill { display: inline-block; padding: 3px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.04em; }
+  .sig-pill.yes { background: var(--green-dim); color: var(--green); }
+  .sig-pill.no  { background: var(--bg3); color: var(--muted); }
+
+  /* Methodology */
+  details.method { background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0; }
+  details.method summary { padding: 14px 18px; cursor: pointer;
+    font-weight: 600; user-select: none; }
+  details.method summary:hover { background: var(--bg3); }
+  details.method .body { padding: 0 18px 18px; font-size: 13px;
+    color: var(--text); line-height: 1.55; max-width: 900px; }
+  details.method .body p { margin: 8px 0; color: var(--muted); }
+  details.method .body p strong { color: var(--text); }
+  details.method .body code { background: var(--bg3); padding: 1px 6px;
+    border-radius: 3px; font-size: 12px; }
+
+  .warmup-banner { background: var(--yellow-dim); border: 1px solid var(--yellow);
+    border-radius: 8px; padding: 12px 16px; margin: 20px 0; }
+  .warmup-banner b { color: #fde68a; }
+  .warmup-banner span { color: #fde68a; font-size: 13px; }
+
+  /* Skeleton */
+  .skeleton { background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
+    background-size: 200% 100%; animation: skel 1.4s ease-in-out infinite;
+    color: transparent; border-radius: 3px; }
+  @keyframes skel {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  @media (max-width: 640px) {
+    .container { padding: 16px 12px 60px; }
+    .page-title { font-size: 22px; }
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    table.ledger thead { display: none; }
+    table.ledger tbody td { display: block; padding: 4px 10px; white-space: normal; }
+    table.ledger tbody tr { border-bottom: 1px solid var(--border2); padding: 8px 0; }
+    .header { padding: 12px 16px; }
+    .header-cta { padding: 6px 10px; font-size: 0.78rem; }
+    .social-link { padding: 5px 9px; font-size: 0.75rem; }
+    .header-center { order: -1; flex: 1 1 100%; justify-content: center; }
+    .header-left, .header-right { flex: 1 1 auto; justify-content: center; flex-wrap: wrap; }
+  }
+  @media (max-width: 400px) {
+    .logo { font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <a class="header-cta" href="/news" title="AI news terminal — labs, arXiv, GitHub, HN, writers">📰 News</a>
+      <a class="header-cta" href="/arbitrage" title="Polymarket × Kalshi arbitrage scanner">⚖ Arbitrage</a>
+      <a class="header-cta" href="/signals" title="All ProbBrain Polymarket signals — full track record">📊 Signals</a>
+      <a class="header-cta" href="/portfolio" title="$10K Kelly-staked simulated portfolio">💰 Portfolio</a>
+    </div>
+    <div class="header-center">
+      <div class="logo"><a href="/">Prob<span>Brain</span></a></div>
+      <div class="live-badge"><div class="pulse-dot"></div>Live</div>
+    </div>
+    <div class="header-right">
+      <a class="header-cta" href="/kelly" title="Free Polymarket Kelly Criterion calculator">🧮 Kelly Calculator</a>
+      <a class="social-link" href="https://x.com/ProbBrain" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
+    </div>
+  </header>
+
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
+      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
+      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
+      <span class="ticker-text">⚠ SIMULATED PORTFOLIO — Not financial advice. Past performance ≠ future. Math is open source: /assets/portfolio.js</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title">Virtual Portfolio</h1>
+    <p class="subtitle">
+      Simulated $10,000 bankroll Kelly-staked on every published ProbBrain Polymarket signal.
+      Bet sizes use fractional Kelly with a per-bet cap; fills include linear-impact slippage;
+      P&L lands at resolution. Every trade is in the ledger below. Every rejected market
+      candidate is in the funnel below. <a href="/assets/portfolio.js">Open-source math.</a>
+    </p>
+    <div class="rule-stamp">
+      rule&nbsp;<span class="mono" id="rule-sha">…</span>
+      &middot; generated <span class="mono" id="generated-at">…</span>
+      &middot; <a href="https://github.com/vpjonny/probbrain-accuracy/blob/main/PUBLICATION_RULE.md">PUBLICATION_RULE.md</a>
+    </div>
+
+    <div id="warmup-region"></div>
+
+    <section>
+      <h2>Headline KPIs <span class="count" id="kpi-N">…</span></h2>
+      <p class="hint">Sample-size badges below each metric. Hidden until N ≥ 20 live resolutions.</p>
+      <div class="kpi-strip" id="kpi-strip">
+        <div class="kpi-card"><div class="kpi-label">Final Equity</div>
+          <div class="kpi-value mono skeleton" id="kpi-equity">—</div>
+          <div class="kpi-sub mono" id="kpi-equity-sub">vs $10,000 start</div></div>
+        <div class="kpi-card"><div class="kpi-label">ROI</div>
+          <div class="kpi-value mono skeleton" id="kpi-roi">—</div>
+          <div class="kpi-sub mono" id="kpi-roi-sub">bankroll change</div></div>
+        <div class="kpi-card"><div class="kpi-label">Profit Factor</div>
+          <div class="kpi-value mono skeleton" id="kpi-pf">—</div>
+          <div class="kpi-sub mono" id="kpi-pf-sub">gross win / gross loss</div></div>
+        <div class="kpi-card"><div class="kpi-label">Expectancy</div>
+          <div class="kpi-value mono skeleton" id="kpi-exp">—</div>
+          <div class="kpi-sub mono" id="kpi-exp-sub">$ per $1 staked</div></div>
+        <div class="kpi-card"><div class="kpi-label">Sortino</div>
+          <div class="kpi-value mono skeleton" id="kpi-sortino">—</div>
+          <div class="kpi-sub mono" id="kpi-sortino-sub">mean / downside-dev</div></div>
+        <div class="kpi-card"><div class="kpi-label">Calmar</div>
+          <div class="kpi-value mono skeleton" id="kpi-calmar">—</div>
+          <div class="kpi-sub mono" id="kpi-calmar-sub">CAGR / |MaxDD|</div></div>
+        <div class="kpi-card"><div class="kpi-label">Max Drawdown</div>
+          <div class="kpi-value mono skeleton" id="kpi-dd">—</div>
+          <div class="kpi-sub mono" id="kpi-dd-sub">peak-to-trough</div></div>
+        <div class="kpi-card"><div class="kpi-label">Win Rate</div>
+          <div class="kpi-value mono skeleton" id="kpi-wr">—</div>
+          <div class="kpi-sub mono" id="kpi-wr-sub">won / traded</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Equity curve</h2>
+      <p class="hint">Default curve = 1/8 Kelly, 1% bankroll cap, 0.5% volume liquidity cap, 0.1% linear-impact slippage.
+        Ghost curves show alternate sizings. Adjust controls below to see how the curve responds.</p>
+      <div class="controls">
+        <label>Kelly fraction
+          <select id="ctl-kelly">
+            <option value="0.125" selected>1/8</option>
+            <option value="0.25">1/4</option>
+            <option value="0.5">1/2</option>
+            <option value="1">full</option>
+          </select>
+        </label>
+        <label>Per-bet cap
+          <select id="ctl-cap">
+            <option value="0.01" selected>1%</option>
+            <option value="0.02">2%</option>
+            <option value="0.05">5%</option>
+          </select>
+        </label>
+        <label>Liquidity cap
+          <select id="ctl-liq">
+            <option value="0.005" selected>0.5% of vol</option>
+            <option value="0.01">1% of vol (conservative)</option>
+            <option value="0.05">5% of vol</option>
+          </select>
+        </label>
+        <label>Slippage
+          <select id="ctl-imp">
+            <option value="0.001" selected>0.1% linear</option>
+            <option value="0.005">0.5% linear</option>
+            <option value="0">none</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="ctl-ghost-full"> show full-Kelly ghost</label>
+      </div>
+      <div class="chart-wrap">
+        <svg id="equity-svg" viewBox="0 0 1200 320" preserveAspectRatio="none"></svg>
+        <div class="chart-legend" id="chart-legend"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Publication Premium</h2>
+      <p class="hint">
+        Defined as (published-only ROI) − (universe ROI, including shadow signals).
+        If positive AND statistically significant, that means we systematically publish our best
+        calls — a selection-bias warning, not a brag. Bootstrap 95% CI from 1000 resamples.
+      </p>
+      <div class="premium-card" id="premium-card">
+        <div><div class="label">Published ROI</div>
+          <div class="value mono" id="prem-pub-roi">—</div>
+          <div class="sub">per $1 deployed across published trades</div></div>
+        <div><div class="label">Universe ROI</div>
+          <div class="value mono" id="prem-uni-roi">—</div>
+          <div class="sub">published + shadow signals combined</div></div>
+        <div><div class="label">Premium</div>
+          <div class="value mono" id="prem-delta">—</div>
+          <div class="sub mono" id="prem-ci">CI 95% [—, —]</div></div>
+        <div><div class="label">Significance</div>
+          <div class="value"><span class="sig-pill no" id="prem-sig">—</span></div>
+          <div class="sub mono" id="prem-p">p = —</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Rejection-reasons funnel <span class="count" id="funnel-count">…</span></h2>
+      <p class="hint">
+        Every market the 2h scan saw, by stage of rejection. The <code>top_n_gate</code> bucket
+        especially matters: those are fully-valid candidates that survived volume + gap + close-date
+        filters but lost the top-3 cut. Tying this to the equity curve is the trust mechanic.
+      </p>
+      <div class="funnel-wrap">
+        <table class="funnel" id="funnel-table">
+          <thead>
+            <tr><th>Stage</th><th>Reason</th><th>Count</th><th>% of rejections</th><th class="bar-cell"></th></tr>
+          </thead>
+          <tbody id="funnel-tbody"><tr><td colspan="5" class="mono" style="color:var(--muted);padding:14px;">loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Bet-by-bet ledger <span class="count" id="ledger-count">…</span></h2>
+      <p class="hint">
+        Every resolved published signal as a simulated bet. Export to your spreadsheet of choice
+        and replicate the equity curve from scratch. This is the verify-yourself layer.
+      </p>
+      <div class="export-row">
+        <button class="btn" id="btn-export-csv">Download CSV</button>
+        <button class="btn" id="btn-export-json">Download JSON</button>
+      </div>
+      <div class="ledger-wrap">
+        <table class="ledger">
+          <thead>
+            <tr>
+              <th>SIG</th>
+              <th>Posted</th>
+              <th>Resolved</th>
+              <th>Question</th>
+              <th>Side</th>
+              <th>Our est</th>
+              <th>Mkt</th>
+              <th>Stake</th>
+              <th>Fill</th>
+              <th>Outcome</th>
+              <th>P&L</th>
+              <th>Equity</th>
+            </tr>
+          </thead>
+          <tbody id="ledger-tbody">
+            <tr><td colspan="12" class="mono" style="color:var(--muted);padding:14px;">loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <details class="method" open>
+        <summary>Methodology &amp; honesty layer</summary>
+        <div class="body">
+          <p><strong>Bankroll &amp; sizing.</strong> $10,000 simulated bankroll, sized
+            off the equity-at-time-of-bet (not the final). Default fractional Kelly = 1/8,
+            capped at 1% of bankroll per bet. Use the controls above to compare sizings
+            — the full-Kelly ghost shows how aggressive sizing would have looked.</p>
+          <p><strong>Liquidity &amp; slippage.</strong> Default = effective stake capped
+            at 0.5% of market volume, with a 0.1% linear-impact slippage applied to the fill
+            price. The 1% volume cap is shown as a more conservative option. None of these
+            assumptions get a signal across the line that wouldn't have been fillable in
+            practice.</p>
+          <p><strong>Resolution P&amp;L.</strong> Win = the side we bet matched the
+            on-chain outcome at <code>resolved_at</code>. Win returns
+            <code>stake × (1/fill_price − 1)</code>; loss returns
+            <code>−stake</code>. No fee model — Polymarket has no taker fees on
+            UMA-resolved markets in this period.</p>
+          <p><strong>Selection bias.</strong> Published signals are the universe a user
+            could actually have followed. <em>Publication Premium</em> compares the
+            published ROI against the broader universe (published ∪ shadow) to surface
+            whether we systematically pick our best calls. The rejection-reasons funnel
+            below shows the full pre-publish pipeline — every candidate, why it died.</p>
+          <p><strong>Out-of-sample.</strong> The signals in this curve were posted live to
+            <a href="https://x.com/ProbBrain">@ProbBrain</a> and
+            <a href="https://t.me/ProbBrain">t.me/ProbBrain</a> at the times shown — no
+            backtesting, no look-ahead. The publication rule that admitted each signal is
+            stamped on every audit-log event by its SHA (top of page).</p>
+          <p><strong>What this does NOT model.</strong> Live market-making fees, gas costs,
+            tax, jurisdictional access to Polymarket. Open positions (unresolved signals)
+            aren't shown here — only resolved trades. Sharpe is deliberately omitted because
+            event-driven P&amp;L is non-normal and autocorrelated; Sortino/Calmar are the
+            right metrics for this shape.</p>
+          <p><strong>Open source.</strong> The math is one file —
+            <a href="/assets/portfolio.js">/assets/portfolio.js</a>. The data is
+            <a href="/data/published_signals.json">/data/published_signals.json</a>,
+            <a href="/data/resolved.json">/data/resolved.json</a>,
+            <a href="/data/shadow_signals.json">/data/shadow_signals.json</a>,
+            <a href="/data/pipeline_audit.json">/data/pipeline_audit.json</a>.
+            Pull them down, audit any number on this page.</p>
+        </div>
+      </details>
+    </section>
+
+  </div>
+
+<script type="module">
+import {
+  joinResolved, buildCurve, profitFactor, sortino, calmar, expectancy,
+  maxDrawdown, publicationPremium, DEFAULTS, fmt,
+} from "/assets/portfolio.js";
+
+// --- data load ---
+const dataPaths = {
+  published: "/data/published_signals.json",
+  resolved:  "/data/resolved.json",
+  shadow:    "/data/shadow_signals.json",
+  resolvedShadow: "/data/resolved_shadow.json",
+  audit:     "/data/pipeline_audit.json",
+};
+async function fetchJSON(p, fallback) {
+  try {
+    const r = await fetch(p, { cache: "no-cache" });
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch (e) {
+    console.warn("Failed to load", p, e);
+    return fallback;
+  }
+}
+
+const [published, resolved, shadow, resolvedShadow, audit] = await Promise.all([
+  fetchJSON(dataPaths.published, []),
+  fetchJSON(dataPaths.resolved, []),
+  fetchJSON(dataPaths.shadow, []),
+  fetchJSON(dataPaths.resolvedShadow, []),
+  fetchJSON(dataPaths.audit, null),
+]);
+
+// Tag shadow signals so the ledger source column shows them.
+const taggedShadow = shadow.map(s => ({ ...s, _source: "shadow" }));
+const pubJoined    = joinResolved(published, resolved);
+const shadowJoined = joinResolved(taggedShadow, resolvedShadow);
+
+// --- state from controls ---
+const ctl = {
+  kelly: document.getElementById("ctl-kelly"),
+  cap:   document.getElementById("ctl-cap"),
+  liq:   document.getElementById("ctl-liq"),
+  imp:   document.getElementById("ctl-imp"),
+  ghost: document.getElementById("ctl-ghost-full"),
+};
+function readOpts() {
+  return {
+    kellyFraction: parseFloat(ctl.kelly.value),
+    perBetCap:     parseFloat(ctl.cap.value),
+    liquidityCap:  parseFloat(ctl.liq.value),
+    impactRate:    parseFloat(ctl.imp.value),
+  };
+}
+
+// --- rendering ---
+function renderRuleStamp() {
+  document.getElementById("rule-sha").textContent =
+    (audit && audit.rule_version_sha) ? audit.rule_version_sha : "n/a";
+  document.getElementById("generated-at").textContent =
+    (audit && audit.generated_at) ? audit.generated_at.replace("T", " ").replace("Z", " UTC") : "—";
+}
+
+function setKPI(id, value, cls = "") {
+  const el = document.getElementById(id);
+  el.textContent = value;
+  el.classList.remove("skeleton", "pos", "neg", "warm");
+  if (cls) el.classList.add(cls);
+}
+
+function renderKPIs(tradable) {
+  const n = tradable.trades.length;
+  const wins = tradable.trades.filter(t => t.won).length;
+  const dd = maxDrawdown(tradable.curve, DEFAULTS.bankrollStart);
+  const pf = profitFactor(tradable.trades);
+  const ex = expectancy(tradable.trades);
+  const so = sortino(tradable.trades);
+  const ca = calmar(tradable.curve, DEFAULTS.bankrollStart);
+  const finalEq = tradable.finalEquity;
+  const roi = finalEq / DEFAULTS.bankrollStart - 1;
+  const warm = n < DEFAULTS.warmupMinResolutions;
+
+  document.getElementById("kpi-N").textContent = `${n} resolved`;
+
+  // Warmup banner
+  const warmupEl = document.getElementById("warmup-region");
+  warmupEl.innerHTML = warm
+    ? `<div class="warmup-banner"><b>WARMUP</b> &mdash; <span>${n}/${DEFAULTS.warmupMinResolutions} resolutions. Headline statistics show, but small-N caveats apply. KPIs lock in at ${DEFAULTS.warmupMinResolutions}.</span></div>`
+    : "";
+
+  setKPI("kpi-equity", fmt.moneyAbs(finalEq), roi >= 0 ? "pos" : "neg");
+  document.getElementById("kpi-equity-sub").textContent = "vs $10,000 start";
+
+  setKPI("kpi-roi", fmt.pct(roi), roi >= 0 ? "pos" : "neg");
+  document.getElementById("kpi-roi-sub").textContent = "bankroll change";
+
+  setKPI("kpi-pf", fmt.ratio(pf), pf >= 1 ? "pos" : "neg");
+  document.getElementById("kpi-pf-sub").textContent = `n=${n}`;
+
+  setKPI("kpi-exp", "$" + ex.toFixed(3), ex >= 0 ? "pos" : "neg");
+  document.getElementById("kpi-exp-sub").textContent = "per $1 staked";
+
+  setKPI("kpi-sortino", fmt.ratio(so), so >= 0 ? "pos" : "neg");
+  document.getElementById("kpi-sortino-sub").textContent = warm ? `n=${n} (small)` : `n=${n}`;
+
+  setKPI("kpi-calmar", fmt.ratio(ca), ca >= 0 ? "pos" : "neg");
+  document.getElementById("kpi-calmar-sub").textContent = warm ? `n=${n} (small)` : `n=${n}`;
+
+  setKPI("kpi-dd", fmt.moneyAbs(dd.dollars), "neg");
+  document.getElementById("kpi-dd-sub").textContent =
+    fmt.pctAbs(dd.pctOfPeak) + " of peak";
+
+  setKPI("kpi-wr", `${wins}/${n}`, wins / Math.max(1, n) >= 0.5 ? "pos" : "neg");
+  document.getElementById("kpi-wr-sub").textContent =
+    `${(wins / Math.max(1, n) * 100).toFixed(0)}%`;
+}
+
+// --- equity SVG ---
+function renderEquityChart(curves) {
+  const svg = document.getElementById("equity-svg");
+  const W = 1200, H = 320;
+  const pad = { left: 60, right: 20, top: 16, bottom: 28 };
+  svg.innerHTML = "";
+
+  const allPoints = curves.flatMap(c => c.curve);
+  if (!allPoints.length) {
+    svg.innerHTML = `<text class="chart-label" x="${W/2}" y="${H/2}" text-anchor="middle">no resolved trades yet</text>`;
+    return;
+  }
+
+  const minTs = Math.min(...allPoints.map(p => new Date(p.ts).getTime()));
+  const maxTs = Math.max(...allPoints.map(p => new Date(p.ts).getTime()));
+  const minEq = Math.min(...allPoints.map(p => p.equity), DEFAULTS.bankrollStart) * 0.98;
+  const maxEq = Math.max(...allPoints.map(p => p.equity), DEFAULTS.bankrollStart) * 1.02;
+
+  const xScale = (t) => pad.left + (new Date(t).getTime() - minTs) / Math.max(1, maxTs - minTs)
+                                    * (W - pad.left - pad.right);
+  const yScale = (e) => H - pad.bottom - (e - minEq) / Math.max(1, maxEq - minEq) * (H - pad.top - pad.bottom);
+
+  // grid + baseline
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (i / 4) * (H - pad.top - pad.bottom);
+    const eq = maxEq - (i / 4) * (maxEq - minEq);
+    svg.insertAdjacentHTML("beforeend",
+      `<line class="chart-grid" x1="${pad.left}" x2="${W - pad.right}" y1="${y}" y2="${y}"/>` +
+      `<text class="chart-label" x="${pad.left - 8}" y="${y + 4}" text-anchor="end">${fmt.moneyAbs(eq)}</text>`);
+  }
+  const baselineY = yScale(DEFAULTS.bankrollStart);
+  svg.insertAdjacentHTML("beforeend",
+    `<line class="chart-baseline" x1="${pad.left}" x2="${W - pad.right}" y1="${baselineY}" y2="${baselineY}"/>`);
+
+  // curves
+  for (const c of curves) {
+    if (!c.curve.length) continue;
+    // start at bankroll on first ts
+    const startX = xScale(c.curve[0].ts);
+    const points = [[startX, baselineY], ...c.curve.map(p => [xScale(p.ts), yScale(p.equity)])];
+    const d = "M " + points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" L ");
+    svg.insertAdjacentHTML("beforeend",
+      `<path class="chart-line ${c.className}" d="${d}"/>`);
+  }
+
+  // x-axis labels (3 ticks)
+  for (let i = 0; i <= 2; i++) {
+    const t = minTs + (i / 2) * (maxTs - minTs);
+    const x = xScale(new Date(t).toISOString());
+    svg.insertAdjacentHTML("beforeend",
+      `<text class="chart-label" x="${x}" y="${H - 8}" text-anchor="middle">${new Date(t).toISOString().slice(0, 10)}</text>`);
+  }
+
+  // legend
+  const legend = document.getElementById("chart-legend");
+  legend.innerHTML = curves.map(c =>
+    `<span><span class="key" style="background:${c.color}"></span>${c.label} &mdash; ${fmt.moneyAbs(c.curve.at(-1)?.equity ?? DEFAULTS.bankrollStart)}</span>`
+  ).join("");
+}
+
+// --- funnel ---
+function renderFunnel() {
+  const tbody = document.getElementById("funnel-tbody");
+  const countEl = document.getElementById("funnel-count");
+  if (!audit || !audit.rejection_reasons || !audit.rejection_reasons.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="mono" style="color:var(--muted);padding:14px;">no audit data yet &mdash; populates after next scan</td></tr>`;
+    countEl.textContent = "0";
+    return;
+  }
+  const total = audit.totals.rejected || 1;
+  countEl.textContent = `${total} rejections across ${audit.window.runs} run(s)`;
+  const maxPct = Math.max(...audit.rejection_reasons.map(r => r.pct_of_rejections));
+  tbody.innerHTML = audit.rejection_reasons.map(r =>
+    `<tr>
+      <td class="mono" style="color:var(--text)">${r.stage}</td>
+      <td class="mono" style="color:var(--muted)">${r.reason}</td>
+      <td class="mono">${r.count}</td>
+      <td class="mono">${(r.pct_of_rejections * 100).toFixed(1)}%</td>
+      <td class="bar-cell"><span class="funnel-bar" style="width:${(r.pct_of_rejections / maxPct * 100).toFixed(0)}%"></span></td>
+    </tr>`
+  ).join("");
+}
+
+// --- ledger ---
+function renderLedger(trades) {
+  const tbody = document.getElementById("ledger-tbody");
+  const countEl = document.getElementById("ledger-count");
+  countEl.textContent = `${trades.length} resolved trades`;
+  if (!trades.length) {
+    tbody.innerHTML = `<tr><td colspan="12" class="mono" style="color:var(--muted);padding:14px;">no resolved trades yet</td></tr>`;
+    return;
+  }
+  // most recent first
+  const rows = [...trades].sort((a, b) => new Date(b.resolved_at) - new Date(a.resolved_at));
+  tbody.innerHTML = rows.map(t => {
+    const sideAbbr = t.direction === "YES_UNDERPRICED" ? "YES" : "NO";
+    return `<tr>
+      <td class="mono">${t.signal_id}</td>
+      <td class="mono">${fmt.date(t.posted_at)}</td>
+      <td class="mono">${fmt.date(t.resolved_at)}</td>
+      <td class="q">${(t.question || "").replace(/&/g, "&amp;").replace(/</g, "&lt;")}</td>
+      <td class="mono">${sideAbbr}</td>
+      <td class="mono">${(t.our_estimate * 100).toFixed(0)}%</td>
+      <td class="mono">${(t.market_price_at_post * 100).toFixed(0)}%</td>
+      <td class="mono">${fmt.moneyAbs(t.effective_stake)}</td>
+      <td class="mono">${(t.effective_fill_price * 100).toFixed(1)}%</td>
+      <td class="mono">${t.outcome}</td>
+      <td class="mono ${t.pnl >= 0 ? "pos" : "neg"}">${fmt.money(t.pnl)}</td>
+      <td class="mono">${fmt.moneyAbs(t.equity_after)}</td>
+    </tr>`;
+  }).join("");
+}
+
+// --- exports ---
+function exportCSV(trades) {
+  const cols = ["signal_id","market_id","question","category","posted_at","resolved_at",
+    "direction","our_estimate","market_price_at_post","kelly_stake","effective_stake",
+    "effective_fill_price","slippage_dollars","volume_at_post","liquidity_capped",
+    "outcome","won","pnl","equity_after","source"];
+  const escape = (v) => {
+    if (v === null || v === undefined) return "";
+    const s = String(v);
+    if (s.includes(",") || s.includes("\"") || s.includes("\n"))
+      return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+  const csv = [cols.join(","),
+    ...trades.map(t => cols.map(c => escape(t[c])).join(","))].join("\n");
+  triggerDownload(csv, "probbrain_portfolio_ledger.csv", "text/csv");
+}
+function exportJSON(trades) {
+  triggerDownload(JSON.stringify(trades, null, 2),
+    "probbrain_portfolio_ledger.json", "application/json");
+}
+function triggerDownload(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// --- publication premium ---
+function renderPremium(published, universe) {
+  if (!published.length || universe.length === published.length) {
+    document.getElementById("prem-pub-roi").textContent = "—";
+    document.getElementById("prem-uni-roi").textContent = "—";
+    document.getElementById("prem-delta").textContent = "n/a";
+    document.getElementById("prem-ci").textContent = "needs resolved shadow signals";
+    document.getElementById("prem-sig").textContent = "WAITING";
+    document.getElementById("prem-sig").className = "sig-pill no";
+    document.getElementById("prem-p").textContent = "p = —";
+    return;
+  }
+  const prem = publicationPremium(published, universe);
+  document.getElementById("prem-pub-roi").textContent = fmt.pct(prem.published_roi);
+  document.getElementById("prem-uni-roi").textContent = fmt.pct(prem.universe_roi);
+  document.getElementById("prem-delta").textContent = fmt.pct(prem.delta);
+  document.getElementById("prem-delta").classList.add(prem.delta >= 0 ? "pos" : "neg");
+  document.getElementById("prem-ci").textContent =
+    `CI 95% [${fmt.pct(prem.ci_low)}, ${fmt.pct(prem.ci_high)}]`;
+  const sigEl = document.getElementById("prem-sig");
+  sigEl.textContent = prem.significant ? "SIGNIFICANT" : "NOT SIG.";
+  sigEl.className = "sig-pill " + (prem.significant ? "yes" : "no");
+  document.getElementById("prem-p").textContent = `p = ${prem.p_value.toFixed(3)}`;
+}
+
+// --- recompute on control change ---
+let currentTrades = [];
+function recompute() {
+  const opts = readOpts();
+  const tradable = buildCurve(pubJoined, opts);
+  currentTrades = tradable.trades;
+
+  renderKPIs(tradable);
+
+  const curves = [
+    { className: "primary", color: "var(--blue)", label: "Published (default)", curve: tradable.curve },
+  ];
+  if (ctl.ghost.checked) {
+    const full = buildCurve(pubJoined, { ...opts, kellyFraction: 1, perBetCap: 0.05 });
+    curves.push({ className: "ghost", color: "var(--muted2)", label: "Full Kelly + 5% cap (ghost)", curve: full.curve });
+  }
+  renderEquityChart(curves);
+  renderLedger(tradable.trades);
+
+  // Premium: published vs universe
+  const universe = buildCurve([...pubJoined, ...shadowJoined], opts);
+  renderPremium(tradable.trades, universe.trades);
+}
+
+// Listeners
+[ctl.kelly, ctl.cap, ctl.liq, ctl.imp, ctl.ghost].forEach(el =>
+  el.addEventListener("change", recompute));
+document.getElementById("btn-export-csv").addEventListener("click", () => exportCSV(currentTrades));
+document.getElementById("btn-export-json").addEventListener("click", () => exportJSON(currentTrades));
+
+// First paint
+renderRuleStamp();
+renderFunnel();
+recompute();
+</script>
+</body>
+</html>
