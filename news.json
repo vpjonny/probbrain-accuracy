@@ -1,6 +1,27 @@
 {
-  "generated_at": "2026-05-30T21:42:55Z",
+  "generated_at": "2026-05-30T21:58:12Z",
   "items": [
+    {
+      "id": "simonw|https://simonwillison.net/2026/May/30/how-we-contain-claude",
+      "anchor": "1de6c43798",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "How we contain Claude across products",
+      "headline": "How we contain Claude across products",
+      "url": "https://simonwillison.net/2026/May/30/how-we-contain-claude",
+      "published_at": "2026-05-30T21:36:24Z",
+      "discovered_at": "2026-05-30T21:57:20Z",
+      "description": "<p><strong><a href=\"https://www.anthropic.com/engineering/how-we-contain-claude\">How we contain Claude across products</a></strong></p> A complaint I often have about sandboxing products is that they are rarely thoroughly <em>documented</em>, and in the absence of detailed documentation it's hard to know how much I can trust them.</p> <p>Anthropic just published a fantastic overview of how their various sandbox techniques work across <a href=\"https://claude.ai/\">Claude.ai</a>, Claude Code, and Cowork.</p> <blockquote> <p>We constrain where and how an agent can act with process sandboxes, VMs, filesystem boundaries, and egress controls. The goal is to set a hard boundary on what an agent can reach. For example, if credentials never enter the sandbox, they can't be exfiltrated, regardless of whether the cause is a user, a model finding a “creative” path, or an attacker.</p> </blockquote> <p>Claude.ai uses gVisor. Claude Code, run locally, uses Seatbelt on macOS and Bubblewrap on Linux. Claude Cowork runs a full VM (Apple's Virtualization framework on macOS, HCS on Windows).</p> <p>There's a lot in here, including some interesting stories of risks they missed such as the <code>api.anthropic.com/v1/files</code> exfiltration vector <a href=\"https://simonwillison.net/2026/Jan/14/claude-cowork-exfiltrates-files/\">covered here previously</a>.</p> <p>This reminded me it's time I took another look at Anthropic's open source <a href=\"https://github.com/anthropic-experimental/sandbox-runtime\">srt (Anthropic Sandbox Runtime)</a> tool - it's mature enough know that I'm ready to give it a proper go. <p>Tags: <a href=\"https://simonwillison.net/tags/sandboxing\">sandboxing</a>, <a href=\"https://simonwillison.net/tags/security\">security</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/anthropic\">anthropic</a>, <a href=\"https://simonwillison.net/tags/claude\">claude</a>, <a href=\"https://simonwillison.net/tags/claude-code\">claude-code</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
     {
       "id": "hn|https://www.lloydslist.com/LL1157327/Hormuz-crisis-side-effect-a-sharp-rise-in-container-shipping-rates",
       "anchor": "901987aec6",
@@ -5646,27 +5667,6 @@
       "published_at": "2026-05-07T19:57:06Z",
       "discovered_at": "2026-05-07T20:13:54Z",
       "description": "<p><strong>Release:</strong> <a href=\"https://github.com/simonw/llm-gemini/releases/tag/0.31\">llm-gemini 0.31</a></p> <blockquote> <ul> <li><code>gemini-3.1-flash-lite</code> is <a href=\"https://cloud.google.com/blog/products/ai-machine-learning/gemini-3-1-flash-lite-is-now-generally-available\">no longer a preview</a>. </li> </ul> </blockquote> <p>Here's my write-up of the <a href=\"https://simonwillison.net/2026/Mar/3/gemini-31-flash-lite/\">Gemini 3.1 Flash-Lite Preview model</a> back in March. I don't believe this new non-preview model has changed since then.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/llm-release\">llm-release</a>, <a href=\"https://simonwillison.net/tags/gemini\">gemini</a>, <a href=\"https://simonwillison.net/tags/llm\">llm</a>, <a href=\"https://simonwillison.net/tags/google\">google</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/May/7/firefox-claude-mythos",
-      "anchor": "5d78a34fd0",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "Behind the Scenes Hardening Firefox with Claude Mythos Preview",
-      "headline": "Behind the Scenes Hardening Firefox with Claude Mythos Preview",
-      "url": "https://simonwillison.net/2026/May/7/firefox-claude-mythos",
-      "published_at": "2026-05-07T17:56:25Z",
-      "discovered_at": "2026-05-07T17:57:55Z",
-      "description": "<p><strong><a href=\"https://hacks.mozilla.org/2026/05/behind-the-scenes-hardening-firefox/\">Behind the Scenes Hardening Firefox with Claude Mythos Preview</a></strong></p> Fascinating, in-depth details on how Mozilla used their access to the Claude Mythos preview to locate and then fix hundreds of vulnerabilities in Firefox:</p> <blockquote> <p><strong>Suddenly, the bugs are very good</strong></p> <p>Just a few months ago, AI-generated security bug reports to open source projects were mostly known for being unwanted slop. Dealing with reports that look plausibly correct but are wrong imposes an asymmetric cost on project maintainers: it’s cheap and easy to prompt an LLM to find a “problem” in code, but slow and expensive to respond to it.</p> <p>It is difficult to overstate how much this dynamic changed for us over a few short months. This was due to a combination of two main factors. First, the models got a lot more capable. Second, we dramatically improved our techniques for <em>harnessing</em> these models — steering them, scaling them, and stacking them to generate large amounts of signal and filter out the noise.</p> </blockquote> <p>They include some detailed bug descriptions too, including a 20-year old XSLT bug and a 15-year-old bug in the <code>&lt;legend&gt;</code> element.</p> <p>A lot of the attempts made by the harness were blocked by Firefox's existing defense-in-depth measures, which is reassuring.</p> <p>Mozilla were fixing around 20-30 security bugs in Firefox per month through 2025. That jumped to 423 in April.</p> <p><img alt=\"Bar chart titled &quot;Firefox Security Bug Fixes by Month&quot; with subtitle &quot;All Sources • All Severities&quot; on a dark purple background, showing monthly counts: Jan 2025: 21, Feb 2025: 20, Mar 2025: 26, Apr 2025: 31, May 2025: 17, Jun 2025: 21, Jul 2025: 22, Aug 2025: 17, Sep 2025: 18, Oct 2025: 26, Nov 2025: 19, Dec 2025: 20, Jan 2026: 25, Feb 2026: 61, Mar 2026: 76, Apr 2026: 423 — a dramatic spike in the final month.\" src=\"https://static.simonwillison.net/static/2026/firefox-security.webp\" /> <p><small></small>Via <a href=\"https://lobste.rs/s/7zppv1/behind_scenes_hardening_firefox_with\">Lobste.rs</a></small></p> <p>Tags: <a href=\"https://simonwillison.net/tags/firefox\">firefox</a>, <a href=\"https://simonwillison.net/tags/mozilla\">mozilla</a>, <a href=\"https://simonwillison.net/tags/security\">security</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/anthropic\">anthropic</a>, <a href=\"https://simonwillison.net/tags/claude\">claude</a>, <a href=\"https://simonwillison.net/tags/ai-security-research\">ai-security-research</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
