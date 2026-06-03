@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-03T04:32:29Z",
+  "generated_at": "2026-06-03T04:47:31Z",
   "items": [
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.02595",
@@ -517,14 +517,14 @@
         "arxiv"
       ],
       "title": "Representational Capacity: Geometric Limits on Feature Representation in Transformer Language Models",
-      "headline": "Representational Capacity: Geometric Limits on Feature Representation in Transformer Language Models",
+      "headline": "Researchers develop framework to estimate how many near-orthogonal feature directions transformer models can represent, improving capacity prediction via embedding analysis.",
       "url": "https://arxiv.org/abs/2606.02765",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:54Z",
       "description": "arXiv:2606.02765v1 Announce Type: new Abstract: Model dimension ($d_{model}$) is a fundamental hyperparameter in transformer language models, yet its role in setting the geometric limits of feature representation remains under-explored. Grounded in the Linear Representation and Superposition Hypotheses - which propose that models encode features as near-orthogonal directions in latent space - we develop a framework for estimating how many such directions a model can support. We first establish the embedding matrix as a measurable proxy for near-orthogonality constraints across the latent space: the boundary between meaningful token relationships and incidental similarity in the pairwise cosine similarity distribution gives a concrete estimate of the model's accepted deviation $\\varepsilon$ from perfect orthogonality. Applying this metric across dozens of open-source models reveals two classes: models with high $\\varepsilon$ whose embeddings lack near-orthogonal structure, and models with low $\\varepsilon$ that maintain it. We then show that the standard Johnson-Lindenstrauss lemma greatly underestimates the packing efficiency of trained representations, and derive an adjusted capacity formula in which the number of near-orthogonal directions depends on the ratio of vectors to dimensions ($k/d$) rather than the raw count - a single modification that cuts prediction error by two orders of magnitude with no extra parameters. Combining these results, we define representational capacity as an upper bound on the number of distinguishable directions available for features and embeddings in a model's latent space. Capacity is exponentially sensitive to $\\varepsilon$, and larger models favor tighter orthogonality constraints over maximizing raw capacity - a pattern compatible with several explanations (a stability-capacity trade-off, a ceiling on usable concepts, or confounds with model scale) that we leave to future work.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:46:22Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.02785",
@@ -538,14 +538,14 @@
         "arxiv"
       ],
       "title": "QUIVER: Quantum-Informed Views for Enhanced Representations in Large ML Models",
-      "headline": "QUIVER: Quantum-Informed Views for Enhanced Representations in Large ML Models",
+      "headline": "QUIVER enhances ML models by incorporating quantum Fisher information from variational circuits, capturing geometric structure that improves performance on molecular and particle physics prediction tasks.",
       "url": "https://arxiv.org/abs/2606.02785",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:54Z",
       "description": "arXiv:2606.02785v1 Announce Type: new Abstract: Large machine learning models benefit substantially from multimodal inputs that provide a complementary view of the same example. We introduce QUIVER (QUantum-Informed Views for Enhanced Representations, a paradigm that enriches classical data-driven features with a quantum Fisher view: a geometrically motivated, basis-independent summary of higher-order correlations captured by a variational quantum circuit (VQC) trained to perform the same task. Unlike classical feature augmentation, the quantum Fisher information matrix encodes the intrinsic geometry of the learned quantum state manifold. While this feature map, motivated by quantum information theory, is ordinarily non-trivial to model classically, it can surface statistical structure that additional classical data or model capacity finds difficult to learn. This makes the quantum Fisher view a genuinely complementary modality rather than a redundant one. We demonstrate that QUIVER improves standard performance metrics on two benchmark datasets from very different fields: QM9 for predicting molecule properties, and JetClass for predicting jet flavor at the Large Hadron Collider (LHC). The core contribution, however, is domain-agnostic: the quantum Fisher view can be fused into a broad class of model architectures via targeted modifications to the base architecture, to incorporate information about the quantum geometry of the problem. These results demonstrate that quantum-geometric features, extracted from simulated variational circuits, can deliver measurable value for standard machine learning tasks, well before the advent of fault-tolerant quantum hardware.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:46:33Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.02823",
@@ -559,14 +559,14 @@
         "arxiv"
       ],
       "title": "Qift: Shift-Friendly No-Zero W2 Post-Training Quantization for Rotated W2A4/KV4 LLM Inference",
-      "headline": "Qift: Shift-Friendly No-Zero W2 Post-Training Quantization for Rotated W2A4/KV4 LLM Inference",
+      "headline": "Qift proposes a training-free two-bit weight quantization method with fixed level sets for efficient LLM inference.",
       "url": "https://arxiv.org/abs/2606.02823",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:54Z",
       "description": "arXiv:2606.02823v1 Announce Type: new Abstract: Two-bit weight quantization is attractive for memory-efficient LLM inference, but the standard W2 level set {-2,-1,0,+1} often collapses under aggressive W2A4/KV4 settings. We study the scalar level-set geometry of two-bit weights in a Hadamard-rotated quantization pipeline. Conventional asymmetric W2 substantially improves over the standard level set, indicating that W2A4 failure is not only a bit-width problem but also a reconstruction-level problem. Across all 224 linear modules in each of LLaMA-2-7B and LLaMA-3.1-8B, pretrained weights are already nearly zero-centered, while Hadamard rotation primarily Gaussianizes their standardized shape: excess kurtosis and Q-Q error drop by orders of magnitude. Based on this approximate zero-centered Gaussian-like source model, we propose Qift, a fixed no-zero W2 level set for rotated W2A4/KV4 inference. The main level set is {+/-0.5, +/-1.5}, equivalently {+/-1, +/-3} under a half-scale reparameterization; a power-of-two variant uses {+/-1, +/-4} for sign-and-shift decoded weight application. Qift redesigns the fixed two-bit code-to-level mapping and is training-free, learned-codebook-free, group-grid-free, and zero-point-free, retaining the standard per-channel scale. A scale-invariant ratio analysis identifies an effective inner/outer centroid ratio range of 0.25 to 0.33, explaining why mirror no-zero (MNZ), Lloyd, NF2, and PoT-MNZ perform well while {+/-1, +/-2} does not. On both models, the no-zero level sets consistently improve pure W2A4 perplexity, L-layer mixed W2/W4 perplexity, downstream accuracy, and GPTQ residual behavior over the standard W2 level set. At L=16 mixed precision, they substantially narrow the gap to W3A4 while keeping half of the transformer layers at two-bit precision, giving a simple, source-aware, and deployment-friendly alternative to more complex learned W2 codebooks.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:46:40Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.02830",
@@ -580,14 +580,14 @@
         "arxiv"
       ],
       "title": "Mitigating Spurious Correlations with Memorization-Guided Dataset De-Biasing",
-      "headline": "Mitigating Spurious Correlations with Memorization-Guided Dataset De-Biasing",
+      "headline": "Two-stage sample scoring method disentangles spurious and causal features to improve model robustness using only 10% of training data.",
       "url": "https://arxiv.org/abs/2606.02830",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:54Z",
       "description": "arXiv:2606.02830v1 Announce Type: new Abstract: Real-world datasets often contain spurious correlations that are not causally related to the target label. When such correlations dominate the majority of training samples, models tend to rely on them, leading to misclassification of minority samples that do not exhibit the same spurious patterns. While a potential approach is to select subsets of data to better represent the minority samples, this may require access to group labels, which are typically unknown. Furthermore, as we demonstrate, widely used sample scoring functions in the invariant subset or coreset selection literature largely depend on spurious features and therefore fail to accurately capture the importance or difficulty of core, causally relevant features. Accordingly, we propose to mitigate spurious correlations by developing a two-stage sample scoring function that disentangles the learning dynamics of core and spurious features and evaluates their difficulty separately. Based on our proposed metric, we introduce a new algorithm to find and prioritize informative samples both with and without spurious correlations. Extensive experiments demonstrate that a standard ERM model trained on our selected samples achieves superior performance compared to state-of-the-art debiasing techniques, while requiring as little as 10\\% of the original training data.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:46:51Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.02841",
@@ -601,14 +601,14 @@
         "arxiv"
       ],
       "title": "Learning Coherent Representations: A Topological Approach to Interpretability",
-      "headline": "Learning Coherent Representations: A Topological Approach to Interpretability",
+      "headline": "Researchers introduce coherence, a geometric property that enforces interpretability in neural networks by requiring features to respond to contiguous regions of input space.",
       "url": "https://arxiv.org/abs/2606.02841",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:54Z",
       "description": "arXiv:2606.02841v1 Announce Type: new Abstract: Deep neural networks learn representations where individual features often lack interpretable meaning; a single neuron may activate for scattered, unrelated inputs. We introduce coherence, a geometric property inspired by neural coding in the brain, where neurons like grid cells and head direction cells respond to contiguous regions of state space. A non-negative matrix is coherent if each row (sample) attends to geometrically clustered columns (features) and vice versa, and in addition every sample is well described by some feature and every feature is needed by some sample. We prove that coherent matrices induce a bounded interleaving between the Vietoris-Rips filtrations of samples and features, guaranteeing that both spaces share compatible topological structure. This geometric constraint facilitates interpretability. For example, if data lies on a circle, coherent features must tile that circle into contiguous arcs. We introduce Coh, a differentiable objective function based on Fr\\'echet variance that enforces coherence during training. Unlike sparsity, which bounds how many samples a feature activates on, coherence bounds which samples, requiring geometric connectivity rather than only rarity. This yields not just interpretable features but an interpretable feature space. We validate Coh in an auto-encoder using synthetic and rotated MNIST datasets and in a token embedding of BERT using language data.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:46:59Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.02842",
@@ -622,14 +622,14 @@
         "arxiv"
       ],
       "title": "Spectral-Progressive Thought Flow for Lightweight Multimodal Reasoning",
-      "headline": "Spectral-Progressive Thought Flow for Lightweight Multimodal Reasoning",
+      "headline": "SpecFlow proposes a lightweight multimodal reasoning framework using discrete cosine representations to achieve competitive performance while reducing computation and memory costs by 2.1 times.",
       "url": "https://arxiv.org/abs/2606.02842",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:54Z",
       "description": "arXiv:2606.02842v1 Announce Type: new Abstract: Multimodal spatial reasoning often relies on long chains of intermediate textual and visual thoughts, where accumulating visual tokens and dense cross-modal attention incur substantial computation and memory overhead. To address this challenge, we propose Spectral-Progressive Thought Flow (SpecFlow), a novel lightweight multimodal spatial reasoning framework that represents intermediate visual thoughts in a fixed-size discrete cosine space. By exploiting strong energy compaction, SpecFlow preserves global layout and relational structure while introducing high-frequency details only when increased spatial precision is required. To align visual state evolution with linguistic intent, classifier-free guidance enables autoregressive textual thoughts to steer flow-based updates of the visual workspace/state without expanding the context. As a result, SpecFlow maintains a bounded visual workspace whose updates depend only on the current visual state and accumulated textual trace, enabling long-horizon inference with stable latency and memory usage independent of reasoning depth. Empirical results show that SpecFlow achieves competitive or superior reasoning performance while reducing computation and KV cache costs by up to 2.1 times.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:47:08Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.02584",
@@ -643,14 +643,14 @@
         "arxiv"
       ],
       "title": "IdiomX A Multilingual Benchmark for Idiom Understanding, Retrieval, and Interpretation",
-      "headline": "IdiomX A Multilingual Benchmark for Idiom Understanding, Retrieval, and Interpretation",
+      "headline": "IdiomX benchmark provides 190K+ multilingual contextualized idiom examples for understanding, retrieval, and interpretation tasks across English, Arabic, and French.",
       "url": "https://arxiv.org/abs/2606.02584",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:57Z",
       "description": "arXiv:2606.02584v1 Announce Type: new Abstract: Idiomatic expressions remain a persistent challenge for natural language processing because their meanings are often non-compositional, context-dependent, and difficult to align across languages. Existing idiom resources are often limited in scale, contextual diversity, or multilingual coverage, restricting their utility for modern language models. We introduce IdiomX, a large-scale multilingual benchmark for idiom understanding, retrieval, and interpretation, constructed through a reproducible multi-stage pipeline combining lexical resource extraction, large-scale normalization, controlled large language model enrichment, and structured validation. The resulting dataset contains over 190K contextualized examples spanning 12K+ idioms, with aligned English, Arabic, and French semantic representations, idiomatic and literal usage labels, and rich linguistic metadata. Building on this resource, we define a unified four-task benchmark covering idiom detection, context-to-idiom retrieval, Arabic-to-English idiom retrieval, and idiom interpretation, extending evaluation from figurative recognition to semantic grounding and explainable meaning retrieval. Experiments show that contextual transformer models substantially improve idiom detection, while hybrid retrieval and reranking architectures significantly strengthen both monolingual and cross-lingual idiom retrieval. Results further demonstrate that idiom interpretation can be effectively modeled as a semantic retrieval task, introducing interpretability as a complementary benchmark dimension. Overall, IdiomX provides a scalable benchmark for studying idiomatic language as a progression from detection to retrieval and semantic interpretation, and offers a modular framework extensible to additional languages and figurative reasoning tasks",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:47:20Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.02741",
@@ -664,14 +664,14 @@
         "arxiv"
       ],
       "title": "Greener Than Humans? Environmental Attitudes in Large Language Models",
-      "headline": "Greener Than Humans? Environmental Attitudes in Large Language Models",
+      "headline": "Study evaluates environmental attitudes in 31 LLMs, finding progressive stances but sycophantic shifts following user-specified ideological positions.",
       "url": "https://arxiv.org/abs/2606.02741",
       "published_at": "2026-06-03T04:00:00Z",
       "discovered_at": "2026-06-03T04:00:57Z",
       "description": "arXiv:2606.02741v1 Announce Type: new Abstract: Large language models (LLMs) are increasingly used in sustainability-related decision support, reporting, and public communication, yet little systematic evidence exists on the environmental attitudes embedded in their outputs. This paper develops a benchmark for evaluating environmental cognition, affect, and behavioural recommendations in LLMs and applies it to 31 widely used proprietary and open-weight models. Drawing on questions from established environmental awareness surveys and additional sustainability-related behavioural measures, we compare LLM responses 1) among models and 2) between models and human survey benchmarks from Germany. We assess their robustness across prompting conditions. We find that many LLMs align more closely with environmentally progressive attitudes than the average survey respondent, exhibiting higher levels of environmental affect and cognition and recommending behaviours associated with substantial potential CO2 reductions. At the same time, we observe no systematic relationship between sustainability-oriented responses and model origin, size, or release context. However, models exhibit contextual sensitivity, controlled by persona-based prompting and show sycophantic shifts mirroring user-specified ideological positions, which raises concerns about steerability and normative reliability in real-world deployments. Our findings provide a reusable evaluation framework for assessing sustainability-related value alignment in LLMs and highlight the importance of governance, transparency, and critical oversight as AI systems become increasingly embedded in sustainability transformations and public decision-making.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-03T04:47:31Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.02750",
