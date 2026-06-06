@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-06T01:03:53.966Z",
-  "scan_duration_ms": 5568,
+  "generated_at": "2026-06-06T01:19:50.994Z",
+  "scan_duration_ms": 62077,
   "errors": [],
   "stats": {
     "poly_markets_scanned": 1151,
     "kalshi_markets_scanned": 1364,
-    "candidates_pre_filter": 30,
+    "candidates_pre_filter": 32,
     "tier1_count": 0,
     "tier2_count": 2,
-    "tier3_count": 8,
+    "tier3_count": 9,
     "pre_cap_tier1": 0,
     "pre_cap_tier2": 2,
-    "pre_cap_tier3": 8,
+    "pre_cap_tier3": 9,
     "per_tier_cap": 50,
     "history_lookback_days": 14
   },
@@ -109,10 +109,9 @@
       ],
       "persistence": {
         "first_seen_at": "2026-05-24T23:48:46.714Z",
-        "scans_seen": 413,
-        "hours_persisted": 289.25,
+        "scans_seen": 414,
+        "hours_persisted": 289.52,
         "gross_pct_history": [
-          5.5,
           6.2,
           6,
           6.15,
@@ -121,6 +120,7 @@
           3.55,
           5.05,
           5.2,
+          5.25,
           5.25
         ],
         "trend": "stable"
@@ -507,10 +507,10 @@
       ],
       "persistence": {
         "first_seen_at": "2026-05-28T19:26:51.936Z",
-        "scans_seen": 767,
-        "hours_persisted": 197.62,
+        "scans_seen": 768,
+        "hours_persisted": 197.88,
         "gross_pct_history": [
-          7.3,
+          7.25,
           7.25,
           7.25,
           7.25,
@@ -539,7 +539,7 @@
           "market_url": "https://kalshi.com/markets/KXFED-27APR/KXFED-27APR-T3.50",
           "side": "YES",
           "price": 0.545,
-          "depth_usd_at_price": 178,
+          "depth_usd_at_price": 164,
           "last_trade_at": "2026-04-09T14:07:28.292236Z",
           "volume_24h_usd": 204
         },
@@ -567,8 +567,8 @@
       ],
       "persistence": {
         "first_seen_at": "2026-05-23T13:22:30.126Z",
-        "scans_seen": 227,
-        "hours_persisted": 323.69,
+        "scans_seen": 228,
+        "hours_persisted": 323.96,
         "gross_pct_history": [
           16,
           16,
@@ -585,10 +585,112 @@
       }
     },
     {
+      "id": "pass3-kalshi-mono-BTC-above-2026-06-19-weekly-KXBTCD-26JUN1217-T56499.99-KXBTCD-26JUN1217-T56999.99",
+      "tier": 3,
+      "type": "kalshi_monotonicity",
+      "summary": "Kalshi BTC above-$56,500 priced 0.715 but above-$57,000 priced 0.795 — strike monotonicity violation (2026-06-19 · weekly)",
+      "underlying": "BTC",
+      "resolution_date": "2026-06-19",
+      "resolution_type": "weekly",
+      "legs": [
+        {
+          "platform": "kalshi",
+          "market_id": "KXBTCD-26JUN1217-T56499.99",
+          "market_url": "https://kalshi.com/markets/KXBTCD-26JUN1217/KXBTCD-26JUN1217-T56499.99",
+          "side": "YES",
+          "price": 0.715,
+          "depth_usd_at_price": 173,
+          "last_trade_at": "2026-06-05T20:00:00.780099Z",
+          "volume_24h_usd": 477
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXBTCD-26JUN1217-T56999.99",
+          "market_url": "https://kalshi.com/markets/KXBTCD-26JUN1217/KXBTCD-26JUN1217-T56999.99",
+          "side": "NO",
+          "price": 0.205,
+          "depth_usd_at_price": 4309,
+          "last_trade_at": "2026-06-05T20:00:00.780099Z",
+          "volume_24h_usd": 2702
+        }
+      ],
+      "edge_gross_pct": 8,
+      "edge_net_estimate_pct": 3.13,
+      "max_executable_size_per_leg_usd": 173,
+      "edge_net_per_dollar": 0.0313,
+      "weakest_link_summary": "Kalshi depth on the thinner leg limits fill to ~$173 before slippage closes the violation.",
+      "confidence_flags": [
+        "stale_price",
+        "depth_limited",
+        "fee_tight",
+        "low_volume"
+      ],
+      "persistence": {
+        "first_seen_at": "2026-06-06T01:19:50.994Z",
+        "scans_seen": 1,
+        "hours_persisted": 0,
+        "gross_pct_history": [
+          8
+        ],
+        "trend": "new"
+      }
+    },
+    {
+      "id": "pass3-kalshi-mono-BTC-above-2026-06-13T02:00:00Z-hourly-KXBTCD-26JUN0522-T60299.99-KXBTCD-26JUN0522-T60399.99",
+      "tier": 3,
+      "type": "kalshi_monotonicity",
+      "summary": "Kalshi BTC above-$60,300 priced 0.950 but above-$60,400 priced 0.975 — strike monotonicity violation (2026-06-13T02:00:00Z · hourly)",
+      "underlying": "BTC",
+      "resolution_date": "2026-06-13T02:00:00Z",
+      "resolution_type": "hourly",
+      "legs": [
+        {
+          "platform": "kalshi",
+          "market_id": "KXBTCD-26JUN0522-T60299.99",
+          "market_url": "https://kalshi.com/markets/KXBTCD-26JUN0522/KXBTCD-26JUN0522-T60299.99",
+          "side": "YES",
+          "price": 0.95,
+          "depth_usd_at_price": 1500,
+          "last_trade_at": "2026-06-06T01:00:01.329449Z",
+          "volume_24h_usd": 400
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXBTCD-26JUN0522-T60399.99",
+          "market_url": "https://kalshi.com/markets/KXBTCD-26JUN0522/KXBTCD-26JUN0522-T60399.99",
+          "side": "NO",
+          "price": 0.025,
+          "depth_usd_at_price": 101,
+          "last_trade_at": "2026-06-06T01:00:01.376185Z",
+          "volume_24h_usd": 450
+        }
+      ],
+      "edge_gross_pct": 2.5,
+      "edge_net_estimate_pct": -0.16,
+      "max_executable_size_per_leg_usd": 101,
+      "edge_net_per_dollar": -0.0016,
+      "weakest_link_summary": "Net edge negative after Kalshi 0.07·C·P·(1−P) fees and spread on both legs.",
+      "confidence_flags": [
+        "stale_price",
+        "depth_limited",
+        "fee_tight",
+        "low_volume"
+      ],
+      "persistence": {
+        "first_seen_at": "2026-06-06T01:19:50.994Z",
+        "scans_seen": 1,
+        "hours_persisted": 0,
+        "gross_pct_history": [
+          2.5
+        ],
+        "trend": "new"
+      }
+    },
+    {
       "id": "pass3-kalshi-mono-BTC-above-2026-06-19-weekly-KXBTCD-26JUN1217-T54999.99-KXBTCD-26JUN1217-T55499.99",
       "tier": 3,
       "type": "kalshi_monotonicity",
-      "summary": "Kalshi BTC above-$55,000 priced 0.845 but above-$55,500 priced 0.870 — strike monotonicity violation (2026-06-19 · weekly)",
+      "summary": "Kalshi BTC above-$55,000 priced 0.840 but above-$55,500 priced 0.865 — strike monotonicity violation (2026-06-19 · weekly)",
       "underlying": "BTC",
       "resolution_date": "2026-06-19",
       "resolution_type": "weekly",
@@ -598,90 +700,42 @@
           "market_id": "KXBTCD-26JUN1217-T54999.99",
           "market_url": "https://kalshi.com/markets/KXBTCD-26JUN1217/KXBTCD-26JUN1217-T54999.99",
           "side": "YES",
-          "price": 0.845,
-          "depth_usd_at_price": 1017,
+          "price": 0.84,
+          "depth_usd_at_price": 1007,
           "last_trade_at": "2026-06-05T20:00:00.780099Z",
-          "volume_24h_usd": 17392
+          "volume_24h_usd": 17399
         },
         {
           "platform": "kalshi",
           "market_id": "KXBTCD-26JUN1217-T55499.99",
           "market_url": "https://kalshi.com/markets/KXBTCD-26JUN1217/KXBTCD-26JUN1217-T55499.99",
           "side": "NO",
-          "price": 0.13,
-          "depth_usd_at_price": 4846,
+          "price": 0.135,
+          "depth_usd_at_price": 4792,
           "last_trade_at": "2026-06-05T20:00:00.780099Z",
           "volume_24h_usd": 7598
         }
       ],
       "edge_gross_pct": 2.5,
-      "edge_net_estimate_pct": -1.51,
-      "max_executable_size_per_leg_usd": 1017,
-      "edge_net_per_dollar": -0.0151,
+      "edge_net_estimate_pct": -1.56,
+      "max_executable_size_per_leg_usd": 1007,
+      "edge_net_per_dollar": -0.0156,
       "weakest_link_summary": "Net edge negative after Kalshi 0.07·C·P·(1−P) fees and spread on both legs.",
       "confidence_flags": [
         "stale_price"
       ],
       "persistence": {
         "first_seen_at": "2026-06-06T00:03:31.000Z",
-        "scans_seen": 4,
-        "hours_persisted": 1.01,
+        "scans_seen": 5,
+        "hours_persisted": 1.27,
         "gross_pct_history": [
           2,
+          2.5,
           2.5,
           2.5,
           2.5
         ],
         "trend": "stable"
-      }
-    },
-    {
-      "id": "pass3-kalshi-mono-BTC-above-2026-06-19-weekly-KXBTCD-26JUN1217-T59999.99-KXBTCD-26JUN1217-T60499.99",
-      "tier": 3,
-      "type": "kalshi_monotonicity",
-      "summary": "Kalshi BTC above-$60,000 priced 0.595 but above-$60,500 priced 0.630 — strike monotonicity violation (2026-06-19 · weekly)",
-      "underlying": "BTC",
-      "resolution_date": "2026-06-19",
-      "resolution_type": "weekly",
-      "legs": [
-        {
-          "platform": "kalshi",
-          "market_id": "KXBTCD-26JUN1217-T59999.99",
-          "market_url": "https://kalshi.com/markets/KXBTCD-26JUN1217/KXBTCD-26JUN1217-T59999.99",
-          "side": "YES",
-          "price": 0.595,
-          "depth_usd_at_price": 4183,
-          "last_trade_at": "2026-06-05T20:00:00.780099Z",
-          "volume_24h_usd": 5392
-        },
-        {
-          "platform": "kalshi",
-          "market_id": "KXBTCD-26JUN1217-T60499.99",
-          "market_url": "https://kalshi.com/markets/KXBTCD-26JUN1217/KXBTCD-26JUN1217-T60499.99",
-          "side": "NO",
-          "price": 0.37,
-          "depth_usd_at_price": 261,
-          "last_trade_at": "2026-06-05T20:00:00.780099Z",
-          "volume_24h_usd": 2879
-        }
-      ],
-      "edge_gross_pct": 3.5,
-      "edge_net_estimate_pct": -2.12,
-      "max_executable_size_per_leg_usd": 261,
-      "edge_net_per_dollar": -0.0212,
-      "weakest_link_summary": "Net edge negative after Kalshi 0.07·C·P·(1−P) fees and spread on both legs.",
-      "confidence_flags": [
-        "stale_price"
-      ],
-      "persistence": {
-        "first_seen_at": "2026-06-06T00:18:37.279Z",
-        "scans_seen": 2,
-        "hours_persisted": 0.75,
-        "gross_pct_history": [
-          2.5,
-          3.5
-        ],
-        "trend": "new"
       }
     },
     {
@@ -855,10 +909,9 @@
       ],
       "persistence": {
         "first_seen_at": "2026-05-23T03:33:58.024Z",
-        "scans_seen": 850,
-        "hours_persisted": 333.5,
+        "scans_seen": 851,
+        "hours_persisted": 333.76,
         "gross_pct_history": [
-          2.95,
           2.95,
           2.05,
           2.15,
@@ -867,6 +920,7 @@
           2.1,
           2.15,
           2.1,
+          2.15,
           2.15
         ],
         "trend": "stable"
@@ -982,10 +1036,9 @@
       ],
       "persistence": {
         "first_seen_at": "2026-05-28T10:39:49.308Z",
-        "scans_seen": 128,
-        "hours_persisted": 206.4,
+        "scans_seen": 129,
+        "hours_persisted": 206.67,
         "gross_pct_history": [
-          3.15,
           3.05,
           3.1,
           3.1,
@@ -994,6 +1047,7 @@
           2.55,
           2.55,
           2.55,
+          1.7,
           1.7
         ],
         "trend": "stable"
@@ -1042,8 +1096,8 @@
       ],
       "persistence": {
         "first_seen_at": "2026-05-23T21:55:11.436Z",
-        "scans_seen": 80,
-        "hours_persisted": 315.15,
+        "scans_seen": 81,
+        "hours_persisted": 315.41,
         "gross_pct_history": [
           5.5,
           5.5,
@@ -1051,7 +1105,7 @@
           5.5,
           5.5,
           5.5,
-          5.5,
+          5,
           5,
           5,
           5
@@ -1557,14 +1611,14 @@
       "confidence_flags": [],
       "persistence": {
         "first_seen_at": "2026-05-28T22:42:41.077Z",
-        "scans_seen": 772,
-        "hours_persisted": 194.35,
+        "scans_seen": 773,
+        "hours_persisted": 194.62,
         "gross_pct_history": [
           2,
           2,
-          2,
           1.9,
           1.9,
+          2.1,
           2.1,
           2.1,
           2.1,
@@ -1944,10 +1998,9 @@
       ],
       "persistence": {
         "first_seen_at": "2026-06-02T04:30:47.167Z",
-        "scans_seen": 304,
-        "hours_persisted": 92.55,
+        "scans_seen": 305,
+        "hours_persisted": 92.82,
         "gross_pct_history": [
-          2.8,
           2.8,
           2.7,
           2.7,
@@ -1956,6 +2009,7 @@
           2.8,
           2.8,
           2.6,
+          2.55,
           2.55
         ],
         "trend": "stable"
@@ -1964,25 +2018,25 @@
   ],
   "track_record": {
     "lookback_days": 14,
-    "total_observed": 441,
-    "active": 10,
-    "left_feed": 431,
+    "total_observed": 443,
+    "active": 11,
+    "left_feed": 432,
     "among_active": {
       "closed_substantially": 0,
       "tightened": 1,
-      "stable": 1,
-      "widened": 8
+      "stable": 3,
+      "widened": 7
     },
     "among_active_pct": {
       "closed_substantially": 0,
-      "tightened": 10,
-      "stable": 10,
-      "widened": 80
+      "tightened": 9.1,
+      "stable": 27.3,
+      "widened": 63.6
     },
     "left_feed_reasons": {
       "leg_expired": 106,
       "leg_delisted": 254,
-      "spread_closed": 71,
+      "spread_closed": 72,
       "unknown": 0
     },
     "median_lifetime_hours": 0.25,
@@ -2022,19 +2076,19 @@
         }
       },
       "3": {
-        "total_observed": 426,
-        "active": 8,
-        "left_feed": 418,
+        "total_observed": 428,
+        "active": 9,
+        "left_feed": 419,
         "among_active": {
           "closed_substantially": 0,
           "tightened": 1,
-          "stable": 1,
-          "widened": 6
+          "stable": 3,
+          "widened": 5
         },
         "left_feed_reasons": {
           "leg_expired": 104,
           "leg_delisted": 252,
-          "spread_closed": 62,
+          "spread_closed": 63,
           "unknown": 0
         }
       }
