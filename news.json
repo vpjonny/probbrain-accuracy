@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T04:47:51Z",
+  "generated_at": "2026-06-10T05:02:51Z",
   "items": [
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09850",
@@ -685,14 +685,14 @@
         "arxiv"
       ],
       "title": "Using Probabilistic Programs to Train Inductive Reasoning in Large Language Models",
-      "headline": "Using Probabilistic Programs to Train Inductive Reasoning in Large Language Models",
+      "headline": "Researchers propose Program-based Posterior Training, which uses probabilistic program generation to improve LLMs' inductive reasoning and uncertainty calibration.",
       "url": "https://arxiv.org/abs/2606.09856",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.09856v1 Announce Type: new Abstract: Post-training Large Language Models (LLMs) for reasoning typically focuses on deductive tasks such as mathematics and coding where correctness is verifiable. Yet, many real-world reasoning problems are inductive: agents must infer uncertain beliefs from sparse, ambiguous observations. There are challenges to using standard fine-tuning methods for inductive reasoning, including difficulties in curating large-scale, high-quality labeled datasets and in handling targets that are inherently distributional. In this work, we introduce a novel approach, called Program-based Posterior Training (PPT), to address these limitations: we use an LLM to generate diverse open-world scenarios as probabilistic programs, run probabilistic inference to produce distributional target responses to queries, and then fine-tune on these probabilistic soft labels. Using this approach, we fine-tune LLMs on 10,000 programmatically generated scenarios and evaluate on held-out motifs, human-labeled judgments, and external benchmarks. Overall, PPT substantially improves estimation accuracy on held-out inductive tasks, increases alignment with human judgments, and transfers to external benchmarks for estimation and calibration. Additionally, the gains in raw calibration are not subsumed by post-hoc temperature scaling, showing that the models have more deeply internalized uncertainty compared to output rescaling. Together, these results suggest that probabilistic-program-mediated fine-tuning is a promising approach for post-training LLMs to reliably perform approximate inductive inference.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:01:33Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.09900",
@@ -706,14 +706,14 @@
         "arxiv"
       ],
       "title": "Less Context, More Accuracy: A Bi-Temporal Memory Engine for LLM Agents Where a Lean Retrieved Context Beats the Full History",
-      "headline": "Less Context, More Accuracy: A Bi-Temporal Memory Engine for LLM Agents Where a Lean Retrieved Context Beats the Full History",
+      "headline": "Engram, a bi-temporal memory engine for LLM agents, achieves 83.6% accuracy with compressed retrieved context versus 73.2% baseline using full history.",
       "url": "https://arxiv.org/abs/2606.09900",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.09900v1 Announce Type: new Abstract: Long-term memory is the missing layer for LLM agents: across sessions they forget, and the common workaround -- replaying the whole history into the prompt -- is expensive, slow, and, as distractors accumulate, less accurate. Most memory systems win on cost or latency but still lose to the full-context baseline on accuracy, and benchmark numbers are reported on inconsistent, non-reproducible harnesses, so one system appears at wildly different scores across sources. We present Engram, an open-source, dual-process memory engine on a bi-temporal data model. A fast write path appends lossless episodes with no LLM on the critical path; an asynchronous path extracts atomic (subject, predicate, object) facts, builds a bi-temporal knowledge graph, and resolves contradictions without an LLM call per fact -- invalidating, never deleting, so every fact keeps provenance and a supersession chain. A hybrid read path fuses dense, lexical, graph, and recency/salience signals, applies a point-in-time (\"as-of\") filter, and assembles a compact, provenance-tagged context. On the full 500-question LongMemEval_S, graded by the official category-specific judge, Engram's lean configuration -- answering from a ~9.6k-token retrieved slice, never the full history -- scores 83.6% vs. 73.2% for full-context (+10.4 points, McNemar p < 10^-6) at ~8x fewer tokens (9.6k vs. 79k), with 0/500 errored. The gain needs a hybrid read path: facts alone lose recall, while facts plus retrieved chunks recover detail. We also contribute a neutral, in-repo evaluation harness with the official judge baked in and the full-context baseline in every table, publish the raw per-question logs, and document the measurement-integrity pitfalls (truncation, home-grown judges, full-history leaks) that silently distort memory benchmarks. Every number ships with a command to reproduce it.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:01:41Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.10061",
@@ -727,14 +727,14 @@
         "arxiv"
       ],
       "title": "BenSyc: Benchmarking Conversational Sycophancy and Human Alignment in LLMs for Bengali Contexts",
-      "headline": "BenSyc: Benchmarking Conversational Sycophancy and Human Alignment in LLMs for Bengali Contexts",
+      "headline": "New benchmark BenSyc evaluates 15+ LLMs on conversational sycophancy in Bengali contexts; models achieve only ~62% accuracy distinguishing support from excessive validation.",
       "url": "https://arxiv.org/abs/2606.10061",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.10061v1 Announce Type: new Abstract: Large language models (LLMs) increasingly participate in emotionally sensitive social conversations, where responses may shift from balanced support toward excessive validation or escalatory alignment. Existing sycophancy research primarily focuses on factual agreement and instruction-following settings, leaving culturally grounded conversational sycophancy underexplored. We introduce BenSyc, the first benchmark for studying conversational sycophancy in Bengali social contexts. Starting from 11,840 Reddit posts and 170k comments collected from communities across Bangladesh and West Bengal, we construct a human-validated benchmark with binary labels and a fine-grained five-level taxonomy spanning Invalidation, Neutral, Support, Validation, and Escalation. We evaluate more than 15 open and proprietary LLMs on conversational alignment classification and response generation tasks. Results show that distinguishing empathetic support from reinforcement-oriented validation remains challenging even for frontier instruction-tuned models: the best system achieves only 61.8 Macro-F1 on binary detection and 61.7 Macro-F1 on five-class classification. In generation settings, several models frequently produce strongly validating or escalatory responses in emotionally charged situations. Our findings highlight substantial variation across model families and conversational behaviors, underscoring the importance of culturally grounded multilingual benchmarks for evaluating socially aligned conversational AI systems.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:01:54Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.10087",
@@ -748,14 +748,14 @@
         "arxiv"
       ],
       "title": "CodeAlchemy: Synthetic Code Rewriting at Scale",
-      "headline": "CodeAlchemy: Synthetic Code Rewriting at Scale",
+      "headline": "CodeAlchemy framework generates 500B+ synthetic code tokens through five strategies, enabling 3B parameter models to outperform frontier models 10x their size.",
       "url": "https://arxiv.org/abs/2606.10087",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.10087v1 Announce Type: new Abstract: Pre-training on raw code teaches syntax but provides sparse signal for diverse real-world task formats. While synthetic data has proven transformative for language models, code remains largely unexplored beyond limited quality improvements. We present CodeAlchemy, a synthetic data generation framework that transforms publicly sourced code into semantically-rich training data through 5 strategies: CodeEnhance (quality-aware rewriting), CodeQA (template-based problems), CodeDev (developer tasks), CodeDialogue (multi-turn conversations), and CodeTrace (execution traces). We process 3 corpora across 15 languages to generate 500B+ tokens of synthetic data plus 350B reasoning tokens, orders of magnitude more than prior efforts. CodeTrace instruments and executes 1.3M+ files across 14 languages and 5K libraries, capturing control flow, state tracking, and library knowledge. We introduce DevEval (developer tasks) and TraceEval (execution prediction) benchmarks; frontier models like Claude Sonnet 4.5 achieve only 5.6% exact match on TraceEval, revealing critical gaps in semantic understanding. Our 3B models achieve 83.5% on HumanEval, 63.2% on MBPP, 8.09% win rate on DevEval, and 15.36 ROUGE-2 on TraceEval, outperforming frontier models 10x the size including 27B Gemma-3 and 32B Granite-4.0.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:02:02Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.10113",
@@ -769,14 +769,14 @@
         "arxiv"
       ],
       "title": "Emotion Profiling in LLM-Based Literary Translation: Systematic Shifts Across MT and Post-Editing",
-      "headline": "Emotion Profiling in LLM-Based Literary Translation: Systematic Shifts Across MT and Post-Editing",
+      "headline": "LLM translations exhibit distinctive emotional fingerprints that diverge from human translations and fail to preserve original author voice.",
       "url": "https://arxiv.org/abs/2606.10113",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.10113v1 Announce Type: new Abstract: This paper investigates whether LLM translations exhibit identifiable emotional profiles and how post-editing reshapes them toward human-like norms. We compare LLM translations of Margaret Atwood's Oryx and Crake with their post-edited versions and a human translation, using a large-scale corpus of contemporary Italian science-fiction as a baseline. We examine emotion through lexicon-based and multilingual modeling, conducting a fine-grained analysis of emotional variation across systems. We find that MT systems introduce model-specific and statistically significant emotional fingerprints across translations, leading to a limited preservation of an author's voice.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:02:16Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.10126",
@@ -790,14 +790,14 @@
         "arxiv"
       ],
       "title": "Pareto-Guided Teacher Alignment for Fair Personalized Text Generation",
-      "headline": "Pareto-Guided Teacher Alignment for Fair Personalized Text Generation",
+      "headline": "Pareto-guided framework mitigates demographic disparities in personalized text generation while preserving personalization fidelity through multi-objective alignment.",
       "url": "https://arxiv.org/abs/2606.10126",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.10126v1 Announce Type: new Abstract: Personalized persuasive text generation can improve relevance and engagement, but demographic conditioning may also introduce unequal framing across groups. We study fairness mitigation in personalized generation as a constrained multi-objective alignment problem: reduce demographic disparities while preserving personalization fidelity. We propose a Pareto-guided teacher alignment framework that combines revision-based candidate generation, pair-aware feasibility gating, Pareto-style candidate selection, and optional preference optimization through supervised fine-tuning and direct preference optimization. We evaluate the framework on climate change and vaccination persuasion tasks using a controlled context-rich demographic grid with matched gender and age pairs and a unified five-audit evaluation suite spanning persuasion bias, formality disparity, emotional framing disparity, lexical association disparity, and personalization fidelity. Across both domains and cross-family transfer settings, no single alignment strategy dominates all objectives simultaneously. Instead, methods occupy different regions of a fairness-personalization Pareto frontier: some achieve stronger disparity reductions, while others better preserve personalization or demographic stability. Our results show that fairness mitigation effects are objective-dependent and transfer inconsistently across domains and model families, motivating bounded-regression, multi-audit model selection over single-metric optimization for fairness-sensitive personalized generation.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:02:29Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.10159",
@@ -811,14 +811,14 @@
         "arxiv"
       ],
       "title": "Gaming AI-Assisted Peer Reviews Poses New Risks to the Scientific Community",
-      "headline": "Gaming AI-Assisted Peer Reviews Poses New Risks to the Scientific Community",
+      "headline": "Abstract rephrasing attacks can fool AI peer review systems with 38% success, improving acceptance scores by 1.31 points at minimal cost.",
       "url": "https://arxiv.org/abs/2606.10159",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.10159v1 Announce Type: new Abstract: AI is increasingly used to support scientific peer review, from manuscript screening, reviewer assistance to editorial triage. Although such systems promise to reduce reviewer burden and accelerate publication, their robustness to strategic manipulation remains poorly understood. Here we show that AI-mediated peer review is vulnerable to a simple, low-cost manipulation: superficial rephrasing of the manuscript abstract. Without changing the underlying scientific content and communication, and even without knowledge of the reviewing model, adversarially rewritten abstracts substantially improve AI review outcomes. We see this across disciplines and publication venues, for both human-written and AI-generated papers. Our strongest attack achieves an attack-success-rate of about 38%, increasing acceptance ratings by +1.31 for Gemini 3 Flash reviewers and by +0.88 for GPT 5.4 Mini reviewers on a 10-point scale. When the original AI review suggests 'reject', the success rate rises to more than 50%. This effect extends beyond overall score inflation, increasing review confidence and scores on core scientific criteria such as soundness, significance and perceived contribution. The attack is practical, requiring only about 5 minutes and $1 for a 10-page AI conference submission, and is hard to distinguish from ordinary scientific editing. Inflated AI reviews could bias downstream human decision-making, shifting editorial recommendations from rejection towards acceptance. These findings reveal a general vulnerability in AI-assisted scientific evaluation: when AI-generated review influence editorial decisions, authors may be incentivized to optimize manuscripts for AI judgment rather than scientific merit. Our results suggest that AI tools should not be treated as neutral evaluators in high-stakes peer review without systematic robustness testing, transparent safeguards and careful human oversight.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:02:40Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.10285",
@@ -832,14 +832,14 @@
         "arxiv"
       ],
       "title": "OpenRTLSet: A Fully Open-Source Dataset for Large Language Model-based Verilog Module Design",
-      "headline": "OpenRTLSet: A Fully Open-Source Dataset for Large Language Model-based Verilog Module Design",
+      "headline": "OpenRTLSet releases 131,000+ open-source Verilog code samples for training large language models on hardware design.",
       "url": "https://arxiv.org/abs/2606.10285",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:44Z",
       "description": "arXiv:2606.10285v1 Announce Type: new Abstract: OpenRTLSet introduces the largest fully open-source dataset for hardware design, offering over 131,000 diverse Verilog code samples to the research community and industry. Our dataset uniquely combines Verilog code from GitHub repositories (102k modules), VHDL translations (5k modules), and synthesizable C/C++ translations (24k modules), all freely accessible without proprietary restrictions. Using the reasoning model DeepSeek-R1, we generated paired natural language descriptions for each code sample, enabling fine-tuning of various language model families (e.g., Qwen and Granite) for Verilog code generation. Our dataset explores multiple options, including Verilator-generated C++ files as additional context during labeling, quantization techniques (INT4 vs. BF16), and performance differences across model sizes (7B-32B parameters). OpenRTLSet demonstrates that open-source approaches can achieve superior performance in hardware design tasks, establishing a new foundation for accessible research and commercial use in this domain.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T05:02:51Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.10296",
@@ -1446,6 +1446,27 @@
       "published_at": "2026-06-09T21:19:11Z",
       "discovered_at": "2026-06-09T22:29:35Z",
       "description": "HN score 132 · 50 comments",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "hn|https://www.404media.co/this-company-will-add-phone-airpod-and-smartwatch-trackers-to-license-plate-readers",
+      "anchor": "3e231d08ea",
+      "source_id": "hn",
+      "source_name": "Hacker News",
+      "category": "community",
+      "category_emoji": "🔥",
+      "hashtags": [
+        "community",
+        "hn"
+      ],
+      "title": "Company Will Add Phone, AirPod, and Smartwatch Trackers to ALPRs",
+      "headline": "Company Will Add Phone, AirPod, and Smartwatch Trackers to ALPRs",
+      "url": "https://www.404media.co/this-company-will-add-phone-airpod-and-smartwatch-trackers-to-license-plate-readers/",
+      "published_at": "2026-06-09T21:01:40Z",
+      "discovered_at": "2026-06-10T05:01:16Z",
+      "description": "HN score 100 · 36 comments",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -2496,27 +2517,6 @@
       "published_at": "2026-06-07T17:22:28Z",
       "discovered_at": "2026-06-07T22:26:33Z",
       "description": "HN score 101 · 34 comments",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "hn|https://github.com/luke8086/gentleos32",
-      "anchor": "624dbb3576",
-      "source_id": "hn",
-      "source_name": "Hacker News",
-      "category": "community",
-      "category_emoji": "🔥",
-      "hashtags": [
-        "community",
-        "hn"
-      ],
-      "title": "Show HN: GentleOS – A pair of hobby OSes for vintage 32-bit and 16-bit PCs",
-      "headline": "Show HN: GentleOS – A pair of hobby OSes for vintage 32-bit and 16-bit PCs",
-      "url": "https://github.com/luke8086/gentleos32",
-      "published_at": "2026-06-07T15:45:50Z",
-      "discovered_at": "2026-06-10T02:15:30Z",
-      "description": "HN score 100 · 92 comments",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
