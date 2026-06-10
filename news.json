@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T04:02:24Z",
+  "generated_at": "2026-06-10T04:17:21Z",
   "items": [
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09850",
@@ -181,14 +181,14 @@
         "arxiv"
       ],
       "title": "Alignment Collapse Under KV Cache Quantization: Diagnosis and Mitigation",
-      "headline": "Alignment Collapse Under KV Cache Quantization: Diagnosis and Mitigation",
+      "headline": "KV cache quantization silently destroys LLM safety alignment by targeting low-dimensional activation subspaces; researchers propose Per-Channel Reduction diagnostics to identify and address failure modes.",
       "url": "https://arxiv.org/abs/2606.09864",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09864v1 Announce Type: new Abstract: Key-value (KV) cache quantization is widely used to reduce Large Language Model (LLM) inference memory, yet existing evaluations solely focus on measuring perplexity and accuracy without assessing the safety impact. In this study, we explore alignment preservation under KV cache quantization. Across eleven instruction-tuned models (3.8B-72B) and five benchmarks (1,894 prompts), we find that low-bit quantization can silently destroy safety alignment: Mistral-7B loses 15.2% of its refusals at only 1.03x perplexity, and no universal safe bit-width exists, with sharp model-specific phase transitions invisible to standard metrics. We identify that the root cause is geometric: safety features occupy a low-dimensional activation subspace 10^2-10^3x more vulnerable to quantization noise than the full representation space perplexity averages over. Inspired by this observation, we propose Per-Channel Reduction (PCR), a diagnostic that classifies each model into one of three mechanistic failure modes: outlier-crushes-safety, where safety lives in non-outlier channels collaterally damaged by outlier-driven scale factors; outlier-as-safety, where safety overlaps outlier channels and finer granularity cannot rescue it; and multi-layer dilution, where safety is distributed across many layers and per-layer fixes fail. PCR predicts the correct mitigation direction on all nine primary models and one held-out model from an independent family using 20 calibration prompts. PCR generalizes across unseen prompts, models, and production quantizers, including KIVI with up to 97.2% recovery, succeeding where attention-based allocation methods fail. The resulting training-free protocol, requiring approximately 35 GPU-minutes, recovers up to 97% of lost alignment at minimal memory overhead, addressing vulnerabilities confirmed in production vLLM serving with FP8 KV cache on NVIDIA GPUs.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:16:15Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09865",
@@ -202,14 +202,14 @@
         "arxiv"
       ],
       "title": "LLM-as-a-Discriminator: When Synthetic Tables Still Look Real",
-      "headline": "LLM-as-a-Discriminator: When Synthetic Tables Still Look Real",
+      "headline": "Researchers propose using LLMs to distinguish real from synthetic tabular data as a privacy audit method, showing varying effectiveness across models.",
       "url": "https://arxiv.org/abs/2606.09865",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09865v1 Announce Type: new Abstract: Privacy and data sharing are often in tension. Many organizations use synthetic data to reduce privacy risk and still share useful data. For tabular data, auditing privacy remains hard. In many cases, even humans cannot easily tell if a table is real or synthetic. In this paper, we propose a method based on LLM discrimination. We ask an LLM to classify each table sample as REAL or SYNTHETIC. We test two settings: C1 with table only, and C2 with table plus distributional metadata. We use LLaMA as an open model and Gemini as a reference model. In our experiments, we run three synthesis models, CTGAN, TVAE, and Gaussian Copula, on two public datasets, UCI Adult and ACS Census. We collect 451 valid trials. Our results show clear differences between models. On Adult, LLaMA reaches DRS=0% in reported cells, while Gemini reaches DRS=100% for CTGAN and TVAE. On Census, LLaMA predicts SYNTHETIC for most samples, while Gemini stays high in C1 but drops for CTGAN and TVAE in C2. We also compare with a classifier two-sample test (C2ST) and record linkage as distributional baselines, and with a human pilot of 2 annotators and 240 trials. Our results show that LLM discrimination is a practical privacy audit signal when model choice, per provider reporting, and data encoding are handled with care. For reproducibility, code and experiment scripts are available at https://github.com/SlokomManel/LLM-as-a-Discriminator.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:16:24Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09866",
@@ -223,14 +223,14 @@
         "arxiv"
       ],
       "title": "Two to Tango: Coupled Task-Reference Selection for Safe LLM Fine-tuning",
-      "headline": "Two to Tango: Coupled Task-Reference Selection for Safe LLM Fine-tuning",
+      "headline": "DualSelect jointly selects task samples and safety references to preserve safety alignment during LLM fine-tuning without sacrificing task utility.",
       "url": "https://arxiv.org/abs/2606.09866",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09866v1 Announce Type: new Abstract: Fine-tuning safety aligned large language models (LLMs) on downstream data improves adaptation but may erode learned safety behavior. Existing methods use fixed safety examples, global constraints, or one-sided task filtering. Our diagnostics show task updates expose different safety constraints, motivating joint selection of relevant references and compatible task samples. We propose DualSelect, a coupled framework for task and reference selection that refreshes task conditioned safety references before filtering whole task samples compatible with the induced reference direction. Under a minimax view, DualSelect selects safety references with high preservation loss and task conflict, together with compatible task samples, through entropy-regularized scoring surrogates, lazy reference refresh, and gradient correction. On 1B-8B LLMs, DualSelect preserves safety without losing task utility; using the REDORCA judge, it improves Safety Avg. over the strongest baseline by at least 5.10 points and remains highest in Safety Avg. across judges with moderate overhead. This view extends to retention focused continual learning.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:16:35Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09868",
@@ -244,14 +244,14 @@
         "arxiv"
       ],
       "title": "SPACE: Source-free Proxy Anchor Concept Erasure for MLLMs",
-      "headline": "SPACE: Source-free Proxy Anchor Concept Erasure for MLLMs",
+      "headline": "SPACE enables removing sensitive concepts from multimodal AI models without access to original training data while maintaining performance.",
       "url": "https://arxiv.org/abs/2606.09868",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09868v1 Announce Type: new Abstract: As Multimodal Large Language Models (MLLMs) face growing privacy risks and regulatory constraints, machine unlearning (MU) has emerged as a crucial solution for removing sensitive data while preserving model performance. However, existing MU methods typically rely on visual data of the target concepts, which is often unavailable due to strict data retention policies, thus creating a demand for source-free unlearning approaches that operate without access to the target data. In this work, we propose Source-free Proxy Anchor Concept Erasure (SPACE), the first source-free unlearning framework specialized for MLLMs. SPACE consists of two stages: (1) Text-Guided Proxy Anchor Selection (TPAS), which retrieves semantically aligned proxy anchors from the shared feature space. (2) Dual-Constraint Semantic Isolation (DCSI), which optimizes these anchors to indirectly erase target concepts. DCSI confines updates to the null space of retained knowledge, ensuring structural integrity. We theoretically prove that SPACE strictly bounds the perturbation on retained knowledge and maximizes feature spectral entropy, thereby maintaining the model's performance. Furthermore, extensive experiments across six datasets show that SPACE achieves performance comparable to that of state-of-the-art data-dependent methods, validating its effectiveness in source-free MU scenarios. The source code will be released.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:16:43Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09869",
@@ -265,14 +265,14 @@
         "arxiv"
       ],
       "title": "QSplitFL: Capability Aware Deep Q-Learning for Optimal Split Point Selection in Split Federated Learning",
-      "headline": "QSplitFL: Capability Aware Deep Q-Learning for Optimal Split Point Selection in Split Federated Learning",
+      "headline": "QSplitFL uses Deep Q-Learning to optimize split points in federated learning based on client hardware capabilities, achieving better convergence and accuracy.",
       "url": "https://arxiv.org/abs/2606.09869",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09869v1 Announce Type: new Abstract: Federated Learning (FL) combined with Split Learning (SL) is a privacy preserving paradigm that enables training deep neural networks (DNNs) on resource constrained devices while reducing overall training cost. However, determining the optimal split point, meaning the layer where the model is divided still remains a critical challenge, especially when clients have heterogeneous hardware capabilities. Fixed split points can overload weak devices and increase the communication and server load, which slows convergence and reduces stability. This paper introduces QSplitFL, a novel capability-aware Deep Q-Network (DQN) framework for optimal split point selection in Split learning based Federated Learning (SFL) environments. Unlike existing approaches that rely on high-dimensional model weight representations, QSplitFL employs a lightweight state representation derived directly from client hardware metrics, including CPU utilization, memory, battery level, and network latency. The proposed framework incorporates a decayed loss-drop reward function that prioritizes early convergence, and a committee-based DQN architecture with majority voting to mitigate reward hacking. Extensive experiments on MNIST, Fashion-MNIST, CIFAR-10, and CIFAR-100 datasets using CNN, ResNet50, MobileNetV4, and ConvNeXt architectures demonstrate that our approach achieves better convergence and higher accuracy compared to existing methods, while effectively adapting to heterogeneous device resources. The source code is publicly available at https://github.com/AIPO-Lab/QSplitFL.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:16:51Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09872",
@@ -286,14 +286,14 @@
         "arxiv"
       ],
       "title": "PatchSTG: Scalable Spatiotemporal Graph Transformers for Traffic Forecasting on Irregular Sensor Networks",
-      "headline": "PatchSTG: Scalable Spatiotemporal Graph Transformers for Traffic Forecasting on Irregular Sensor Networks",
+      "headline": "PatchSTG, a patch-based spatiotemporal Transformer, efficiently forecasts traffic on irregular sensor networks with near-linear computational complexity.",
       "url": "https://arxiv.org/abs/2606.09872",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09872v1 Announce Type: new Abstract: Traffic forecasting is a fundamental component of intelligent transportation systems, yet remains challenging in real-world settings due to irregular sensor distributions and the high computational cost of modeling large-scale spatiotemporal dependencies. In practical traffic networks, sensors are unevenly distributed across regions, leading to non-uniform spatial structures that limit the effectiveness and scalability of existing graph-based and attention-based models. To address these challenges, we propose PatchSTG, a patch-based spatiotemporal graph Transformer designed for efficient forecasting on irregular sensor networks. The key idea is to introduce a hierarchical spatial representation that partitions sensors into balanced, locality-preserving patches based on geographic information. On top of this structure, a dual attention encoder alternates between intra-patch attention for capturing local interactions and inter-patch attention for modeling global dependencies, reducing computational complexity from quadratic to near-linear scaling. We evaluate PatchSTG on real-world traffic data from Rhode Island and additional large-scale datasets. Experimental results demonstrate that the proposed model achieves stable and competitive forecasting performance across multiple horizons, while significantly improving computational efficiency. Ablation studies further validate the effectiveness of spatial partitioning and dual attention in capturing both local and long-range traffic dynamics. These results suggest that patch-based spatiotemporal modeling provides a scalable and effective framework for traffic forecasting under irregular spatial settings.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:17:03Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09873",
@@ -307,14 +307,14 @@
         "arxiv"
       ],
       "title": "Rotate2Think: Geometric Priming via Orthogonal Rotation to Improve Language Model Reasoning",
-      "headline": "Rotate2Think: Geometric Priming via Orthogonal Rotation to Improve Language Model Reasoning",
+      "headline": "Rotate2Think uses orthogonal rotation to prime language models for improved reasoning, achieving accuracy gains across 30 of 32 model-benchmark combinations.",
       "url": "https://arxiv.org/abs/2606.09873",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09873v1 Announce Type: new Abstract: Reasoning models achieve strong performance on challenging tasks by generating explicit intermediate reasoning traces before producing a final answer. Yet the internal structure of representation space when reasoning remains poorly understood: how do a model's hidden representations differ during thinking versus the embeddings of the input prompt, and can this structure be exploited to elicit stronger reasoning at inference time? We show that both input embeddings and thinking embeddings (mean-pooled last-layer hidden states over the prompt and reasoning trace, respectively) exhibit extremely high conicity, with all vectors clustering tightly around a single mean direction. Crucially, these mean input and thinking directions are non-collinear, with thinking embeddings occupying a geometrically distinct region of embedding space across many different models and benchmark tasks. This observation motivates casting the input-to-thinking transition as a rotation problem admitting a closed-form solution via orthogonal Procrustes analysis. We propose Rotate2Think, a training-free method that estimates this rotation from a small set of correctly solved examples and injects the resulting synthetic thinking vector between thinking delimiters at inference time, providing a geometric primer at the onset of the reasoning trace. Evaluated across multiple benchmarks and model families, Rotate2Think improves accuracy in 30 of 32 model-benchmark configurations across mathematics, science, and code tasks, and generalizes zero-shot to multimodal reasoning on MATH-Vision.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:17:11Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09874",
@@ -328,14 +328,14 @@
         "arxiv"
       ],
       "title": "Disjoint or Overlapping? Inference Windowing for Reconstruction-Based Time Series Anomaly Detection",
-      "headline": "Disjoint or Overlapping? Inference Windowing for Reconstruction-Based Time Series Anomaly Detection",
+      "headline": "Overlapping inference windows improve reconstruction-based time series anomaly detection across multiple model architectures, achieving average performance gains up to 28%.",
       "url": "https://arxiv.org/abs/2606.09874",
       "published_at": "2026-06-10T04:00:00Z",
       "discovered_at": "2026-06-10T04:00:42Z",
       "description": "arXiv:2606.09874v1 Announce Type: new Abstract: Reconstruction-based methods are widely used for time series anomaly detection, where models are trained to reconstruct subsequences, and anomalies are identified through reconstruction errors. However, reported results are often hard to compare due to heterogeneous evaluation practices and underspecified inference procedures. In this paper, we revisit reconstruction-based anomaly detection in the univariate offline setting and study the role of the inference stride, which controls whether subsequences are processed as disjoint windows or with overlap. We propose a unified training, tuning, and multi-seed evaluation protocol on the curated TSB-AD benchmark, and study how overlapping inference affects anomaly detection performance for a range of reconstruction models, including PCA-based baselines, DLinear, an AutoEncoder, TimesNet, and Transformer variants. The results show that across all models, overlapping windows yield consistent improvements, with average relative gain up to +28%, and can alter method rankings. We further analyze variability across datasets, random seeds, and hyperparameter configurations. Finally, we complement the benchmark study with an evaluation on the full UCR archive using localization criteria aligned with sliding-window reconstruction. Overall, our results highlight that reconstruction-based anomaly detection performance depends not only on model architecture and training, but also on inference choices, motivating a clear and reproducible protocol. Our results show that reconstructionbased baselines achieve strong performance on both TSB-AD and UCR benchmarks, supporting them as competitive and practical approaches for univariate time series anomaly detection.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-10T04:17:21Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.09875",
