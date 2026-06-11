@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-11T04:38:17Z",
+  "generated_at": "2026-06-11T04:53:35Z",
   "items": [
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11192",
@@ -517,14 +517,14 @@
         "arxiv"
       ],
       "title": "Risk Under Pressure: Compute-Aware Evaluation of Adversarial Robustness in Language Models",
-      "headline": "Risk Under Pressure: Compute-Aware Evaluation of Adversarial Robustness in Language Models",
+      "headline": "Compute-aware framework evaluates LLM adversarial robustness using FLOPs instead of fixed query budgets to measure attack effort.",
       "url": "https://arxiv.org/abs/2606.11409",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:19Z",
       "description": "arXiv:2606.11409v1 Announce Type: new Abstract: Adversarial robustness evaluations of large language models (LLMs) typically report attack success rate (ASR) under fixed query budgets, implicitly treating all attacks as equally costly. In practice, the computational expense of different attack strategies can vary by orders of magnitude. Consequently, ASR at a fixed budget can obscure the true effort required to jailbreak a model, thereby making it hard to determine whether an attack's cost justifies its payoff to the attacker. We propose a compute-aware evaluation framework based on computational pressure, measured in cumulative floating-point operations (FLOPs), as a proxy for adversarial effort. We introduce risk-compute curves, which map compute budgets to attack risk, and derive two metrics that summarize the average pressure required for a given attack to succeed. Across ten models spanning three families and four different stages in language model training and alignment, evaluated with three attack strategies (gradient-based, iterative refinement, and template-based) on two jailbreak robustness benchmarks, we find: (1) alignment training has non-monotonic effects on compute-space robustness; (2) scaling model size reduces gradient-based attack effectiveness but has limited impact on cheaper template-based attacks; (3) gradient-based attacks optimized on a surrogate model can transfer to a separate target model, providing a way to reduce attacker costs; (4) compute cost varies by up to ${\\approx}5{\\times}$ across harm categories within a single model; and (5) safety-aligned RL increases aggregate cost while leaving some categories disproportionately accessible. We release our framework to enable compute-aware risk assessment and evaluation.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:51:59Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11417",
@@ -538,14 +538,14 @@
         "arxiv"
       ],
       "title": "Signed Compression Progress on a Sealed Audit is Goodhart-Resistant",
-      "headline": "Signed Compression Progress on a Sealed Audit is Goodhart-Resistant",
+      "headline": "Researchers prove signed compression-progress rewards on sealed audits prevent indefinite reward accumulation without true audit performance improvement.",
       "url": "https://arxiv.org/abs/2606.11417",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:19Z",
       "description": "arXiv:2606.11417v1 Announce Type: new Abstract: Compression progress is a long-standing proposal for intrinsic motivation: reward an agent when its world model becomes better at predicting or compressing experience. The folk claim is that this reward is \"credible\" because it is paid only for learning. We make this precise and prove it. If intrinsic reward is the signed decrease of a fixed sealed-audit loss, r_t = E(theta_{t-1}) - E(theta_t), then cumulative reward telescopes exactly to endpoint audit improvement, so no policy can push reward up indefinitely while true audit performance stagnates or degrades. For finite audit panels the same result holds with a sharp false-positive budget: cumulative empirical reward is at most true audit improvement plus 2 Delta_n(F, delta), the uniform audit deviation of the model class. This is horizon-free: adaptivity over time costs nothing once the sealed panel uniformly controls the class. The theorem also identifies the failure modes: the guarantee disappears if progress is clipped, scored on the agent's own stream, exposed to a high-capacity model on a reusable panel, or applied to a neural class that makes Delta_n vacuous. We give a Lean 4 mechanization of the structural core (telescoping, the finite-audit bound, finite Gibbs, and the entropy floor) and an experiment suite on ARC-TGI grid-transformation generators with adaptive holdout attacks. Experiments confirm the theory: finite-audit deviation scales as n^{-0.527}; signed progress resists clip-farming, stream leakage, and noisy-TV curiosity; naive reusable audits are exploitable by black-box scalar feedback, while standard release defenses keep the attack below the 2 Delta_n threshold. Signed compression progress on a sealed audit is an accounting signal of genuine improvement.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:52:14Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11431",
@@ -559,14 +559,14 @@
         "arxiv"
       ],
       "title": "Mirror Descent Beyond Euclidean Stability: An Exponential Separation in Initialization Sensitivity",
-      "headline": "Mirror Descent Beyond Euclidean Stability: An Exponential Separation in Initialization Sensitivity",
+      "headline": "Study reveals non-quadratic mirror descent is exponentially sensitive to initialization, unlike gradient descent, affecting LLM post-training robustness.",
       "url": "https://arxiv.org/abs/2606.11431",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:19Z",
       "description": "arXiv:2606.11431v1 Announce Type: new Abstract: Mirror Descent (MD) extends Gradient Descent (GD) beyond Euclidean geometry and has recently reappeared as a lens for KL-regularized policy optimization in reinforcement learning and LLM post-training. This raises a basic robustness question, crucial to reproducibility and reliability: how sensitive are MD dynamics to their inputs? We focus on initialization, often itself a pretrained or previously aligned model. Quadratic-regularized MD, including GD and Mahalanobis geometries, is well-known to be stable for convex smooth objectives. We show a sharp contrast: once the regularizer is non-quadratic, MD can be exponentially more sensitive to initialization than GD, even with a well-conditioned regularizer in Euclidean norm. We give a three-dimensional construction with a convex, smooth objective and a strongly convex, smooth, well-conditioned regularizer where an initial $\\varepsilon$ perturbation is quickly amplified to $\\min\\{\\text{polylog}^{-1}(1/\\varepsilon), \\varepsilon e^{\\Omega(\\eta T)}\\}$ after $T$ iterations of MD with step size $\\eta$. For canonical KL-regularized MD on the simplex, we show that even linear objectives can amplify an initial $\\varepsilon$ perturbation exponentially fast in high-dimensional or near-boundary regimes. Finally, we show that adding a Bregman regularization term toward an anchor point can stabilize the dynamics while largely preserving the optimization guarantees, and that the choice of anchor is crucial: anchoring at the initialization only partially mitigates the instability, whereas anchoring at a fixed point yields a more stable mechanism.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:52:27Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11463",
@@ -580,14 +580,14 @@
         "arxiv"
       ],
       "title": "LSTM-Based Detection of Structural Breaks in Property Insurance Loss Reserving: A Climate-Informed Approach",
-      "headline": "LSTM-Based Detection of Structural Breaks in Property Insurance Loss Reserving: A Climate-Informed Approach",
+      "headline": "LSTM networks detect climate-driven structural breaks in insurance loss reserving with theoretical performance guarantees.",
       "url": "https://arxiv.org/abs/2606.11463",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:19Z",
       "description": "arXiv:2606.11463v1 Announce Type: new Abstract: Accurate loss reserving is foundational to insurer solvency, yet accelerating climate driven catastrophes systematically violate the stability assumptions on which traditional actuarial methods depend. This white paper presents a research program testing whether Long Short Term Memory (LSTM) neural networks can detect and adapt to these structural breaks faster and more accurately than Chain Ladder, Bornhuetter Ferguson, and Cape Cod methods. Using 15 plus years of regulatory development triangle data from Florida and Louisiana, enriched with NOAA hurricane intensity indices and sea surface temperatures, we hypothesize a targeted improvement of 15, 20% in reserve accuracy for catastrophe exposed years, a threshold grounded both in the prior neural network reserving literature and in the formal convergence results developed here. Beyond empirical validation, we develop a theoretical framework grounding LSTM structural break detection in probabilistic terms, providing formal performance guarantees that compensate for the limited number of catastrophe events in the test period. We document the research design, methodology, expected contributions, and a candid assessment of limitations.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:52:44Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11473",
@@ -601,14 +601,14 @@
         "arxiv"
       ],
       "title": "CRUMB: Efficient Prior Fitted Network Inference via Distributionally Matched Context Batching",
-      "headline": "CRUMB: Efficient Prior Fitted Network Inference via Distributionally Matched Context Batching",
+      "headline": "CRUMB improves prior-fitted network inference speed by clustering queries and selecting distributionally-matched training subsets without model retraining.",
       "url": "https://arxiv.org/abs/2606.11473",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:19Z",
       "description": "arXiv:2606.11473v1 Announce Type: new Abstract: Prior-fitted networks (PFNs) are a promising class of tabular foundation models that perform in-context learning, whereby the entire labelled training set is supplied as context, and predictions for test queries are produced in a single forward pass. However, the quadratically scaling self-attention mechanism in many PFN architectures makes inference prohibitive for very large training datasets. We propose CRUMB (Clustered Retrieval Using Minimised-MMD Batching), a three-stage inference wrapper that (i) clusters the test queries, (ii) selects a small, distributionally matched training subset for each cluster by greedily minimising the maximum mean discrepancy (MMD), and (iii) runs exact PFN inference on each reduced-context batch. CRUMB is architecture-agnostic and requires no retraining. On the 51-dataset TabArena benchmark, evaluated across three PFN architectures (TabPFNv2, TabICLv1, TabICLv2), we show that CRUMB outperforms similar state-of-the-art context selection strategies. We also show that CRUMB is resilient to covariate drift, as the MMD-minimisation step naturally helps align the training context distribution to match the current test batch distributions.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:52:56Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11474",
@@ -622,14 +622,14 @@
         "arxiv"
       ],
       "title": "Mahalanobis-Guided Latent OOD Detection for Hybrid ES-DRL Control in Time-Varying Systems",
-      "headline": "Mahalanobis-Guided Latent OOD Detection for Hybrid ES-DRL Control in Time-Varying Systems",
+      "headline": "Method uses Mahalanobis distance in VAE latent space to detect out-of-distribution scenarios and switch between RL and extremum-seeking controllers in particle accelerators.",
       "url": "https://arxiv.org/abs/2606.11474",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:19Z",
       "description": "arXiv:2606.11474v1 Announce Type: new Abstract: In this paper, we study Mahalanobis-guided latent out-of-distribution (OOD) detection for test-time RL controller switching in nonlinear time-varying systems. RL controllers can quickly control high-dimensional systems within the training distribution, but their performance can degrade when time-varying dynamics produce unseen observations. We consider a combined ES--DRL controller, where RL provides fast in-distribution actions and bounded extremum seeking (ES) provides robust model-independent control under OOD operation. The key challenge is deciding when to switch. We train a variational autoencoder (VAE) on in-distribution beam-profile observations and use Mahalanobis distance in the VAE latent space to detect OOD beam profiles at test time. This OOD decision sets a binary switch that selects either the RL controller or the ES controller. We evaluate the approach in safety-critical particle accelerator control. In this setting, spatial magnet motion creates OOD beam profiles that were not seen during RL training. Visualization of the VAE latent space shows that the proposed method identifies this OOD scenario and provides an interpretable signal for switching between RL and ES in the combined controller.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:53:04Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.11196",
@@ -643,14 +643,14 @@
         "arxiv"
       ],
       "title": "PoQ-Judge: A Multi-Architecture Evaluation Framework for Cost-Aware Proof-of-Quality in Decentralized LLM Inference",
-      "headline": "PoQ-Judge: A Multi-Architecture Evaluation Framework for Cost-Aware Proof-of-Quality in Decentralized LLM Inference",
+      "headline": "PoQ-Judge framework evaluates LLM output quality without references in decentralized networks, matching reference-based evaluation performance.",
       "url": "https://arxiv.org/abs/2606.11196",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:21Z",
       "description": "arXiv:2606.11196v1 Announce Type: new Abstract: Decentralized LLM inference networks need lightweight, reference-free quality evaluation for Proof of Quality (PoQ). We present PoQ-Judge, a framework that trains dedicated judge models to score query-output pairs without ground-truth references. We study three architectures across the quality-cost tradeoff: a TextCNN judge, a MiniLM cross-encoder, and a DeBERTa judge. Using two-stage training on UltraFeedback plus GPT-labeled in-domain data, the best model reaches 0.747 Pearson correlation with the ground-truth proxy on a held-out test set, outperforming reference-based evaluators from prior work. As a reference-free component in composite scoring, it achieves 0.645 Pearson correlation, matching the best single reference-based evaluator while removing the need for reference answers. We also show that online calibration identifies semantic quality as the dominant dimension and that cascade evaluation reduces cost by 72.7 percent with only modest quality loss. Results are much stronger on QA than summarization, pointing to proxy quality as the main remaining limitation.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:53:22Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.11198",
@@ -664,14 +664,14 @@
         "arxiv"
       ],
       "title": "The Structural Attention Tax: How Retrieval Format Hijacks In-Context Learning Independent of Content",
-      "headline": "The Structural Attention Tax: How Retrieval Format Hijacks In-Context Learning Independent of Content",
+      "headline": "RAG retrieval format hijacks LLM attention independent of semantic content relevance.",
       "url": "https://arxiv.org/abs/2606.11198",
       "published_at": "2026-06-11T04:00:00Z",
       "discovered_at": "2026-06-11T04:06:21Z",
       "description": "arXiv:2606.11198v1 Announce Type: new Abstract: Retrieval-augmented generation (RAG) systems inject external knowledge to improve LLM outputs, yet the format of injected content -- distinct from its semantic relevance -- can independently distort the model's attention distribution. We identify and formalise a phenomenon we term the structural attention tax: knowledge graph (KG) triples, due to their relational delimiters and repeated slot patterns, capture 2-3x more attention per token than semantically equivalent natural-language text ($\\hat{o}$(KG) $\\approx$ 0.70 vs. $\\hat{o}$(neutral) $\\approx$ 0.25), compressing demonstration attention by up to 42% -- regardless of whether the triples are relevant or noise. We develop a formal framework decomposing attention scores into semantic and structural components (Eq. 2), derive a compression bound (Proposition 1) connecting token-level format bias to demonstration attention loss, and show that the structural term governs how much attention is diverted while the semantic term governs whether this helps or hurts. This decoupling reveals two orthogonal axes for improving retrieval-augmented ICL: optimising retrieval quality (semantic axis) and reducing format-driven attention capture (structural axis). Empirically, across two model families (Mistral-7B, LLaMA-3-8B) and three QA benchmarks, we observe that source-task alignment dominates: task-matched BM25 retrieval achieves 58-62% on HotpotQA vs. ConceptNet's 25-27%, a >30 pp gap that dwarfs all gating strategies ($\\leq$2 pp). We derive five structure-aware mitigation strategies from the framework, ranging from zero-cost prompt modifications to training-time regularisation; format flattening (S3) is validated by both accuracy and attention-level evidence from a verbalized-triple control, while structural dispersal (S1) yields mixed results that illuminate the challenges of format-level intervention.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-11T04:53:35Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.11199",
