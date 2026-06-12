@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-12T04:14:40Z",
+  "generated_at": "2026-06-12T04:29:39Z",
   "items": [
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11480",
@@ -181,14 +181,14 @@
         "arxiv"
       ],
       "title": "Beyond the Golden Teacher: Enhancing Graph Learning through LLM-GNN Co-teaching",
-      "headline": "Beyond the Golden Teacher: Enhancing Graph Learning through LLM-GNN Co-teaching",
+      "headline": "LLM-GNN co-teaching framework enables bidirectional supervision through exchanged pseudo-labels for few-shot learning on text-attributed graphs.",
       "url": "https://arxiv.org/abs/2606.11583",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11583v1 Announce Type: new Abstract: Text-attributed graphs (TAGs) underlie real-world applications such as citation networks, social media, and e-commerce. Few-shot graph learning on TAGs is hard: with only a handful of labels per class and the rest of the graph unannotated, neither GNNs nor LLMs can learn well on their own. GNNs read topology and fail on cold nodes; LLMs read text and fail on text-ambiguous nodes. Existing LLM-GNN methods all follow the same recipe: designate one model as the golden teacher and use its outputs (e.g., features or pseudo-labels) to supervise the other. We argue this golden-teacher assumption breaks under sparse supervision: neither model is golden, and treating either as such transfers its blind spots into the student. We therefore ask: can we avoid designating either model as the golden teacher, and still perform effective graph learning? We answer with LLM-GNN Co-Teaching, a bidirectional co-teaching framework in which neither model is fixed as teacher. The GNN and LLM exchange their most confident pseudo-labels under an architecture-specific small-loss criterion, and both update every round. Supervision is then mined from the trajectory: whenever a node moves from cross-model contradiction at round t to cross-model agreement at round t+1, the LLM's two answers on the same input form a preference pair (old contradicting self < new peer-endorsed self) for DPO training. We call this Round-based Pseudo-Label Preference Optimization (RPL-PO). On six benchmarks, LLM-GNN Co-Teaching consistently outperforms GNN-as-Judge and all prior methods, with absolute 3-shot gains of 7.86% on Cora and 7.73% on ogbn-arxiv; improvements carry over to 5-shot and to zero-shot cross-dataset transfer. Error-structure analysis further shows that abandoning the golden-teacher assumption substantially improves the LLM's graph learning capability on challenging samples.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:28:30Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11585",
@@ -202,14 +202,14 @@
         "arxiv"
       ],
       "title": "Kuramoto Attention: Synchronizing Self-Attention on the Torus",
-      "headline": "Kuramoto Attention: Synchronizing Self-Attention on the Torus",
+      "headline": "Kuramoto Attention implements self-attention via phase states and Kuramoto coupling equations, matching RoPE transformer performance on character-level language modeling.",
       "url": "https://arxiv.org/abs/2606.11585",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11585v1 Announce Type: new Abstract: We introduce Kuramoto attention, a self-attention layer in which each hidden coordinate is an angle. The layer scores tokens by gated cosine similarity, attends over previous phase states, and updates each token by the tangent component of the attention-weighted circular mean. Because the values are the raw phase states, this update is exactly the Kuramoto coupling term $\\sum_u A_{t,u}\\sin(\\theta_u-\\theta_t)$, with the attention matrix acting as an adaptive, content-dependent coupling kernel. Equivalently, the gated score is a learned metric on the torus that selects which tokens couple, and the update pulls each token toward the circular mean of the tokens it selects, tightening their phase agreement. The same two ingredients, an invariant similarity score and an on-manifold mean, define such a layer on any compact group; the torus is the abelian case, where both are closed-form. The softmax weights solve an entropy-regularized phase-retrieval problem, and rotary position enters as a position-dependent phase drift in the score. On enwiki8 character-level language modeling, the layer trains as a functional language model whose bits-per-character stays close to a strong matched RoPE+SwiGLU transformer: within $0.02$ BPC at one million parameters ($1.637\\pm0.010$ versus $1.616\\pm0.004$) and level on the median at five million ($1.448$ versus $1.452$ over five seeds) with the transformer ahead on the mean ($1.468$ versus $1.456$). These experiments establish that the constrained geometric structure is a viable language model at this scale; the structure itself, and its synchronization reading, is the contribution. Ablations isolate the load-bearing components, and the result gives a compact bridge between self-attention and phase synchronization.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:28:42Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11605",
@@ -223,14 +223,14 @@
         "arxiv"
       ],
       "title": "Physics-Distilled Neural Network enabled by Large Language Models for Manufacturing Process-Property Predictive Modeling",
-      "headline": "Physics-Distilled Neural Network enabled by Large Language Models for Manufacturing Process-Property Predictive Modeling",
+      "headline": "Framework integrates LLM-extracted physics knowledge into lightweight neural networks for robust manufacturing process-property prediction in data-scarce scenarios.",
       "url": "https://arxiv.org/abs/2606.11605",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11605v1 Announce Type: new Abstract: Predicting process-property relationships in manufacturing is often challenged by high experimental costs and the limited interpretability of complex 'black-box' models. This paper proposes a novel knowledge distillation framework designed to achieve high-accuracy predictions in data-scarce scenarios. The framework integrates analytical physics priors, which are systematically extracted from scientific literature via Large Language Models, into a privileged teacher model. We employ a Graph-Masked Attention layer to capture the complex physical dependencies among input variables showing strict setpoints or a combination of static and high-frequency temporal signatures. This privileged knowledge is distilled into a lightweight student predictor for inference. The feasibility and robustness of the framework are evaluated through a comprehensive experiment across five diverse manufacturing processes. To ensure statistical reliability, given the small dataset sizes, a repeated K-fold cross-validation technique is employed to quantify model stability and generalization. Results indicate that the proposed framework consistently achieves high predictive accuracy across all evaluated domains. Most importantly, the architecture demonstrates significant fault tolerance by maintaining robust predictive performance even in scenarios where LLM-derived analytical priors are suboptimal or incomplete. Furthermore, the student predictor achieves an inference frequency exceeding 6000 Hz, which facilitates real-time edge deployment on standard industrial hardware. This work provides a scalable solution for bridging the gap between theoretical physics and real-time industrial monitoring in data-limited environments.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:28:53Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11614",
@@ -244,14 +244,14 @@
         "arxiv"
       ],
       "title": "Information-Theoretic Decomposition for Multimodal Interaction Learning",
-      "headline": "Information-Theoretic Decomposition for Multimodal Interaction Learning",
+      "headline": "Paper proposes DMIL, a framework that explicitly decomposes and adaptively learns sample-specific multimodal interactions to address limitations in ensemble and joint learning approaches.",
       "url": "https://arxiv.org/abs/2606.11614",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11614v1 Announce Type: new Abstract: Multimodal learning hinges on capturing redundant, unique, and synergistic information across modalities, which collectively constitute multimodal interactions. A critical yet underexplored challenge is that these implicit interactions vary dynamically across samples. In this work, we present the first systematic, information-theoretic analysis highlighting why learning these dynamic, sample-specific interactions is critical for effective multimodal learning. Our analysis further reveals deficits in conventional paradigms at learning these distinct interaction types: modality ensemble approaches struggle to capture synergy, while joint learning paradigms often under-utilize redundant information. This highlights the need for an approach that can adaptively learn from different interaction types on a per-sample basis. To this end, we propose Decomposition-based Multimodal Interaction Learning (DMIL), a novel paradigm that explicitly models and learns from sample-specific interactions. First, we design a variational decomposition architecture to isolate the constituent interaction components. Second, we employ a new learning strategy that leverages these explicit interaction components in a fine-tuning process to achieve comprehensive interaction learning. Extensive experiments across diverse tasks and architectures demonstrate that DMIL consistently achieves superior performance by adapting to holistic sample-specific interactions. Our framework is flexible and broadly applicable, establishing an interaction-centric paradigm for multimodal learning. The code is available at https://github.com/GeWu-Lab/DMIL.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:29:01Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11616",
@@ -265,14 +265,14 @@
         "arxiv"
       ],
       "title": "DeMix: Debugging Training Data with Mixed Data Error Types by Investigating Influence Vectors",
-      "headline": "DeMix: Debugging Training Data with Mixed Data Error Types by Investigating Influence Vectors",
+      "headline": "DeMix framework uses influence vectors to simultaneously detect erroneous training samples and classify their error types across multiple datasets.",
       "url": "https://arxiv.org/abs/2606.11616",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11616v1 Announce Type: new Abstract: High-quality training data is essential for the success of machine learning models. However, real-world datasets often contain mixed types of errors arising from systematic flaws in data preparation pipelines, including label errors, feature errors, and spurious correlations. Effective debugging of training data requires both detecting erroneous samples and identifying their specific error types to enable targeted repair, yet existing data cleaning and attribution methods fail to adequately address this dual requirement. In this paper, we propose DeMix, a novel framework that simultaneously diagnoses erroneous samples and their error types. Our key insight is that different error types produce distinct patterns on model behavior. DeMix captures such error-specific patterns by influence vectors that characterize how each training sample affects model predictions across all validation samples. We formulate training data debugging as a multi-label classification problem where a classifier is developed to predict error types directly from influence vectors. We further introduce an intervention-based learning strategy that guides the classifier to capture invariant rationales specific to each error type, ensuring the learned classifier generalizes effectively. Empirical evaluations on 11 tasks across tabular data prediction, recommendation systems, and LLM alignment demonstrate that DeMix significantly outperforms state-of-the-art approaches, achieving a 22.61% improvement in data debugging F1-score and a 9.32% gain in task model performance after data repair. Code is available at: https://github.com/SJTU-DMTai/DeMix.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:29:10Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11625",
@@ -286,14 +286,14 @@
         "arxiv"
       ],
       "title": "TimeRouter: Efficient and Adaptive Routing of Time-Series Foundation Models",
-      "headline": "TimeRouter: Efficient and Adaptive Routing of Time-Series Foundation Models",
+      "headline": "TimeRouter efficiently routes forecasting tasks across time-series foundation models using lightweight discriminative routing instead of expensive LLM-based selection.",
       "url": "https://arxiv.org/abs/2606.11625",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11625v1 Announce Type: new Abstract: Time-series foundation models (TSFMs) are increasingly explored as predictive experts within emerging agentic time-series systems. However, TSFMs exhibit heterogeneous inductive biases, and no single model consistently dominates across forecasting regimes, making expert selection a critical challenge. Existing systems often delegate this decision to LLM-based controllers, incurring substantial inference overhead. We present TimeRouter, an efficient routing framework that leverages empirical complementarity across a pool of pretrained TSFMs through lightweight discriminative routing, selective gating, and ensemble fallback. Concretely, TimeRouter combines a learned routing head, a selective gate, and an ensemble fallback, enabling adaptive expert selection without invoking an LLM at inference time. TimeRouter achieves state-of-the-art performance on the GIFT-EVAL leaderboard, with an LB MASE of 0.6765. Beyond benchmark performance, our ablation studies provide empirical insights into TSFM routing design, highlighting the importance of pool composition and selective gating. Taken together, these results position TimeRouter as a modular and lightweight routing layer for future agentic time-series systems built upon foundation-model pools. Our code is available at https://github.com/UConn-DSIS/TimeRouter.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:29:21Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11627",
@@ -307,14 +307,14 @@
         "arxiv"
       ],
       "title": "When Context Returns: Toward Robust Internalization in On-Policy Distillation",
-      "headline": "When Context Returns: Toward Robust Internalization in On-Policy Distillation",
+      "headline": "Research identifies context-induced degradation in on-policy distillation and proposes a consistency regularizer to ensure student model robustness with reintroduced context.",
       "url": "https://arxiv.org/abs/2606.11627",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11627v1 Announce Type: new Abstract: Recent work has shown that on-policy distillation can internalize privileged context, such as system prompts or task hints, into a student model so that the context is no longer needed at inference time. Although this approach successfully improves the student's no-context performance, we identify an interesting and previously unstudied phenomenon: in many settings, reintroducing the original privileged context to the distilled student actually degrades its performance, even on instances it already solves correctly without context. We term this context-induced degradation and argue that robust internalization demands not only matching the teacher's context-conditioned behavior, but also remaining stable when the context is reintroduced, a property we call context removability. Motivated by this observation, we propose a lightweight consistency regularizer that first anchors the student's no-context output via stop-gradient, then penalizes the context-conditioned output for deviating from it via forward KL divergence. This simple addition requires only one extra forward pass per training step, yet it effectively mitigates context-induced degradation and, in many cases, even improves no-context performance. Across 12 configurations spanning diverse domains and model families, our method improves context-conditioned accuracy in the majority of settings, reduces context-induced harm in 11 out of 12 settings, and effectively eliminates response-length inflation. A mechanistic case study further confirms that context removability is achieved at the representation level, with hidden states remaining nearly identical regardless of whether the context is present.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:29:32Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11640",
@@ -328,14 +328,14 @@
         "arxiv"
       ],
       "title": "TAROT: Task-Adaptive Refinement of LLM-prior Graphs for Few-shot Tabular Learning",
-      "headline": "TAROT: Task-Adaptive Refinement of LLM-prior Graphs for Few-shot Tabular Learning",
+      "headline": "TAROT framework uses GNN-based semantic graphs refined from LLM priors to improve few-shot tabular learning performance.",
       "url": "https://arxiv.org/abs/2606.11640",
       "published_at": "2026-06-12T04:00:00Z",
       "discovered_at": "2026-06-12T04:13:00Z",
       "description": "arXiv:2606.11640v1 Announce Type: new Abstract: Few-shot tabular learning provides a cost-effective approach for real-world applications where annotation is costly and collecting sufficient samples for new tasks is difficult. Existing Traditional and LLM-based methods have demonstrated effectiveness in few-shot scenarios. However, traditional methods need additional training on unlabeled or generated data, which incur significant computational overhead. In addition, LLM-based methods that directly feed raw tabular data into LLMs raise privacy and compliance concerns. More importantly, both paradigms largely overlook the semantic relationships between features, which provide structural and semantic prior for constructing a semantic graph. Semantic graph is essential for modeling meaningful feature interactions in few-shot scenarios. In this paper, we propose TAROT, a GNN-based framework that encodes the structural and semantic prior by constructing and refining a task-adaptive semantic graph from this prior, thereby improving predictive performance in few-shot tabular learning. TAROT first encodes heterogeneous tabular data into unified node semantic representations via a Unified Semantic Tabular Node Encoder (USTNE). Then, it prompts LLMs to infer the semantic relationship between features based on the task description and feature names to construct a semantic graph. To mitigate structural noise introduced by the hallucination of LLMs, TAROT introduces Task-adaptive Semantic Graph Refinement that prunes spurious or task-unrelated edges and adds missing task-related ones, aligning the graph structure with the downstream objective. Finally, a GNN performs message passing over the refined graph to capture task-related semantic dependencies for prediction. Extensive experiments on various few-shot tabular learning benchmarks demonstrate the superior performance of TAROT, establishing it as a state-of-the-art approach in this domain.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-12T04:29:39Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2606.11646",
