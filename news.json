@@ -1,6 +1,27 @@
 {
-  "generated_at": "2026-06-15T23:31:37Z",
+  "generated_at": "2026-06-15T23:46:39Z",
   "items": [
+    {
+      "id": "simonw|https://simonwillison.net/2026/Jun/15/datasette-agent",
+      "anchor": "041a956ac2",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "datasette-agent 0.3a0",
+      "headline": "datasette-agent 0.3a0",
+      "url": "https://simonwillison.net/2026/Jun/15/datasette-agent",
+      "published_at": "2026-06-15T17:19:27Z",
+      "discovered_at": "2026-06-15T23:44:59Z",
+      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/datasette/datasette-agent/releases/tag/0.3a0\">datasette-agent 0.3a0</a></p> <blockquote> <ul> <li>New tool, <code>execute_write_sql</code>, which requests user approval and then writes to a database - taking user permissions into account. <a href=\"https://github.com/datasette/datasette-agent/issues/27\">#27</a></li> </ul> </blockquote> <p>I added a mechanism for asking user approval in <a href=\"https://simonwillison.net/2026/Jun/10/datasette-agent/\">datasette agent 0.2a0</a>. The new <code>execute_write_sql</code> tool can now prompt the user for all kinds of useful operations. Here's an example where I add some pelican sightings to my <code>pelican_sightings</code> table:</p> <p><img alt=\"Screenshot of a chat interface showing a write SQL confirmation dialog. User message (blue bubble): &quot;I saw 4 pelicans flying over the harbor&quot;. Collapsed tool section: &quot;► Tool: execute_write_sql&quot;. A yellow-bordered confirmation card reads: &quot;Confirm write SQL batch / Database: pelicans / Statements execute in order. If one statement fails, later statements will not be executed. / Statement 1 / INSERT INTO pelican_sightings (number_of_pelicans, notes) VALUES (:number_of_pelicans, :notes); / number_of_pelicans 4 / notes Flying over the harbor&quot;. A table with columns &quot;Operation, Database, Table, Required permissions&quot; shows row: &quot;insert, pelicans, pelican_sightings&quot; with permission buttons &quot;insert-row&quot;, &quot;update-row&quot;, &quot;delete-row&quot;. Below: &quot;Execute 1 write SQL statement against database 'pelicans'? / Asked by tool: execute_write_sql&quot; with &quot;Yes&quot; (blue) and &quot;No&quot; (gray) buttons.\" src=\"https://static.simonwillison.net/static/2026/i-saw-pelicans-agent.jpg\" /></p> <p>The new version also enhances the <code>datasette agent chat</code> terminal mode to support approvals, and adds several new options including <code>--unsafe</code> mode for auto-approving them:</p> <blockquote> <ul> <li><code>datasette agent chat</code> can execute tools that require user approval. <a href=\"https://github.com/datasette/datasette-agent/issues/30\">#30</a></li> <li>Three new options for <code>datasette agent chat</code> - <code>--root</code> to run as root, <code>--yes</code> to approve all ask user questions, and <code>--unsafe</code> for both.</li> <li>Tools can now provide plain text alternatives to HTML, for display in the <code>datasette agent chat</code> CLI. <a href=\"https://github.com/datasette/datasette-agent/issues/31\">#31</a></li> </ul> </blockquote> <p>The <code>datasette agent chat content.db -m gpt-5.5 --unsafe</code> command can now be used to chat directly with a specific database <em>and</em> directly modify it through prompts like \"create a notes table\", \"add a note about X\" etc.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/projects\">projects</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a>, <a href=\"https://simonwillison.net/tags/annotated-release-notes\">annotated-release-notes</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/llm-tool-use\">llm-tool-use</a>, <a href=\"https://simonwillison.net/tags/datasette-agent\">datasette-agent</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
     {
       "id": "hn|https://tinywind.io/",
       "anchor": "e36c21e9c2",
@@ -5772,27 +5793,6 @@
       "published_at": "2026-05-26T15:39:02Z",
       "discovered_at": "2026-05-26T15:53:13Z",
       "description": "Gemini Flash 3.5, Mythos, open-closed balance, America's open-source surge, emerging power struggles and more.",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/May/26/copilot-cowork-exfiltrates-files",
-      "anchor": "c74a7bbd1e",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "Microsoft Copilot Cowork Exfiltrates Files",
-      "headline": "Microsoft Copilot Cowork Exfiltrates Files",
-      "url": "https://simonwillison.net/2026/May/26/copilot-cowork-exfiltrates-files",
-      "published_at": "2026-05-26T15:36:48Z",
-      "discovered_at": "2026-05-26T15:38:14Z",
-      "description": "<p><strong><a href=\"https://www.promptarmor.com/resources/microsoft-copilot-cowork-exfiltrates-files\">Microsoft Copilot Cowork Exfiltrates Files</a></strong></p> The biggest challenge in designing agentic systems continues to be preventing them from enabling attackers to exfiltrate data.</p> <p>In this case Microsoft Copilot Cowork (yes, that's <a href=\"https://www.microsoft.com/en-us/microsoft-365/blog/2026/03/09/copilot-cowork-a-new-way-of-getting-work-done/\">a real product name</a>) was allowing agents to send emails to the user's own inbox without approval... but those messages were then rendered in a way that could leak data to an attacker via rendered images:</p> <blockquote> <p>Because these messages can contain external images that trigger network requests to external websites, data can be exfiltrated when a user opens a compromised message sent by the agent.</p> </blockquote> <p>Since OneDrive can create pre-authenticated download links, a successful prompt injection could cause those links to be leaked, allowing files to be downloaded by the attacker. <p><small></small>Via <a href=\"https://news.ycombinator.com/item?id=48272354\">Hacker News</a></small></p> <p>Tags: <a href=\"https://simonwillison.net/tags/microsoft\">microsoft</a>, <a href=\"https://simonwillison.net/tags/security\">security</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/prompt-injection\">prompt-injection</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/exfiltration-attacks\">exfiltration-attacks</a>, <a href=\"https://simonwillison.net/tags/lethal-trifecta\">lethal-trifecta</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
