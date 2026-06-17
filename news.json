@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-17T05:40:32Z",
+  "generated_at": "2026-06-17T05:55:48Z",
   "items": [
     {
       "id": "latentspace|https://www.latent.space/p/ainews-glm-52-the-top-frontend-coding",
@@ -1210,14 +1210,14 @@
         "arxiv"
       ],
       "title": "When Correct Edges Cannot Be Verified: A Provenance Gap in Incomplete KGQA and a Provenance-Favoring Completion Policy",
-      "headline": "When Correct Edges Cannot Be Verified: A Provenance Gap in Incomplete KGQA and a Provenance-Favoring Completion Policy",
+      "headline": "Study shows 76-96% of correct knowledge graph edges lack textual support, revealing textual verifiability measures provenance not correctness in incomplete KGQA.",
       "url": "https://arxiv.org/abs/2606.15833",
       "published_at": "2026-06-17T04:00:00Z",
       "discovered_at": "2026-06-17T04:07:39Z",
       "description": "arXiv:2606.15833v1 Announce Type: new Abstract: Incomplete Knowledge Graph Question Answering (IKGQA) requires completing missing edges to continue reasoning. A growing line of work verifies completed edges against retrieved text, treating textual support as a proxy for edge quality. We ask a question that, to our knowledge, has not been systematically tested: does textual verifiability actually track correctness? Exploiting the gold deleted triples provided by the standard random-deletion protocol, we measure both. The finding is counterintuitive: among gold-correct completed edges, 76-96% have no supporting passage even under exhaustive retrieval, robustly across deletion rates (20%/40%), datasets (CWQ/WebQSP), and relation types (structural, commonsense, long-tail). Most Freebase-style facts simply do not occur as head-tail co-mentions in text. Textual faithfulness therefore measures provenance, not correctness -- separated by a paradigm-level gap no in-corpus retrieval closes. This reframes edge completion. Since most completed edges -- correct or not -- are causally redundant for the answer (95-97% of correct answers do not depend on any unsupported edge), the central question shifts from \"is the edge correct?\" to \"admit or abstain under provenance uncertainty?\" Within this framing we present TGComplete, a provenance-favoring admission policy that retrieves evidence at a reasoning breakpoint, verifies a candidate through a lightweight loop, and abstains when support is absent. Against the generate-to-complete baseline GoG, it attains higher edge precision against gold (15-21% vs 3-14%), with no statistically detectable EM loss and 3.1-7.4 times higher strict faithfulness of admitted edges -- at the cost of lower recall. We position TGComplete not as uniformly better, but as a principled point on a precision/provenance-recall trade-off, appropriate when auditability matters.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-17T05:53:40Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.15872",
@@ -1231,14 +1231,14 @@
         "arxiv"
       ],
       "title": "SciOrch: Learning to Orchestrate Expert LLMs for Solving Frontier Multimodal Scientific Reasoning Tasks",
-      "headline": "SciOrch: Learning to Orchestrate Expert LLMs for Solving Frontier Multimodal Scientific Reasoning Tasks",
+      "headline": "SciOrch trains an 8B orchestrator to coordinate frontier LLMs for scientific reasoning, achieving 56.66% accuracy with lower API costs than alternatives.",
       "url": "https://arxiv.org/abs/2606.15872",
       "published_at": "2026-06-17T04:00:00Z",
       "discovered_at": "2026-06-17T04:07:39Z",
       "description": "arXiv:2606.15872v1 Announce Type: new Abstract: Frontier scientific reasoning remains a major challenge for large language models (LLMs), where even the strongest commercial systems fall short of expert-level performance. A closer look at model behavior reveals substantial complementarity that single-model evaluation hides: different frontier models excel on different question types, and no single model captures the full picture. We present SciOrch, a framework that trains a lightweight 8B model to orchestrate frontier LLMs for scientific reasoning. The orchestrator decomposes each question, delegates sub-problems to selected commercial models through API calls, and synthesizes a final answer. Training such an orchestrator is fundamentally harder than conventional agentic RL: each action triggers an API call that is expensive in both dollar cost and latency, making standard online rollouts infeasible. We address this with MCTS-based approach, producing diverse orchestration trajectories, extracting per-node single-turn samples, and optimizing the orchestrator with GRPO-style training. On a 240-question test set spanning SGI-Reasoning and Scientists' First Exam, SciOrch reaches 56.66% average accuracy, outperforming the strongest single commercial model by 3.74% and the strongest multi-agent baseline by 3.33%. It also attains the best accuracy on both SGI and SFE with less than half the API cost of typical multi-agent methods.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-17T05:53:59Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.15877",
@@ -1252,14 +1252,14 @@
         "arxiv"
       ],
       "title": "Free Energy Heuristics: Fast-And-Frugal Cognition as Active Inference Under Uncertain Precision",
-      "headline": "Free Energy Heuristics: Fast-And-Frugal Cognition as Active Inference Under Uncertain Precision",
+      "headline": "Longer chain-of-thought reasoning decreases accuracy on high-uncertainty tasks; meta-uncertainty determines performance, connecting fast-and-frugal heuristics to active inference principles.",
       "url": "https://arxiv.org/abs/2606.15877",
       "published_at": "2026-06-17T04:00:00Z",
       "discovered_at": "2026-06-17T04:07:39Z",
       "description": "arXiv:2606.15877v1 Announce Type: new Abstract: Chain-of-thought (CoT) improves large language models' performance in math and symbolic reasoning. But on planning, contested ethics, and tasks where the model cannot check itself, more reasoning makes things worse. Both effects are documented; what has been missing is a principled account of which property decides the outcome. We argue it is meta-uncertainty: how unsure the model is about the reliability of its own evidence. When that uncertainty is high, extra reasoning stops adding signal and starts manufacturing false confidence. We prove that the policy minimizing expected free energy under uncertain precision stops integrating cues after a finite number of high-validity ones when the precision prior is heavy-tailed (Theorem 2.6.1), and under a Descending Dominance condition, is sample-wise identical to take-the-best (Theorem 2.7.4). Fast-and-frugal heuristics and active inference are, then, two descriptions of the same computation. The prediction is that on high-meta-uncertainty items, longer CoT should degrade accuracy. We score the regime per item (simulate-and-recover rho > 0.96), build FEH-79, a benchmark of Knightian frames with matched controls, and run a pre-registered study across seven models (five open-weight 3B-32B, two frontier), five CoT lengths, and 7,875 responses. The gate, fixed before any data, required a negative interaction with posterior probability above 0.95 and an accuracy drop of more than 6 points. It held. The high-regime drop is 17.3 points (95% CI [7.7, 25.5]); matched items with definite answers show no cost. The effect is regime-dependent: decisive in capable mid-to-large models, directional in the two frontier systems, absent-to-reversed in the weakest. The framework answers when CoT helps and unifies the Bayesian and fast-and-frugal traditions: less-is-more effects are evidence about the meta-uncertainty regime, not against Bayesian cognition.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-17T05:54:21Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2606.15883",
@@ -1273,14 +1273,14 @@
         "arxiv"
       ],
       "title": "Koshur Diacritizer: A Byte-Level Sequence-to-Sequence Model for Kashmiri Diacritic Restoration",
-      "headline": "Koshur Diacritizer: A Byte-Level Sequence-to-Sequence Model for Kashmiri Diacritic Restoration",
+      "headline": "Koshur Diacritizer, a sequence-to-sequence model, restores Kashmiri diacritics with 77.5% accuracy; researchers release dataset of 23.7k sentence pairs.",
       "url": "https://arxiv.org/abs/2606.15883",
       "published_at": "2026-06-17T04:00:00Z",
       "discovered_at": "2026-06-17T04:07:39Z",
       "description": "arXiv:2606.15883v2 Announce Type: new Abstract: Kashmiri, an Indo-Aryan language written in a modified Perso-Arabic script, frequently omits diacritic marks in digital text, creating ambiguity and challenging downstream NLP applications. We present Koshur Diacritizer, a ByT5-small byte-level sequence-to-sequence model for restoring diacritics in Kashmiri text. To support this task, we release a publicly available dataset of 23.7k aligned undiacritized diacritized Kashmiri sentence pairs. The proposed framework combines script-aware normalization, alignment validation, and skeleton-preserving inference to ensure reliable restoration while maintaining the original base-letter sequence. Experimental results on a held-out test set achieve a DERm of 0.2012 and a WER of 0.2159. Additionally, evaluation by a native Kashmiri linguistic expert yields a mean accuracy of 77.5%. The dataset, model, and source code are publicly released to provide a reproducible baseline for Kashmiri diacritic restoration and future low-resource language research.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-06-17T05:54:45Z"
     },
     {
       "id": "hn|https://runtimewire.com/article/openai-leaked-financials-altman-compute-burn",
@@ -1299,6 +1299,27 @@
       "published_at": "2026-06-17T02:47:29Z",
       "discovered_at": "2026-06-17T05:23:01Z",
       "description": "HN score 146 · 121 comments",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "hn|https://www.dexerto.com/gaming/stop-killing-games-fails-to-secure-eu-law-despite-1-3m-signatures-3376431",
+      "anchor": "c64491da9a",
+      "source_id": "hn",
+      "source_name": "Hacker News",
+      "category": "community",
+      "category_emoji": "🔥",
+      "hashtags": [
+        "community",
+        "hn"
+      ],
+      "title": "Stop Killing Games fails to secure EU law despite 1.3M signatures",
+      "headline": "Stop Killing Games fails to secure EU law despite 1.3M signatures",
+      "url": "https://www.dexerto.com/gaming/stop-killing-games-fails-to-secure-eu-law-despite-1-3m-signatures-3376431/",
+      "published_at": "2026-06-17T01:40:22Z",
+      "discovered_at": "2026-06-17T05:53:09Z",
+      "description": "HN score 104 · 29 comments",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -2392,27 +2413,6 @@
       "discovered_at": "2026-06-16T16:04:53Z",
       "description": "text-generation",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "hn|https://twitter.com/zenmagnets/status/2065796012820848699",
-      "anchor": "c9cca29575",
-      "source_id": "hn",
-      "source_name": "Hacker News",
-      "category": "community",
-      "category_emoji": "🔥",
-      "hashtags": [
-        "community",
-        "hn"
-      ],
-      "title": "Rio de Janeiro's city government model Rio3.5 beats Qwen3.7 in recent benchmarks",
-      "headline": "Rio de Janeiro's city government model Rio3.5 beats Qwen3.7 in recent benchmarks",
-      "url": "https://twitter.com/zenmagnets/status/2065796012820848699",
-      "published_at": "2026-06-14T14:38:37Z",
-      "discovered_at": "2026-06-14T17:35:10Z",
-      "description": "HN score 103 · 28 comments",
-      "summarize": false,
       "summarized": false,
       "summarized_at": null
     },
