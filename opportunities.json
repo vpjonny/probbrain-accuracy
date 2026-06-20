@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-20T12:20:41.866Z",
-  "scan_duration_ms": 5715,
+  "generated_at": "2026-06-20T12:35:56.311Z",
+  "scan_duration_ms": 5534,
   "errors": [],
   "stats": {
     "poly_markets_scanned": 1063,
     "kalshi_markets_scanned": 1334,
-    "candidates_pre_filter": 28,
+    "candidates_pre_filter": 27,
     "tier1_count": 0,
     "tier2_count": 0,
-    "tier3_count": 9,
+    "tier3_count": 11,
     "pre_cap_tier1": 0,
     "pre_cap_tier2": 0,
-    "pre_cap_tier3": 9,
+    "pre_cap_tier3": 11,
     "per_tier_cap": 50,
     "history_lookback_days": 14
   },
@@ -59,8 +59,8 @@
       ],
       "persistence": {
         "first_seen_at": "2026-06-13T22:03:13.930Z",
-        "scans_seen": 466,
-        "hours_persisted": 158.29,
+        "scans_seen": 467,
+        "hours_persisted": 158.55,
         "gross_pct_history": [
           18.5,
           18.5,
@@ -77,10 +77,61 @@
       }
     },
     {
+      "id": "pass3-kalshi-mono-SOL-above-2026-06-27T13:00:00Z-hourly-KXSOLD-26JUN2009-T71.9999-KXSOLD-26JUN2009-T72.9999",
+      "tier": 3,
+      "type": "kalshi_monotonicity",
+      "summary": "Kalshi SOL above-$72 priced 0.035 but above-$73 priced 0.080 — strike monotonicity violation (2026-06-27T13:00:00Z · hourly)",
+      "underlying": "SOL",
+      "resolution_date": "2026-06-27T13:00:00Z",
+      "resolution_type": "hourly",
+      "legs": [
+        {
+          "platform": "kalshi",
+          "market_id": "KXSOLD-26JUN2009-T71.9999",
+          "market_url": "https://kalshi.com/markets/KXSOLD-26JUN2009/KXSOLD-26JUN2009-T71.9999",
+          "side": "YES",
+          "price": 0.035,
+          "depth_usd_at_price": 28,
+          "last_trade_at": "2026-06-20T12:00:00.322756Z",
+          "volume_24h_usd": 380
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXSOLD-26JUN2009-T72.9999",
+          "market_url": "https://kalshi.com/markets/KXSOLD-26JUN2009/KXSOLD-26JUN2009-T72.9999",
+          "side": "NO",
+          "price": 0.92,
+          "depth_usd_at_price": 90,
+          "last_trade_at": "2026-06-20T12:00:00.322756Z",
+          "volume_24h_usd": 183
+        }
+      ],
+      "edge_gross_pct": 4.5,
+      "edge_net_estimate_pct": 1.59,
+      "max_executable_size_per_leg_usd": 28,
+      "edge_net_per_dollar": 0.0159,
+      "weakest_link_summary": "Kalshi depth on the thinner leg limits fill to ~$28 before slippage closes the violation.",
+      "confidence_flags": [
+        "stale_price",
+        "depth_limited",
+        "fee_tight",
+        "low_volume"
+      ],
+      "persistence": {
+        "first_seen_at": "2026-06-20T12:35:56.311Z",
+        "scans_seen": 1,
+        "hours_persisted": 0,
+        "gross_pct_history": [
+          4.5
+        ],
+        "trend": "new"
+      }
+    },
+    {
       "id": "pass1-poly-sum-next-james-bond-actor-635-underpriced",
       "tier": 3,
       "type": "poly_sum_violation",
-      "summary": "Polymarket negRisk: Next James Bond actor? — 15 legs sum to 0.972 (2.8pp underpriced; buy-all-YES)",
+      "summary": "Polymarket negRisk: Next James Bond actor? — 15 legs sum to 0.979 (2.0pp underpriced; buy-all-YES)",
       "underlying": "OTHER",
       "resolution_date": "2026-06-30",
       "resolution_type": "weekly",
@@ -91,8 +142,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/aaron-taylor-johnson-announced-as-next-james-bond",
           "side": "YES",
           "price": 0.0055,
-          "depth_usd_at_price": 1016,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1005,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 391
         },
         {
@@ -100,10 +151,10 @@
           "market_id": "572133",
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/no-one-announced-as-next-james-bond-962",
           "side": "YES",
-          "price": 0.9155,
-          "depth_usd_at_price": 675,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 685
+          "price": 0.9225,
+          "depth_usd_at_price": 648,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 707
         },
         {
           "platform": "polymarket",
@@ -111,8 +162,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/james-norton-announced-as-next-james-bond-575",
           "side": "YES",
           "price": 0.0045,
-          "depth_usd_at_price": 1932,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1951,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 343
         },
         {
@@ -121,7 +172,7 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/paul-mescal-announced-as-next-james-bond",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 1550,
+          "depth_usd_at_price": 1607,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -131,8 +182,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/jacob-elordi-announced-as-next-james-bond-216",
           "side": "YES",
           "price": 0.0025,
-          "depth_usd_at_price": 1298,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1335,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 421
         },
         {
@@ -141,8 +192,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/harris-dickinson-announced-as-next-james-bond-784",
           "side": "YES",
           "price": 0.005,
-          "depth_usd_at_price": 1219,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1249,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 343
         },
         {
@@ -151,8 +202,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/tom-hardy-announced-as-next-james-bond-996-479",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 2473,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 2489,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 391
         },
         {
@@ -161,8 +212,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/pierce-brosnan-announced-as-next-james-bond-557",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 2308,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 2315,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 343
         },
         {
@@ -171,8 +222,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/tom-holland-announced-as-next-james-bond-679",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 1867,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1877,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 973
         },
         {
@@ -181,8 +232,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/henry-cavill-announced-as-next-james-bond-857-642",
           "side": "YES",
           "price": 0.0025,
-          "depth_usd_at_price": 1636,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1686,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 1062
         },
         {
@@ -191,8 +242,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/callum-turner-announced-as-next-james-bond",
           "side": "YES",
           "price": 0.0245,
-          "depth_usd_at_price": 1235,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1255,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 1043
         },
         {
@@ -201,8 +252,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/jack-lowdon-announced-as-next-james-bond",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 2561,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 2537,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 2716
         },
         {
@@ -211,8 +262,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/theo-james-announced-as-next-james-bond",
           "side": "YES",
           "price": 0.003,
-          "depth_usd_at_price": 1047,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1017,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 343
         },
         {
@@ -221,8 +272,8 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/james-collier-announced-as-next-james-bond",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 1613,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1615,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 524
         },
         {
@@ -231,27 +282,25 @@
           "market_url": "https://polymarket.com/event/next-james-bond-actor-635/placeholder-6-announced-as-next-james-bond-114",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 1315,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1307,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 343
         }
       ],
-      "edge_gross_pct": 2.75,
-      "edge_net_estimate_pct": -1.3,
-      "max_executable_size_per_leg_usd": 675,
-      "edge_net_per_dollar": -0.013,
+      "edge_gross_pct": 2.05,
+      "edge_net_estimate_pct": -1.95,
+      "max_executable_size_per_leg_usd": 648,
+      "edge_net_per_dollar": -0.0195,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 15 legs consume it.",
       "confidence_flags": [
-        "fee_tight",
         "stale_price",
         "low_volume"
       ],
       "persistence": {
-        "first_seen_at": "2026-06-06T12:23:02.238Z",
+        "first_seen_at": "2026-06-06T12:38:05.052Z",
         "scans_seen": 224,
         "hours_persisted": 335.96,
         "gross_pct_history": [
-          2.65,
           2.75,
           2.75,
           2.65,
@@ -260,7 +309,8 @@
           2.55,
           2.75,
           2.6,
-          2.75
+          2.75,
+          2.05
         ],
         "trend": "stable"
       }
@@ -269,7 +319,7 @@
       "id": "pass1-poly-sum-harvey-weinstein-prison-time-underpriced",
       "tier": 3,
       "type": "poly_sum_violation",
-      "summary": "Polymarket negRisk: Harvey Weinstein prison time? — 6 legs sum to 0.982 (1.8pp underpriced; buy-all-YES)",
+      "summary": "Polymarket negRisk: Harvey Weinstein prison time? — 6 legs sum to 0.981 (1.9pp underpriced; buy-all-YES)",
       "underlying": "OTHER",
       "resolution_date": "2025-12-31",
       "resolution_type": "hourly",
@@ -280,8 +330,8 @@
           "market_url": "https://polymarket.com/event/harvey-weinstein-prison-time/will-harvey-weinstein-be-sentenced-to-no-prison-time",
           "side": "YES",
           "price": 0.812,
-          "depth_usd_at_price": 526,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 525,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 374
         },
         {
@@ -290,8 +340,8 @@
           "market_url": "https://polymarket.com/event/harvey-weinstein-prison-time/will-harvey-weinstein-be-sentenced-to-less-than-5-years-in-prison",
           "side": "YES",
           "price": 0.0325,
-          "depth_usd_at_price": 449,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 450,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 1815
         },
         {
@@ -301,7 +351,7 @@
           "side": "YES",
           "price": 0.034,
           "depth_usd_at_price": 375,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 130
         },
         {
@@ -310,8 +360,8 @@
           "market_url": "https://polymarket.com/event/harvey-weinstein-prison-time/will-harvey-weinstein-be-sentenced-to-between-10-and-20-years-in-prison",
           "side": "YES",
           "price": 0.028,
-          "depth_usd_at_price": 318,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 344,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 1068
         },
         {
@@ -319,9 +369,9 @@
           "market_id": "544096",
           "market_url": "https://polymarket.com/event/harvey-weinstein-prison-time/will-harvey-weinstein-be-sentenced-to-between-20-and-30-years-in-prison",
           "side": "YES",
-          "price": 0.048,
-          "depth_usd_at_price": 1008,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "price": 0.047,
+          "depth_usd_at_price": 1009,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 505
         },
         {
@@ -330,25 +380,25 @@
           "market_url": "https://polymarket.com/event/harvey-weinstein-prison-time/will-harvey-weinstein-be-sentenced-to-more-than-30-years-in-prison",
           "side": "YES",
           "price": 0.0275,
-          "depth_usd_at_price": 310,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 307,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 120
         }
       ],
-      "edge_gross_pct": 1.8,
-      "edge_net_estimate_pct": -2.73,
-      "max_executable_size_per_leg_usd": 310,
-      "edge_net_per_dollar": -0.0273,
+      "edge_gross_pct": 1.9,
+      "edge_net_estimate_pct": -2.63,
+      "max_executable_size_per_leg_usd": 307,
+      "edge_net_per_dollar": -0.0263,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 6 legs consume it.",
       "confidence_flags": [
+        "stale_price",
         "low_volume"
       ],
       "persistence": {
         "first_seen_at": "2026-06-07T05:58:17.546Z",
-        "scans_seen": 1013,
-        "hours_persisted": 318.37,
+        "scans_seen": 1014,
+        "hours_persisted": 318.63,
         "gross_pct_history": [
-          1.75,
           1.65,
           1.75,
           1.65,
@@ -357,9 +407,68 @@
           1.85,
           1.7,
           1.8,
-          1.8
+          1.8,
+          1.9
         ],
         "trend": "stable"
+      }
+    },
+    {
+      "id": "pass3-kalshi-mono-CPI-above-2026-10-13-quarterly-KXCPI-26JUN-T0.0-KXCPI-26JUN-T0.1",
+      "tier": 3,
+      "type": "kalshi_monotonicity",
+      "summary": "Kalshi CPI above-0.00% priced 0.130 but above-0.10% priced 0.165 — strike monotonicity violation (2026-10-13 · quarterly)",
+      "underlying": "CPI",
+      "resolution_date": "2026-10-13",
+      "resolution_type": "quarterly",
+      "legs": [
+        {
+          "platform": "kalshi",
+          "market_id": "KXCPI-26JUN-T0.0",
+          "market_url": "https://kalshi.com/markets/KXCPI-26JUN/KXCPI-26JUN-T0.0",
+          "side": "YES",
+          "price": 0.13,
+          "depth_usd_at_price": 3,
+          "last_trade_at": "2026-04-09T09:43:07.216889Z",
+          "volume_24h_usd": 2943
+        },
+        {
+          "platform": "kalshi",
+          "market_id": "KXCPI-26JUN-T0.1",
+          "market_url": "https://kalshi.com/markets/KXCPI-26JUN/KXCPI-26JUN-T0.1",
+          "side": "NO",
+          "price": 0.835,
+          "depth_usd_at_price": 1,
+          "last_trade_at": "2026-04-09T09:43:07.317039Z",
+          "volume_24h_usd": 1448
+        }
+      ],
+      "edge_gross_pct": 3.5,
+      "edge_net_estimate_pct": -2.78,
+      "max_executable_size_per_leg_usd": 1,
+      "edge_net_per_dollar": -0.0278,
+      "weakest_link_summary": "Net edge negative after Kalshi 0.07·C·P·(1−P) fees and spread on both legs.",
+      "confidence_flags": [
+        "stale_price",
+        "depth_limited"
+      ],
+      "persistence": {
+        "first_seen_at": "2026-06-08T00:03:54.596Z",
+        "scans_seen": 59,
+        "hours_persisted": 300.53,
+        "gross_pct_history": [
+          4,
+          9,
+          4,
+          2.5,
+          2.5,
+          2.5,
+          2,
+          2.5,
+          3.5,
+          3.5
+        ],
+        "trend": "tightening"
       }
     },
     {
@@ -377,8 +486,8 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-vicky-dvila-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 70294,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 70314,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 2100
         },
         {
@@ -407,7 +516,7 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-david-luna-snchez-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 102087,
+          "depth_usd_at_price": 102085,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -417,8 +526,8 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-juan-daniel-oviedo-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 109192,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 109202,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 1
         },
         {
@@ -427,7 +536,7 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-gustavo-bolvar-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 91075,
+          "depth_usd_at_price": 91070,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -437,8 +546,8 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-sergio-fajardo-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 44952,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 44933,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 11
         },
         {
@@ -457,9 +566,9 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-abelardo-de-la-espriella-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.885,
-          "depth_usd_at_price": 50414,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 150631
+          "depth_usd_at_price": 50609,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 149327
         },
         {
           "platform": "polymarket",
@@ -467,7 +576,7 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-mauricio-cardenas-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 100188,
+          "depth_usd_at_price": 100217,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -477,9 +586,9 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-ivan-cepeda-castro-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.125,
-          "depth_usd_at_price": 49292,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 319704
+          "depth_usd_at_price": 49246,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 319542
         },
         {
           "platform": "polymarket",
@@ -487,7 +596,7 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-daniel-quintero-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 98987,
+          "depth_usd_at_price": 99007,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -497,7 +606,7 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-roy-barreras-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 103560,
+          "depth_usd_at_price": 103561,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -527,8 +636,8 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-paloma-valencia-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 29224,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 29164,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 10611
         },
         {
@@ -537,14 +646,14 @@
           "market_url": "https://polymarket.com/event/colombia-presidential-election/will-carlos-felipe-crdoba-win-the-2026-colombian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 98633,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 98635,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 12
         }
       ],
       "edge_gross_pct": 1.75,
       "edge_net_estimate_pct": -3.15,
-      "max_executable_size_per_leg_usd": 29224,
+      "max_executable_size_per_leg_usd": 29164,
       "edge_net_per_dollar": -0.0315,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 17 legs consume it.",
       "confidence_flags": [
@@ -552,7 +661,7 @@
         "low_volume"
       ],
       "persistence": {
-        "first_seen_at": "2026-06-06T12:23:02.238Z",
+        "first_seen_at": "2026-06-06T12:38:05.052Z",
         "scans_seen": 290,
         "hours_persisted": 335.96,
         "gross_pct_history": [
@@ -574,7 +683,7 @@
       "id": "pass1-poly-sum-michigan-democratic-senate-primary-winner-overpriced",
       "tier": 3,
       "type": "poly_sum_violation",
-      "summary": "Polymarket negRisk: Michigan Democratic Senate Primary Winner — 9 legs sum to 1.018 (1.9pp overpriced; buy-all-NO)",
+      "summary": "Polymarket negRisk: Michigan Democratic Senate Primary Winner — 9 legs sum to 1.019 (1.9pp overpriced; buy-all-NO)",
       "underlying": "OTHER",
       "resolution_date": "2026-08-04",
       "resolution_type": "monthly",
@@ -585,8 +694,8 @@
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-mallory-mcmorrow-win-the-2026-michigan-democratic-primary",
           "side": "YES",
           "price": 0.065,
-          "depth_usd_at_price": 1946,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1916,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 55
         },
         {
@@ -594,9 +703,9 @@
           "market_id": "599304",
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-haley-stevens-win-the-2026-michigan-democratic-primary",
           "side": "YES",
-          "price": 0.2185,
-          "depth_usd_at_price": 3130,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "price": 0.2195,
+          "depth_usd_at_price": 3145,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 174
         },
         {
@@ -605,8 +714,8 @@
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-abdul-el-sayed-win-the-2026-michigan-democratic-primary",
           "side": "YES",
           "price": 0.73,
-          "depth_usd_at_price": 1473,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 1625,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 759
         },
         {
@@ -615,8 +724,8 @@
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-dana-nessel-win-the-2026-michigan-democratic-primary",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 3082,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 3024,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 113
         },
         {
@@ -625,7 +734,7 @@
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-rashida-tlaib-win-the-2026-michigan-democratic-primary",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 2486,
+          "depth_usd_at_price": 2534,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -634,8 +743,8 @@
           "market_id": "599308",
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-sarah-anthony-win-the-2026-michigan-democratic-primary",
           "side": "YES",
-          "price": 0.001,
-          "depth_usd_at_price": 2906,
+          "price": 0.0005,
+          "depth_usd_at_price": 2901,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -645,8 +754,8 @@
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-kristen-mcdonald-rivet-win-the-2026-michigan-democratic-primary",
           "side": "YES",
           "price": 0.001,
-          "depth_usd_at_price": 2139,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 2171,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 170
         },
         {
@@ -655,7 +764,7 @@
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-andy-levin-win-the-2026-michigan-democratic-primary",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 2305,
+          "depth_usd_at_price": 2275,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -665,26 +774,25 @@
           "market_url": "https://polymarket.com/event/michigan-democratic-senate-primary-winner/will-matt-sahr-win-the-2026-michigan-democratic-primary",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 3175,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 3172,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 159
         }
       ],
-      "edge_gross_pct": 1.85,
-      "edge_net_estimate_pct": -5.03,
-      "max_executable_size_per_leg_usd": 1473,
-      "edge_net_per_dollar": -0.0503,
+      "edge_gross_pct": 1.9,
+      "edge_net_estimate_pct": -4.98,
+      "max_executable_size_per_leg_usd": 1625,
+      "edge_net_per_dollar": -0.0498,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 9 legs consume it.",
       "confidence_flags": [
         "stale_price",
         "low_volume"
       ],
       "persistence": {
-        "first_seen_at": "2026-06-06T12:23:02.238Z",
+        "first_seen_at": "2026-06-06T14:23:36.213Z",
         "scans_seen": 112,
-        "hours_persisted": 335.96,
+        "hours_persisted": 334.21,
         "gross_pct_history": [
-          2.2,
           2.2,
           2.25,
           1.55,
@@ -693,7 +801,8 @@
           1.65,
           1.75,
           1.85,
-          1.85
+          1.85,
+          1.9
         ],
         "trend": "stable"
       }
@@ -702,7 +811,7 @@
       "id": "pass1-poly-sum-ballon-dor-winner-2026-overpriced",
       "tier": 3,
       "type": "poly_sum_violation",
-      "summary": "Polymarket negRisk: Ballon d'Or Winner 2026 — 25 legs sum to 1.045 (4.5pp overpriced; buy-all-NO)",
+      "summary": "Polymarket negRisk: Ballon d'Or Winner 2026 — 25 legs sum to 1.043 (4.3pp overpriced; buy-all-NO)",
       "underlying": "OTHER",
       "resolution_date": "2026-10-31",
       "resolution_type": "quarterly",
@@ -713,8 +822,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-kylian-mbapp-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.115,
-          "depth_usd_at_price": 6986,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6977,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 237
         },
         {
@@ -722,9 +831,9 @@
           "market_id": "608541",
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-erling-haaland-win-the-2026-ballon-dor",
           "side": "YES",
-          "price": 0.0215,
-          "depth_usd_at_price": 8169,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "price": 0.021,
+          "depth_usd_at_price": 8538,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 3153
         },
         {
@@ -733,9 +842,9 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-jude-bellingham-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0035,
-          "depth_usd_at_price": 9351,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 362
+          "depth_usd_at_price": 9366,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 374
         },
         {
           "platform": "polymarket",
@@ -743,8 +852,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-ousmane-dembl-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0685,
-          "depth_usd_at_price": 6950,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 7028,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 679
         },
         {
@@ -753,9 +862,9 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-mohamed-salah-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0025,
-          "depth_usd_at_price": 11421,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2791
+          "depth_usd_at_price": 11424,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2721
         },
         {
           "platform": "polymarket",
@@ -764,7 +873,7 @@
           "side": "YES",
           "price": 0.08,
           "depth_usd_at_price": 6751,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 218
         },
         {
@@ -773,8 +882,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-vincius-jnior-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0125,
-          "depth_usd_at_price": 4557,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 4568,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 140
         },
         {
@@ -783,8 +892,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-harry-kane-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.3205,
-          "depth_usd_at_price": 5985,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 5982,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 1109
         },
         {
@@ -793,7 +902,7 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-pedri-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0135,
-          "depth_usd_at_price": 5540,
+          "depth_usd_at_price": 5219,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -803,9 +912,9 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-cole-palmer-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0025,
-          "depth_usd_at_price": 10780,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 4550
+          "depth_usd_at_price": 10779,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 4533
         },
         {
           "platform": "polymarket",
@@ -813,8 +922,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-declan-rice-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.036,
-          "depth_usd_at_price": 7419,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 7417,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 335
         },
         {
@@ -823,8 +932,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-vitinha-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.078,
-          "depth_usd_at_price": 5593,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 5588,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 28
         },
         {
@@ -833,8 +942,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-julian-alvarez-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0045,
-          "depth_usd_at_price": 5116,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 5126,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 30
         },
         {
@@ -843,8 +952,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-raphinha-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0025,
-          "depth_usd_at_price": 4584,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 4644,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 3109
         },
         {
@@ -854,7 +963,7 @@
           "side": "YES",
           "price": 0.006,
           "depth_usd_at_price": 7622,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 11
         },
         {
@@ -863,7 +972,7 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-lautaro-martinez-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0125,
-          "depth_usd_at_price": 7278,
+          "depth_usd_at_price": 6240,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -873,8 +982,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-cristiano-ronaldo-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0235,
-          "depth_usd_at_price": 11379,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 11369,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 640
         },
         {
@@ -883,8 +992,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-michael-olise-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.1235,
-          "depth_usd_at_price": 3721,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 3924,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 482
         },
         {
@@ -893,7 +1002,7 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-khvicha-kvaratskhelia-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.017,
-          "depth_usd_at_price": 4200,
+          "depth_usd_at_price": 4208,
           "last_trade_at": null,
           "volume_24h_usd": 0
         },
@@ -903,8 +1012,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-federico-valverde-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 6960,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6956,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 38
         },
         {
@@ -913,8 +1022,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-desire-doue-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0045,
-          "depth_usd_at_price": 5605,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 5617,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 99
         },
         {
@@ -922,7 +1031,7 @@
           "market_id": "608559",
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-achraf-hakimi-win-the-2026-ballon-dor",
           "side": "YES",
-          "price": 0.023,
+          "price": 0.022,
           "depth_usd_at_price": 7825,
           "last_trade_at": null,
           "volume_24h_usd": 0
@@ -933,8 +1042,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-luis-diaz-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 4592,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 4602,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 24
         },
         {
@@ -943,8 +1052,8 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-dominik-szoboszlai-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 10230,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 10221,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 451
         },
         {
@@ -953,15 +1062,15 @@
           "market_url": "https://polymarket.com/event/ballon-dor-winner-2026/will-lionel-messi-win-the-2026-ballon-dor",
           "side": "YES",
           "price": 0.0645,
-          "depth_usd_at_price": 11947,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 159
+          "depth_usd_at_price": 11890,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 148
         }
       ],
-      "edge_gross_pct": 4.5,
-      "edge_net_estimate_pct": -8.02,
-      "max_executable_size_per_leg_usd": 3721,
-      "edge_net_per_dollar": -0.0802,
+      "edge_gross_pct": 4.35,
+      "edge_net_estimate_pct": -8.16,
+      "max_executable_size_per_leg_usd": 3924,
+      "edge_net_per_dollar": -0.0816,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 25 legs consume it.",
       "confidence_flags": [
         "fee_tight",
@@ -970,10 +1079,9 @@
       ],
       "persistence": {
         "first_seen_at": "2026-06-06T23:41:43.897Z",
-        "scans_seen": 1152,
-        "hours_persisted": 324.65,
+        "scans_seen": 1153,
+        "hours_persisted": 324.9,
         "gross_pct_history": [
-          4.45,
           4.45,
           4.35,
           5,
@@ -982,7 +1090,8 @@
           5.1,
           4.5,
           4.9,
-          4.5
+          4.5,
+          4.35
         ],
         "trend": "stable"
       }
@@ -1002,9 +1111,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-tarcisio-de-frietas-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 127358,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 45322
+          "depth_usd_at_price": 127457,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 45252
         },
         {
           "platform": "polymarket",
@@ -1012,9 +1121,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-luiz-incio-lula-da-silva-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.515,
-          "depth_usd_at_price": 72148,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 24506
+          "depth_usd_at_price": 72029,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 22607
         },
         {
           "platform": "polymarket",
@@ -1022,8 +1131,8 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-jair-bolsonaro-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 79831,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 79449,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 9975
         },
         {
@@ -1032,9 +1141,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-fernando-haddad-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0215,
-          "depth_usd_at_price": 72576,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 32230
+          "depth_usd_at_price": 72654,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 31240
         },
         {
           "platform": "polymarket",
@@ -1042,9 +1151,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-michelle-bolsonaro-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0135,
-          "depth_usd_at_price": 52360,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 61683
+          "depth_usd_at_price": 52173,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 61791
         },
         {
           "platform": "polymarket",
@@ -1052,9 +1161,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-eduardo-bolsonaro-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 295097,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 52362
+          "depth_usd_at_price": 295457,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 52422
         },
         {
           "platform": "polymarket",
@@ -1062,9 +1171,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-carlos-roberto-massa-jnior-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 313624,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 25608
+          "depth_usd_at_price": 313811,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 25886
         },
         {
           "platform": "polymarket",
@@ -1072,9 +1181,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-renan-santos-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.1405,
-          "depth_usd_at_price": 64720,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 35670
+          "depth_usd_at_price": 64222,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 31250
         },
         {
           "platform": "polymarket",
@@ -1082,9 +1191,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-flvio-bolsonaro-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.2505,
-          "depth_usd_at_price": 63916,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 28552
+          "depth_usd_at_price": 64234,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 21465
         },
         {
           "platform": "polymarket",
@@ -1092,9 +1201,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-ronaldo-caiado-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0215,
-          "depth_usd_at_price": 73036,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 69728
+          "depth_usd_at_price": 73118,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 69294
         },
         {
           "platform": "polymarket",
@@ -1102,8 +1211,8 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-romeu-zema-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0145,
-          "depth_usd_at_price": 100110,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 99656,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 8804
         },
         {
@@ -1112,8 +1221,8 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-camilo-santana-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0175,
-          "depth_usd_at_price": 65494,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 65760,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 5199
         },
         {
@@ -1122,8 +1231,8 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-geraldo-alckmin-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0035,
-          "depth_usd_at_price": 54462,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 54549,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 45286
         },
         {
@@ -1132,8 +1241,8 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-eduardo-leite-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 330140,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 330254,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 87733
         },
         {
@@ -1142,9 +1251,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-aldo-rebelo-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 325125,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 25319
+          "depth_usd_at_price": 325245,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 25173
         },
         {
           "platform": "polymarket",
@@ -1152,9 +1261,9 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-tereza-cristina-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0025,
-          "depth_usd_at_price": 73403,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 162272
+          "depth_usd_at_price": 73843,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 162568
         },
         {
           "platform": "polymarket",
@@ -1162,29 +1271,29 @@
           "market_url": "https://polymarket.com/event/brazil-presidential-election/will-helder-barbalho-win-the-2026-brazilian-presidential-election",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 163103,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 162914,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 25491
         }
       ],
       "edge_gross_pct": 1.6,
       "edge_net_estimate_pct": -8.59,
-      "max_executable_size_per_leg_usd": 52360,
+      "max_executable_size_per_leg_usd": 52173,
       "edge_net_per_dollar": -0.0859,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 17 legs consume it.",
       "confidence_flags": [],
       "persistence": {
         "first_seen_at": "2026-06-07T14:00:20.826Z",
-        "scans_seen": 389,
-        "hours_persisted": 310.34,
+        "scans_seen": 390,
+        "hours_persisted": 310.59,
         "gross_pct_history": [
-          1.55,
           1.65,
           1.65,
           1.65,
           1.65,
           1.65,
           1.65,
+          1.6,
           1.6,
           1.6,
           1.6
@@ -1196,7 +1305,7 @@
       "id": "pass1-poly-sum-world-cup-winner-overpriced",
       "tier": 3,
       "type": "poly_sum_violation",
-      "summary": "Polymarket negRisk: World Cup Winner  — 46 legs sum to 1.017 (1.7pp overpriced; buy-all-NO)",
+      "summary": "Polymarket negRisk: World Cup Winner  — 46 legs sum to 1.020 (2.0pp overpriced; buy-all-NO)",
       "underlying": "OTHER",
       "resolution_date": "2026-07-20",
       "resolution_type": "weekly",
@@ -1207,9 +1316,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-spain-win-the-2026-fifa-world-cup-963",
           "side": "YES",
           "price": 0.1365,
-          "depth_usd_at_price": 2399514,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 527411
+          "depth_usd_at_price": 2394249,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 530657
         },
         {
           "platform": "polymarket",
@@ -1217,8 +1326,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-new-zealand-win-the-2026-fifa-world-cup-635",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 6541582,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6541335,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 273015
         },
         {
@@ -1227,9 +1336,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-switzerland-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 1088327,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 830532
+          "depth_usd_at_price": 1088666,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 832341
         },
         {
           "platform": "polymarket",
@@ -1237,19 +1346,19 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-england-win-the-2026-fifa-world-cup-937",
           "side": "YES",
           "price": 0.1255,
-          "depth_usd_at_price": 1881958,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1033079
+          "depth_usd_at_price": 1876591,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1027431
         },
         {
           "platform": "polymarket",
           "market_id": "558936",
           "market_url": "https://polymarket.com/event/world-cup-winner/will-france-win-the-2026-fifa-world-cup-924",
           "side": "YES",
-          "price": 0.1935,
-          "depth_usd_at_price": 1844020,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1305516
+          "price": 0.1975,
+          "depth_usd_at_price": 1804480,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1531534
         },
         {
           "platform": "polymarket",
@@ -1257,9 +1366,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-south-korea-win-the-2026-fifa-world-cup-485",
           "side": "YES",
           "price": 0.0035,
-          "depth_usd_at_price": 1827775,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1020124
+          "depth_usd_at_price": 1828416,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1018545
         },
         {
           "platform": "polymarket",
@@ -1267,9 +1376,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-brazil-win-the-2026-fifa-world-cup-183",
           "side": "YES",
           "price": 0.0595,
-          "depth_usd_at_price": 1718288,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2576055
+          "depth_usd_at_price": 1718932,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2562302
         },
         {
           "platform": "polymarket",
@@ -1277,8 +1386,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-jordan-win-the-2026-fifa-world-cup-233",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 6658261,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6659091,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 4015
         },
         {
@@ -1287,8 +1396,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-curaao-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 6367718,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6367758,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 6015
         },
         {
@@ -1297,9 +1406,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-argentina-win-the-2026-fifa-world-cup-245",
           "side": "YES",
           "price": 0.1175,
-          "depth_usd_at_price": 2060637,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 637481
+          "depth_usd_at_price": 2054926,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 640992
         },
         {
           "platform": "polymarket",
@@ -1307,9 +1416,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-germany-win-the-2026-fifa-world-cup-467",
           "side": "YES",
           "price": 0.0635,
-          "depth_usd_at_price": 1115689,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1311868
+          "depth_usd_at_price": 1479601,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1311070
         },
         {
           "platform": "polymarket",
@@ -1317,9 +1426,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-colombia-win-the-2026-fifa-world-cup-734",
           "side": "YES",
           "price": 0.0155,
-          "depth_usd_at_price": 1082095,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2217921
+          "depth_usd_at_price": 1083012,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2199939
         },
         {
           "platform": "polymarket",
@@ -1327,19 +1436,19 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-iran-win-the-2026-fifa-world-cup-788",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 4120361,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1145757
+          "depth_usd_at_price": 4119251,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1150357
         },
         {
           "platform": "polymarket",
           "market_id": "558940",
           "market_url": "https://polymarket.com/event/world-cup-winner/will-portugal-win-the-2026-fifa-world-cup-912",
           "side": "YES",
-          "price": 0.0725,
-          "depth_usd_at_price": 1433194,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1364765
+          "price": 0.0715,
+          "depth_usd_at_price": 1449296,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1356832
         },
         {
           "platform": "polymarket",
@@ -1347,9 +1456,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-ghana-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 4727382,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1089523
+          "depth_usd_at_price": 4727841,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1089979
         },
         {
           "platform": "polymarket",
@@ -1357,9 +1466,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-netherlands-win-the-2026-fifa-world-cup-739",
           "side": "YES",
           "price": 0.0395,
-          "depth_usd_at_price": 694390,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 989495
+          "depth_usd_at_price": 694419,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 993409
         },
         {
           "platform": "polymarket",
@@ -1367,9 +1476,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-algeria-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 3562520,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 559735
+          "depth_usd_at_price": 3562934,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 555235
         },
         {
           "platform": "polymarket",
@@ -1377,8 +1486,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-bosnia-herzegovina-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 2671413,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 2671453,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 271779
         },
         {
@@ -1387,9 +1496,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-usa-win-the-2026-fifa-world-cup-467",
           "side": "YES",
           "price": 0.0325,
-          "depth_usd_at_price": 922554,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 7153326
+          "depth_usd_at_price": 921741,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 7239994
         },
         {
           "platform": "polymarket",
@@ -1397,9 +1506,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-canada-win-the-2026-fifa-world-cup-755",
           "side": "YES",
           "price": 0.0035,
-          "depth_usd_at_price": 2132803,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2477526
+          "depth_usd_at_price": 2133435,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2487193
         },
         {
           "platform": "polymarket",
@@ -1407,9 +1516,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-uruguay-win-the-2026-fifa-world-cup-932",
           "side": "YES",
           "price": 0.0055,
-          "depth_usd_at_price": 3028914,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 708570
+          "depth_usd_at_price": 3029630,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 708121
         },
         {
           "platform": "polymarket",
@@ -1417,9 +1526,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-mexico-win-the-2026-fifa-world-cup-529",
           "side": "YES",
           "price": 0.0125,
-          "depth_usd_at_price": 1952220,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2587426
+          "depth_usd_at_price": 1948138,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2607056
         },
         {
           "platform": "polymarket",
@@ -1427,9 +1536,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-paraguay-win-the-2026-fifa-world-cup-967",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 2188377,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 3101569
+          "depth_usd_at_price": 2189034,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 3101613
         },
         {
           "platform": "polymarket",
@@ -1437,9 +1546,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-scotland-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 1669626,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2021986
+          "depth_usd_at_price": 1670547,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2021292
         },
         {
           "platform": "polymarket",
@@ -1447,9 +1556,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-japan-win-the-2026-fifa-world-cup-112",
           "side": "YES",
           "price": 0.0135,
-          "depth_usd_at_price": 626169,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2145466
+          "depth_usd_at_price": 625419,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2152933
         },
         {
           "platform": "polymarket",
@@ -1457,9 +1566,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-norway-win-the-2026-fifa-world-cup-893",
           "side": "YES",
           "price": 0.0245,
-          "depth_usd_at_price": 852204,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1402604
+          "depth_usd_at_price": 853122,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1402176
         },
         {
           "platform": "polymarket",
@@ -1467,8 +1576,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-tunisia-win-the-2026-fifa-world-cup-165",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 6096032,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6095819,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 54025
         },
         {
@@ -1477,9 +1586,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-ecuador-win-the-2026-fifa-world-cup-986",
           "side": "YES",
           "price": 0.0045,
-          "depth_usd_at_price": 1912757,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1022164
+          "depth_usd_at_price": 1912490,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1026436
         },
         {
           "platform": "polymarket",
@@ -1487,8 +1596,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-uzbekistan-win-the-2026-fifa-world-cup-773",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 5673357,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 5673394,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 4015
         },
         {
@@ -1497,9 +1606,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-morocco-win-the-2026-fifa-world-cup-464",
           "side": "YES",
           "price": 0.0265,
-          "depth_usd_at_price": 388057,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1684309
+          "depth_usd_at_price": 388881,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1680121
         },
         {
           "platform": "polymarket",
@@ -1507,8 +1616,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-team-z-win-the-2026-fifa-world-cup-316",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 6845330,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6844770,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 10945
         },
         {
@@ -1517,9 +1626,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-iraq-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 6831731,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 16015
+          "depth_usd_at_price": 6830622,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 20615
         },
         {
           "platform": "polymarket",
@@ -1527,8 +1636,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-south-africa-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 5654394,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 5654434,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 56033
         },
         {
@@ -1537,9 +1646,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-senegal-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0055,
-          "depth_usd_at_price": 2178327,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 747629
+          "depth_usd_at_price": 2177844,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 751760
         },
         {
           "platform": "polymarket",
@@ -1547,9 +1656,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-ivory-coast-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0045,
-          "depth_usd_at_price": 2407729,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1467944
+          "depth_usd_at_price": 2395373,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1479789
         },
         {
           "platform": "polymarket",
@@ -1557,9 +1666,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-congo-dr-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 5543150,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 727291
+          "depth_usd_at_price": 5544800,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 727273
         },
         {
           "platform": "polymarket",
@@ -1567,8 +1676,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-cape-verde-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 5201499,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 5202063,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 87337
         },
         {
@@ -1577,9 +1686,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-czechia-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 3755797,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 278882
+          "depth_usd_at_price": 3755809,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 278989
         },
         {
           "platform": "polymarket",
@@ -1587,8 +1696,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-qatar-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 6360374,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 6360141,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 16437
         },
         {
@@ -1597,9 +1706,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-belgium-win-the-2026-fifa-world-cup-358",
           "side": "YES",
           "price": 0.0155,
-          "depth_usd_at_price": 1343926,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1509839
+          "depth_usd_at_price": 1344851,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1509946
         },
         {
           "platform": "polymarket",
@@ -1607,9 +1716,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-australia-win-the-2026-fifa-world-cup-816",
           "side": "YES",
           "price": 0.0035,
-          "depth_usd_at_price": 3971373,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 787313
+          "depth_usd_at_price": 3972071,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 767284
         },
         {
           "platform": "polymarket",
@@ -1617,8 +1726,8 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-saudi-arabia-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0005,
-          "depth_usd_at_price": 3779541,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 3779581,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 313095
         },
         {
@@ -1627,9 +1736,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-austria-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0045,
-          "depth_usd_at_price": 1639212,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 369625
+          "depth_usd_at_price": 1639772,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 367025
         },
         {
           "platform": "polymarket",
@@ -1637,9 +1746,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-croatia-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 1147608,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1435339
+          "depth_usd_at_price": 1148315,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1432640
         },
         {
           "platform": "polymarket",
@@ -1647,9 +1756,9 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-egypt-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0015,
-          "depth_usd_at_price": 2417233,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 3297828
+          "depth_usd_at_price": 2417857,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 3296865
         },
         {
           "platform": "polymarket",
@@ -1657,23 +1766,22 @@
           "market_url": "https://polymarket.com/event/world-cup-winner/will-sweden-win-the-2026-fifa-world-cup",
           "side": "YES",
           "price": 0.0045,
-          "depth_usd_at_price": 2837446,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 1222506
+          "depth_usd_at_price": 2824536,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 1219143
         }
       ],
-      "edge_gross_pct": 1.7,
-      "edge_net_estimate_pct": -10.16,
-      "max_executable_size_per_leg_usd": 388057,
-      "edge_net_per_dollar": -0.1016,
+      "edge_gross_pct": 2,
+      "edge_net_estimate_pct": -9.88,
+      "max_executable_size_per_leg_usd": 388881,
+      "edge_net_per_dollar": -0.0988,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 46 legs consume it.",
       "confidence_flags": [],
       "persistence": {
-        "first_seen_at": "2026-06-06T12:23:02.238Z",
+        "first_seen_at": "2026-06-06T12:38:05.052Z",
         "scans_seen": 1053,
         "hours_persisted": 335.96,
         "gross_pct_history": [
-          2.1,
           2.1,
           1.8,
           1.8,
@@ -1682,7 +1790,8 @@
           1.6,
           1.8,
           1.7,
-          1.7
+          1.7,
+          2
         ],
         "trend": "stable"
       }
@@ -1702,8 +1811,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-stephen-a-smith-win-the-2028-democratic-presidential-nomination-914",
           "side": "YES",
           "price": 0.0105,
-          "depth_usd_at_price": 279968,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 279971,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 3804
         },
         {
@@ -1712,9 +1821,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-gretchen-whitmer-win-the-2028-democratic-presidential-nomination-676",
           "side": "YES",
           "price": 0.0085,
-          "depth_usd_at_price": 211935,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 3877
+          "depth_usd_at_price": 211929,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 3883
         },
         {
           "platform": "polymarket",
@@ -1722,9 +1831,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-oprah-winfrey-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 624107,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 24409
+          "depth_usd_at_price": 623884,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 24396
         },
         {
           "platform": "polymarket",
@@ -1732,8 +1841,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-andy-beshear-win-the-2028-democratic-presidential-nomination-832",
           "side": "YES",
           "price": 0.0235,
-          "depth_usd_at_price": 123662,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 123667,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 44981
         },
         {
@@ -1742,8 +1851,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-james-talarico-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0165,
-          "depth_usd_at_price": 90646,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 90659,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 1099
         },
         {
@@ -1752,9 +1861,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-pete-buttigieg-win-the-2028-democratic-presidential-nomination-687",
           "side": "YES",
           "price": 0.0435,
-          "depth_usd_at_price": 110354,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 35335
+          "depth_usd_at_price": 110329,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 35333
         },
         {
           "platform": "polymarket",
@@ -1762,9 +1871,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
           "side": "YES",
           "price": 0.0955,
-          "depth_usd_at_price": 78102,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 51565
+          "depth_usd_at_price": 77285,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 53164
         },
         {
           "platform": "polymarket",
@@ -1772,9 +1881,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-gina-raimondo-win-the-2028-democratic-presidential-nomination-676",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 587112,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 10745
+          "depth_usd_at_price": 587121,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 10742
         },
         {
           "platform": "polymarket",
@@ -1782,9 +1891,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-raphael-warnock-win-the-2028-democratic-presidential-nomination-914",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 501635,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 45231
+          "depth_usd_at_price": 501629,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 45169
         },
         {
           "platform": "polymarket",
@@ -1792,9 +1901,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-barack-obama-win-the-2028-democratic-presidential-nomination-265",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 585150,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 20643
+          "depth_usd_at_price": 585166,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 20636
         },
         {
           "platform": "polymarket",
@@ -1802,9 +1911,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-george-clooney-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 649050,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 48616
+          "depth_usd_at_price": 649041,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 48641
         },
         {
           "platform": "polymarket",
@@ -1812,8 +1921,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-corey-booker-win-the-2028-democratic-presidential-nomination-125",
           "side": "YES",
           "price": 0.0095,
-          "depth_usd_at_price": 484022,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 484043,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 4397
         },
         {
@@ -1822,9 +1931,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-jon-stewart-win-the-2028-democratic-presidential-nomination-518",
           "side": "YES",
           "price": 0.0265,
-          "depth_usd_at_price": 149510,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 16377
+          "depth_usd_at_price": 149516,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 15819
         },
         {
           "platform": "polymarket",
@@ -1832,9 +1941,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-tim-walz-win-the-2028-democratic-presidential-nomination-475",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 612370,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 21957
+          "depth_usd_at_price": 612116,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 21948
         },
         {
           "platform": "polymarket",
@@ -1842,9 +1951,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-bernie-sanders-win-the-2028-democratic-presidential-nomination-879",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 274110,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 24069
+          "depth_usd_at_price": 274613,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 24008
         },
         {
           "platform": "polymarket",
@@ -1852,8 +1961,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-mark-kelly-win-the-2028-democratic-presidential-nomination-479",
           "side": "YES",
           "price": 0.0155,
-          "depth_usd_at_price": 132796,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 132627,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 61027
         },
         {
@@ -1862,9 +1971,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-liz-cheney-win-the-2028-democratic-presidential-nomination-551",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 645944,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 8692
+          "depth_usd_at_price": 646072,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 8624
         },
         {
           "platform": "polymarket",
@@ -1872,9 +1981,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-beto-orourke-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 622014,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 28071
+          "depth_usd_at_price": 622137,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 28204
         },
         {
           "platform": "polymarket",
@@ -1882,9 +1991,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-michelle-obama-win-the-2028-democratic-presidential-nomination-777",
           "side": "YES",
           "price": 0.0115,
-          "depth_usd_at_price": 524714,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 6007
+          "depth_usd_at_price": 524698,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 5942
         },
         {
           "platform": "polymarket",
@@ -1892,9 +2001,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-zohran-mamdani-win-the-2028-democratic-presidential-nomination-445",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 623845,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 18431
+          "depth_usd_at_price": 623934,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 18426
         },
         {
           "platform": "polymarket",
@@ -1902,9 +2011,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-andrew-yang-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 630625,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 22723
+          "depth_usd_at_price": 630611,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 22755
         },
         {
           "platform": "polymarket",
@@ -1912,9 +2021,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-alexandria-ocasio-cortez-win-the-2028-democratic-presidential-nomination-653",
           "side": "YES",
           "price": 0.0905,
-          "depth_usd_at_price": 91912,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 5451
+          "depth_usd_at_price": 91560,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 5372
         },
         {
           "platform": "polymarket",
@@ -1922,8 +2031,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-rahm-emanuel-win-the-2028-democratic-presidential-nomination-299",
           "side": "YES",
           "price": 0.0165,
-          "depth_usd_at_price": 101037,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 101150,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 4042
         },
         {
@@ -1932,9 +2041,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-john-fetterman-win-the-2028-democratic-presidential-nomination-941",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 526841,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 47433
+          "depth_usd_at_price": 526793,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 47401
         },
         {
           "platform": "polymarket",
@@ -1942,9 +2051,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-kim-kardashian-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 811586,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 23500
+          "depth_usd_at_price": 811548,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 23481
         },
         {
           "platform": "polymarket",
@@ -1952,9 +2061,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-ruben-gallego-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 273977,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 11564
+          "depth_usd_at_price": 273947,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 11458
         },
         {
           "platform": "polymarket",
@@ -1962,9 +2071,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-jared-polis-win-the-2028-democratic-presidential-nomination-837",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 221290,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 19425
+          "depth_usd_at_price": 221210,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 19525
         },
         {
           "platform": "polymarket",
@@ -1972,9 +2081,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-mark-cuban-win-the-2028-democratic-presidential-nomination-329",
           "side": "YES",
           "price": 0.0095,
-          "depth_usd_at_price": 546614,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2658
+          "depth_usd_at_price": 546596,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2620
         },
         {
           "platform": "polymarket",
@@ -1982,9 +2091,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-phil-murphy-win-the-2028-democratic-presidential-nomination-611",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 665653,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 21420
+          "depth_usd_at_price": 665555,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 21442
         },
         {
           "platform": "polymarket",
@@ -1992,9 +2101,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-wes-moore-win-the-2028-democratic-presidential-nomination-714",
           "side": "YES",
           "price": 0.0125,
-          "depth_usd_at_price": 132253,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 2509
+          "depth_usd_at_price": 132298,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 2521
         },
         {
           "platform": "polymarket",
@@ -2002,8 +2111,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-jb-pritzker-win-the-2028-democratic-presidential-nomination-288",
           "side": "YES",
           "price": 0.0125,
-          "depth_usd_at_price": 117969,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 117971,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 50540
         },
         {
@@ -2012,8 +2121,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-lebron-james-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 705307,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 705278,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 37181
         },
         {
@@ -2022,8 +2131,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-person-a-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.009,
-          "depth_usd_at_price": 224367,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 223995,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 85770
         },
         {
@@ -2032,9 +2141,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-chelsea-clinton-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0095,
-          "depth_usd_at_price": 166128,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 8411
+          "depth_usd_at_price": 166330,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 8361
         },
         {
           "platform": "polymarket",
@@ -2042,8 +2151,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-dwayne-the-rock-johnson-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0125,
-          "depth_usd_at_price": 237722,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 237727,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 5695
         },
         {
@@ -2052,9 +2161,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-mrbeast-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 684817,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 28053
+          "depth_usd_at_price": 684828,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 28025
         },
         {
           "platform": "polymarket",
@@ -2062,8 +2171,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-chris-murphy-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0085,
-          "depth_usd_at_price": 482209,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 482222,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 5174
         },
         {
@@ -2072,8 +2181,8 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-ro-khanna-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0155,
-          "depth_usd_at_price": 95098,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 95109,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 22824
         },
         {
@@ -2082,9 +2191,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-josh-shapiro-win-the-2028-democratic-presidential-nomination-977",
           "side": "YES",
           "price": 0.0495,
-          "depth_usd_at_price": 123067,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 27427
+          "depth_usd_at_price": 123039,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 27368
         },
         {
           "platform": "polymarket",
@@ -2092,9 +2201,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-roy-cooper-win-the-2028-democratic-presidential-nomination-286",
           "side": "YES",
           "price": 0.0095,
-          "depth_usd_at_price": 446534,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 4763
+          "depth_usd_at_price": 446708,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 4764
         },
         {
           "platform": "polymarket",
@@ -2102,9 +2211,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-jasmine-crockett-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0065,
-          "depth_usd_at_price": 680552,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 20237
+          "depth_usd_at_price": 680535,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 20213
         },
         {
           "platform": "polymarket",
@@ -2112,9 +2221,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-graham-platner-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0205,
-          "depth_usd_at_price": 158112,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 7164
+          "depth_usd_at_price": 158068,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 6598
         },
         {
           "platform": "polymarket",
@@ -2122,9 +2231,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-kamala-harris-win-the-2028-democratic-presidential-nomination-641",
           "side": "YES",
           "price": 0.0715,
-          "depth_usd_at_price": 99775,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 27445
+          "depth_usd_at_price": 99737,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 27441
         },
         {
           "platform": "polymarket",
@@ -2132,9 +2241,9 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-hillary-clinton-win-the-2028-democratic-presidential-nomination",
           "side": "YES",
           "price": 0.0075,
-          "depth_usd_at_price": 689154,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
-          "volume_24h_usd": 21811
+          "depth_usd_at_price": 689203,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
+          "volume_24h_usd": 21840
         },
         {
           "platform": "polymarket",
@@ -2142,21 +2251,21 @@
           "market_url": "https://polymarket.com/event/democratic-presidential-nominee-2028/will-gavin-newsom-win-the-2028-democratic-presidential-nomination-568",
           "side": "YES",
           "price": 0.2335,
-          "depth_usd_at_price": 74217,
-          "last_trade_at": "2026-06-20T12:15:56.552684Z",
+          "depth_usd_at_price": 73151,
+          "last_trade_at": "2026-06-20T12:29:55.900498Z",
           "volume_24h_usd": 35982
         }
       ],
       "edge_gross_pct": 1.7,
       "edge_net_estimate_pct": -27.06,
-      "max_executable_size_per_leg_usd": 74217,
+      "max_executable_size_per_leg_usd": 73151,
       "edge_net_per_dollar": -0.2706,
       "weakest_link_summary": "Net edge negative after fees at any size — sum violation exists but Polymarket fees + spread on 45 legs consume it.",
       "confidence_flags": [],
       "persistence": {
         "first_seen_at": "2026-06-06T16:09:13.546Z",
-        "scans_seen": 522,
-        "hours_persisted": 332.19,
+        "scans_seen": 523,
+        "hours_persisted": 332.45,
         "gross_pct_history": [
           1.7,
           1.7,
@@ -2175,25 +2284,25 @@
   ],
   "track_record": {
     "lookback_days": 14,
-    "total_observed": 386,
-    "active": 9,
-    "left_feed": 377,
+    "total_observed": 387,
+    "active": 11,
+    "left_feed": 376,
     "among_active": {
-      "closed_substantially": 0,
-      "tightened": 3,
-      "stable": 3,
-      "widened": 3
+      "closed_substantially": 2,
+      "tightened": 1,
+      "stable": 6,
+      "widened": 2
     },
     "among_active_pct": {
-      "closed_substantially": 0,
-      "tightened": 33.3,
-      "stable": 33.3,
-      "widened": 33.3
+      "closed_substantially": 18.2,
+      "tightened": 9.1,
+      "stable": 54.5,
+      "widened": 18.2
     },
     "left_feed_reasons": {
       "leg_expired": 201,
       "leg_delisted": 129,
-      "spread_closed": 47,
+      "spread_closed": 46,
       "unknown": 0
     },
     "median_lifetime_hours": 0.25,
@@ -2233,19 +2342,19 @@
         }
       },
       "3": {
-        "total_observed": 378,
-        "active": 9,
-        "left_feed": 369,
+        "total_observed": 379,
+        "active": 11,
+        "left_feed": 368,
         "among_active": {
-          "closed_substantially": 0,
-          "tightened": 3,
-          "stable": 3,
-          "widened": 3
+          "closed_substantially": 2,
+          "tightened": 1,
+          "stable": 6,
+          "widened": 2
         },
         "left_feed_reasons": {
           "leg_expired": 200,
           "leg_delisted": 126,
-          "spread_closed": 43,
+          "spread_closed": 42,
           "unknown": 0
         }
       }
