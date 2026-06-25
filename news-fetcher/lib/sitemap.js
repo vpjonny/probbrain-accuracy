@@ -43,26 +43,13 @@ function fmtDate(d) { return d.toISOString().slice(0, 10); }
 export function generateSitemap(repoRoot) {
   const entries = [];
 
-  for (const f of readdirSync(repoRoot)) {
-    if (!f.endsWith('.html') || EXCLUDE_TOPLEVEL.has(f)) continue;
-    const url = htmlToUrl(f);
-    const stat = statSync(join(repoRoot, f));
-    entries.push({ url, lastmod: fmtDate(stat.mtime), ...(PAGE_META[url] || TOPLEVEL_META) });
-  }
-
-  const signalsDir = join(repoRoot, 'signals');
-  let signalsExist = false;
-  try { signalsExist = statSync(signalsDir).isDirectory(); } catch {}
+  // Site stripped to the AI News page only — the sitemap lists just /news.
+  // (All other routes redirect to /news via vercel.json, so indexing them is pointless.)
   let skipped = 0;
-  if (signalsExist) {
-    for (const f of readdirSync(signalsDir).sort()) {
-      if (!f.endsWith('.html')) continue;
-      const path = join(signalsDir, f);
-      const status = readSignalStatus(path);
-      if (status && EXCLUDE_SIGNAL_STATUSES.has(status)) { skipped++; continue; }
-      const stat = statSync(path);
-      entries.push({ url: '/signals/' + f.replace(/\.html$/, ''), lastmod: fmtDate(stat.mtime), ...SIGNAL_META });
-    }
+  for (const f of readdirSync(repoRoot)) {
+    if (f !== 'news.html') continue;
+    const stat = statSync(join(repoRoot, f));
+    entries.push({ url: '/news', lastmod: fmtDate(stat.mtime), ...PAGE_META['/news'], priority: '1.0' });
   }
 
   // Root first, then alphabetical so output is deterministic across runs
