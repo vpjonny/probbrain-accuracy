@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>the after hours · murmuration</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0e0c12; overflow: hidden; cursor: crosshair; }
+  canvas { display: block; }
+  #hint {
+    position: fixed; left: 0; right: 0; bottom: 18px; text-align: center;
+    font: 12px/1.6 ui-monospace, monospace; letter-spacing: 3px;
+    color: #6a6472; pointer-events: none; user-select: none;
+  }
+  #hint b { color: #ff6f93; font-weight: 600; }
+  #mode { color: #ffd0dd; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hint">THE AFTER HOURS · murmuration &nbsp;—&nbsp; <b>move</b> to herd · <b>click</b> to flip the cursor to <span id="mode">predator</span></div>
+<script>
+// Boids. Each bird obeys three local rules with the neighbours it can see:
+//   1. separation — don't crowd the one next to you
+//   2. alignment  — fly roughly the way your neighbours are flying
+//   3. cohesion   — drift toward the middle of your little group
+// Nobody is in charge. No bird can see the whole flock. Yet the flock turns as one,
+// splits around a threat, and re-forms — behaviour that exists nowhere in any single
+// bird, only between them. Craig Reynolds, 1986. Still the cleanest demo of emergence.
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d', { alpha: false });
+let W, H;
+function resize() {
+  W = cv.width = innerWidth; H = cv.height = innerHeight;
+  ctx.fillStyle = '#0e0c12'; ctx.fillRect(0, 0, W, H);
+}
+addEventListener('resize', resize); resize();
+
+let mouseX = -9999, mouseY = -9999, predator = true;
+addEventListener('pointermove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+addEventListener('pointerdown', () => {
+  predator = !predator;
+  document.getElementById('mode').textContent = predator ? 'predator' : 'food';
+});
+
+// tuning
+const NUM = 340;
+const VISUAL = 56, PROTECT = 18;
+const ALIGN = 0.05, COHERE = 0.0007, AVOID = 0.06, TURN = 0.22;
+const MAXSP = 4.2, MINSP = 2.6;
+const CURSOR_RANGE = 150, CURSOR_FORCE = 0.9;
+const MARGIN = 90;
+
+const boids = [];
+for (let i = 0; i < NUM; i++) {
+  const a = Math.random() * Math.PI * 2;
+  boids.push({
+    x: Math.random() * W, y: Math.random() * H,
+    vx: Math.cos(a) * MINSP, vy: Math.sin(a) * MINSP,
+  });
+}
+
+function step() {
+  for (const b of boids) {
+    let xvel = 0, yvel = 0, xpos = 0, ypos = 0, near = 0, cdx = 0, cdy = 0;
+    for (const o of boids) {
+      if (o === b) continue;
+      const dx = b.x - o.x, dy = b.y - o.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > VISUAL * VISUAL) continue;
+      if (d2 < PROTECT * PROTECT) { cdx += dx; cdy += dy; }
+      else { xvel += o.vx; yvel += o.vy; xpos += o.x; ypos += o.y; near++; }
+    }
+    if (near > 0) {
+      b.vx += (xvel / near - b.vx) * ALIGN + (xpos / near - b.x) * COHERE;
+      b.vy += (yvel / near - b.vy) * ALIGN + (ypos / near - b.y) * COHERE;
+    }
+    b.vx += cdx * AVOID; b.vy += cdy * AVOID;
+
+    // soft walls
+    if (b.x < MARGIN) b.vx += TURN;
+    if (b.x > W - MARGIN) b.vx -= TURN;
+    if (b.y < MARGIN) b.vy += TURN;
+    if (b.y > H - MARGIN) b.vy -= TURN;
+
+    // the cursor: predator (flee) or food (seek)
+    const mdx = b.x - mouseX, mdy = b.y - mouseY;
+    const md = Math.hypot(mdx, mdy);
+    if (md < CURSOR_RANGE && md > 0.01) {
+      const f = (1 - md / CURSOR_RANGE) * CURSOR_FORCE * (predator ? 1 : -1);
+      b.vx += (mdx / md) * f; b.vy += (mdy / md) * f;
+    }
+
+    // speed clamp
+    const sp = Math.hypot(b.vx, b.vy) || 1;
+    const cl = sp > MAXSP ? MAXSP / sp : sp < MINSP ? MINSP / sp : 1;
+    b.vx *= cl; b.vy *= cl;
+    b.x += b.vx; b.y += b.vy;
+  }
+}
+
+function draw() {
+  // motion trails
+  ctx.fillStyle = 'rgba(14,12,18,0.20)';
+  ctx.fillRect(0, 0, W, H);
+  for (const b of boids) {
+    const sp = Math.hypot(b.vx, b.vy);
+    const t = Math.min(1, (sp - MINSP) / (MAXSP - MINSP));     // faster → paler
+    const r = 255, g = (27 + 170 * t) | 0, bl = (92 + 118 * t) | 0;
+    ctx.fillStyle = `rgb(${r},${g},${bl})`;
+    const a = Math.atan2(b.vy, b.vx);
+    const ca = Math.cos(a), sa = Math.sin(a);
+    // little arrowhead pointing along the velocity
+    ctx.beginPath();
+    ctx.moveTo(b.x + ca * 6, b.y + sa * 6);
+    ctx.lineTo(b.x - ca * 4 - sa * 3, b.y - sa * 4 + ca * 3);
+    ctx.lineTo(b.x - ca * 4 + sa * 3, b.y - sa * 4 - ca * 3);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function loop() { step(); draw(); requestAnimationFrame(loop); }
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>the after hours · living attractor</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0e0c12; overflow: hidden; }
+  canvas { display: block; }
+  #hint {
+    position: fixed; left: 0; right: 0; bottom: 18px; text-align: center;
+    font: 12px/1.6 ui-monospace, monospace; letter-spacing: 3px;
+    color: #6a6472; pointer-events: none; user-select: none;
+  }
+  #hint b { color: #ff6f93; font-weight: 600; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hint">THE AFTER HOURS · living attractor &nbsp;—&nbsp; <b>move</b> to bend it · <b>click</b> to reshuffle</div>
+<script>
+// A Clifford attractor, drawn live and let to morph forever.
+//   x' = sin(a·y) + c·cos(a·x)
+//   y' = sin(b·x) + d·cos(b·y)
+// Its four numbers drift on slow sine waves, so the smoke never settles. Additive
+// blending means wherever the point lingers, pink piles up into cream. The mouse
+// nudges two of the numbers; a click jumps to a fresh quartet. No libraries.
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d', { alpha: false });
+let W, H, cx, cy;
+function resize() {
+  W = cv.width = innerWidth; H = cv.height = innerHeight;
+  cx = W / 2; cy = H / 2;
+  ctx.fillStyle = '#0e0c12'; ctx.fillRect(0, 0, W, H);
+}
+addEventListener('resize', resize); resize();
+
+let mx = 0.5, my = 0.5;          // normalized mouse, drives interactivity
+addEventListener('pointermove', e => { mx = e.clientX / W; my = e.clientY / H; });
+
+// Curated quartets — each is a known-beautiful, well-spread Clifford. (Pure-random
+// quartets collapse into dull little loops half the time, so we pick from these.)
+const HOMES = [
+  { a: -1.4, b:  1.6, c:  1.0, d:  0.7 },
+  { a:  1.6, b: -0.6, c: -1.2, d:  1.6 },
+  { a:  1.5, b: -1.8, c:  1.6, d:  0.9 },
+  { a: -1.7, b:  1.8, c: -1.9, d: -0.4 },
+  { a: -1.8, b: -2.0, c: -0.5, d: -0.9 },
+  { a:  1.7, b:  1.7, c:  0.6, d:  1.2 },
+];
+let hi = 0;                      // index into HOMES; click advances it
+addEventListener('pointerdown', () => { hi = (hi + 1) % HOMES.length; });
+
+const POINTS = 60000;
+let t = 0, x = 0.1, y = 0.1;
+
+function frame() {
+  t += 0.0035;
+  const home = HOMES[hi];
+  // breathe gently around the curated quartet (small amplitude = stays pretty),
+  // plus a mouse bend you can steer it with.
+  const a = home.a + 0.32 * Math.sin(t) + (mx - 0.5) * 0.7;
+  const b = home.b + 0.32 * Math.cos(t * 0.83) + (my - 0.5) * 0.7;
+  const c = home.c + 0.28 * Math.sin(t * 0.61);
+  const d = home.d + 0.28 * Math.cos(t * 0.47);
+  const range = 1 + Math.max(Math.abs(c), Math.abs(d));
+  const scale = (Math.min(W, H) * 0.42) / range;
+
+  // fade the previous frame a little → soft motion trails as it morphs
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = 'rgba(14,12,18,0.10)';
+  ctx.fillRect(0, 0, W, H);
+
+  // additive pink: density blooms toward cream on its own
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = 'rgba(255,27,92,0.065)';
+  for (let i = 0; i < POINTS; i++) {
+    const nx = Math.sin(a * y) + c * Math.cos(a * x);
+    const ny = Math.sin(b * x) + d * Math.cos(b * y);
+    x = nx; y = ny;
+    ctx.fillRect(cx + x * scale, cy + y * scale, 1.2, 1.2);
+  }
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
+</body>
+</html>
