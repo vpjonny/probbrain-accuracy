@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>the after hours · quantum walk</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0e0c12; overflow: hidden; cursor: crosshair; }
+  canvas { display: block; }
+  #hint {
+    position: fixed; left: 0; right: 0; bottom: 18px; text-align: center;
+    font: 12px/1.6 ui-monospace, monospace; letter-spacing: 3px;
+    color: #6a6472; pointer-events: none; user-select: none;
+  }
+  #hint b { color: #ff6f93; font-weight: 600; }
+  #mode { color: #ffd0dd; }
+  #read {
+    position: fixed; top: 16px; left: 0; right: 0; text-align: center;
+    font: 11px/1.5 ui-monospace, monospace; letter-spacing: 2px;
+    color: #56505e; pointer-events: none; user-select: none;
+  }
+  #read b { color: #ff6f93; font-weight: 600; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="read">THE AFTER HOURS · QUANTUM WALK</div>
+<div id="hint"><b>move</b> to tilt the coin &nbsp;·&nbsp; <b>click</b> to switch to <span id="mode">classical</span></div>
+<script>
+// A discrete-time quantum walk on a line, drawn as a space–time tapestry:
+//   time runs downward, position runs across, brightness = probability.
+//
+// Each step a "coin" (a Hadamard-like rotation) puts the walker into a
+// superposition of going left AND right; then it moves both ways at once.
+// The amplitudes are signed and complex, so the countless paths INTERFERE —
+// some cancel to black, some pile up to cream. That interference is the whole
+// point: a classical coin-flipper just diffuses into a smooth bell curve, but
+// this walker races outward in two bright "horns" laced with fringes that exist
+// nowhere in a classical walk. Click to flip between them and watch the
+// difference appear. No libraries.
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d', { alpha: false });
+const modeEl = document.getElementById('mode');
+const readEl = document.getElementById('read');
+
+const STILL = location.search.indexOf('still') >= 0;   // ?still → weave once, then freeze
+let W, H, NS, TS, center, img, step, quantum = location.search.indexOf('classical') < 0;
+// quantum amplitudes: right-/left-moving coin, each complex (re, im)
+let Rr, Ri, Lr, Li, tRr, tRi, tLr, tLi;
+// classical probability
+let P, tP, prob;
+let mx = 0.5;
+
+// near-black → wine → hot-pink → salmon → cream  (kept saturated so it blooms pink, not gray)
+const STOPS = [[14,12,18],[120,8,46],[255,30,96],[255,140,172],[255,226,234]];
+const rgb = [0,0,0];
+function toneRGB(t) {
+  const s = t * (STOPS.length - 1);
+  const i = Math.min(s | 0, STOPS.length - 2), f = s - i, a = STOPS[i], b = STOPS[i+1];
+  rgb[0] = a[0] + (b[0]-a[0])*f;
+  rgb[1] = a[1] + (b[1]-a[1])*f;
+  rgb[2] = a[2] + (b[2]-a[2])*f;
+}
+
+function alloc() {
+  Rr = new Float64Array(NS); Ri = new Float64Array(NS);
+  Lr = new Float64Array(NS); Li = new Float64Array(NS);
+  tRr = new Float64Array(NS); tRi = new Float64Array(NS);
+  tLr = new Float64Array(NS); tLi = new Float64Array(NS);
+  P = new Float64Array(NS); tP = new Float64Array(NS); prob = new Float64Array(NS);
+}
+
+function reset() {
+  Rr.fill(0); Ri.fill(0); Lr.fill(0); Li.fill(0); P.fill(0);
+  center = NS >> 1;
+  const s = Math.SQRT1_2;
+  Rr[center] = s;            // start in (|right> + i|left>)/√2 → the symmetric walk
+  Li[center] = s;
+  P[center] = 1;             // classical: a sharp delta at the centre
+  step = 0;
+  ctx.fillStyle = '#0e0c12'; ctx.fillRect(0, 0, W, H);
+  img = ctx.getImageData(0, 0, W, H);
+}
+
+function resize() {
+  W = cv.width = innerWidth; H = cv.height = innerHeight;
+  // coarse simulation grid → bold, countable fringes (fat cells, not 1px mush)
+  TS = Math.max(120, Math.min(190, Math.round(H / 5.5)));   // time steps
+  NS = Math.round(TS * 1.5) + 4;                            // positions (cone fits inside)
+  alloc(); reset();
+}
+addEventListener('resize', resize);
+
+addEventListener('pointermove', e => { mx = e.clientX / W; });
+addEventListener('pointerdown', () => {
+  quantum = !quantum;
+  modeEl.textContent = quantum ? 'classical' : 'quantum';   // label = what a click switches TO
+  reset();
+});
+
+function stepQuantum(theta) {
+  const c = Math.cos(theta), s = Math.sin(theta);
+  for (let x = 0; x < NS; x++) {                 // coin: rotation on (right,left) at every site
+    tRr[x] = c*Rr[x] + s*Lr[x];  tRi[x] = c*Ri[x] + s*Li[x];
+    tLr[x] = s*Rr[x] - c*Lr[x];  tLi[x] = s*Ri[x] - c*Li[x];
+  }
+  Rr.fill(0); Ri.fill(0); Lr.fill(0); Li.fill(0);
+  for (let x = 0; x < NS; x++) {                 // shift: right walks +1, left walks −1
+    if (x+1 < NS) { Rr[x+1] = tRr[x]; Ri[x+1] = tRi[x]; }
+    if (x-1 >= 0) { Lr[x-1] = tLr[x]; Li[x-1] = tLi[x]; }
+  }
+}
+
+function stepClassical() {                        // the honest counterpart: pure diffusion
+  for (let x = 0; x < NS; x++) {
+    let v = 0;
+    if (x-1 >= 0) v += 0.5 * P[x-1];
+    if (x+1 < NS) v += 0.5 * P[x+1];
+    tP[x] = v;
+  }
+  P.set(tP);
+}
+
+function drawStep(s) {
+  let max = 0;
+  if (quantum) {
+    for (let x = 0; x < NS; x++) {
+      const p = Rr[x]*Rr[x] + Ri[x]*Ri[x] + Lr[x]*Lr[x] + Li[x]*Li[x];
+      prob[x] = p; if (p > max) max = p;
+    }
+  } else {
+    for (let x = 0; x < NS; x++) { const p = P[x]; prob[x] = p; if (p > max) max = p; }
+  }
+  if (max <= 0) return;
+  // normalise to a FRACTION of the row peak: interior fringes land in vivid pink,
+  // the ballistic horns clip up to cream, the gaps stay near-black.
+  const inv = 1 / (max * 0.42);
+  const y0 = (s * H / TS) | 0, y1 = ((s + 1) * H / TS) | 0;
+  for (let x = 0; x < NS; x++) {
+    let t = Math.pow(prob[x] * inv, 0.55); if (t > 1) t = 1;
+    toneRGB(t);
+    const r = rgb[0], g = rgb[1], b = rgb[2];
+    const x0 = (x * W / NS) | 0, x1 = ((x + 1) * W / NS) | 0;
+    for (let py = y0; py < y1; py++) {
+      let o = (py * W + x0) * 4;
+      for (let px = x0; px < x1; px++) { img.data[o]=r; img.data[o+1]=g; img.data[o+2]=b; img.data[o+3]=255; o+=4; }
+    }
+  }
+}
+
+function frame() {
+  if (step < TS) {
+    const theta = (0.11 + mx * 0.28) * Math.PI;   // mouse → coin angle, ~20°–70°, centred on 45°
+    const K = STILL ? TS : 1;
+    for (let k = 0; k < K && step < TS; k++, step++) {
+      if (quantum) stepQuantum(theta); else stepClassical();
+      drawStep(step);
+    }
+    ctx.putImageData(img, 0, 0);
+    const deg = Math.round((0.11 + mx * 0.28) * 180);
+    readEl.innerHTML = `THE AFTER HOURS · QUANTUM WALK &nbsp;—&nbsp; <b>${quantum ? 'quantum' : 'classical'}</b> · coin ${deg}°`;
+  } else {
+    if (STILL) return;                            // freeze the finished tapestry
+    ctx.fillStyle = 'rgba(14,12,18,0.05)';        // hold, then fade and weave the next one
+    ctx.fillRect(0, 0, W, H);
+    if ((step++ - TS) > 90) reset();
+  }
+  requestAnimationFrame(frame);
+}
+
+resize();
+frame();
+</script>
+</body>
+</html>
