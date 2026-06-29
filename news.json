@@ -1,6 +1,27 @@
 {
-  "generated_at": "2026-06-29T16:20:21Z",
+  "generated_at": "2026-06-29T16:35:20Z",
   "items": [
+    {
+      "id": "simonw|https://simonwillison.net/2026/Jun/29/ornith",
+      "anchor": "bec0eaec6d",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding",
+      "headline": "Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding",
+      "url": "https://simonwillison.net/2026/Jun/29/ornith",
+      "published_at": "2026-06-29T16:17:59Z",
+      "discovered_at": "2026-06-29T16:33:26Z",
+      "description": "<p><strong><a href=\"https://deep-reinforce.com/ornith_1_0.html\">Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding</a></strong></p> This is an interesting new open weights (MIT licensed) model, the first model release from DeepReinforce.</p> <blockquote> <p>[...] with variants including 9B Dense, 31B Dense, 35B MoE, and 397B MoE. Built on top of pretrained Gemma 4 and Qwen 3.5, it achieves state-of-the-art performance among open-source models of comparable size on coding benchmarks.</p> </blockquote> <p>As far as I can tell the licenses of those underlying models is compatible with being used in this way - Gemma 4 is Apache 2.0 licensed (and not bound by the janky additional <a href=\"https://ai.google.dev/gemma/terms\">Gemma Terms of Use</a> that afflicted the previous Gemma models) and Qwen 3.5 is Apache 2.0 licensed as well.</p> <p>I've been running the model using LM Studio and the <a href=\"https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B-GGUF\">ornith-1.0-35b-Q4_K_M.gguf</a> (20GB) GGUF, hooked up to <a href=\"https://pi.dev/\">Pi</a>. Initial impressions are very good - it seems to be able to run the agent harness over many tool calls in a proficient way.</p> <p>Here's <a href=\"https://gisthost.github.io/?35da4d9ce7f0c27124c67655a0dc9e5d\">a terminal session</a> where I asked it to \"find the code that decodes the actor cookie\" and then \"find the code that opens the insert dialog when thebutton is clicked\" against a Datasette checkout, which it handled with ease.</p> <p>I also had it <a href=\"https://gist.github.com/simonw/1869e1bbcafe5bcad0f26351f6a978a6\">draw this pelican</a>, which came out at 103 tokens/second:</p> <p><img alt=\"Cartoon illustration of a white pelican (albeit slightly mangled) with a large orange beak riding a red bicycle across green hills. The scene has a blue sky with a yellow sun and three white clouds, and small grass tufts dot the foreground.\" src=\"https://static.simonwillison.net/static/2024/ornith-1-pelican.png\" /></p> <p>It's a little bit mangled but the pelican is clearly a pelican.</p> <p>I couldn't find much information about DeepReinforce themselves. The earliest paper I could find from the was <a href=\"https://arxiv.org/abs/2507.14111\">CUDA-L1: Improving CUDA Optimization via Contrastive Reinforcement Learning</a> from June 2025. <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/local-llms\">local-llms</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/qwen\">qwen</a>, <a href=\"https://simonwillison.net/tags/pelican-riding-a-bicycle\">pelican-riding-a-bicycle</a>, <a href=\"https://simonwillison.net/tags/gemma\">gemma</a>, <a href=\"https://simonwillison.net/tags/llm-release\">llm-release</a>, <a href=\"https://simonwillison.net/tags/lm-studio\">lm-studio</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
     {
       "id": "github|https://github.com/0xNyk/council-of-high-intelligence",
       "anchor": "13a9722f8d",
@@ -6255,27 +6276,6 @@
       "published_at": "2026-06-02T22:21:52Z",
       "discovered_at": "2026-06-02T22:28:58Z",
       "description": "<p>Microsoft <a href=\"https://microsoft.ai/news/building-a-hillclimbing-machine-launching-seven-new-mai-models/\">announced two new text LLMs</a> this morning - <strong><a href=\"https://microsoft.ai/news/introducing-mai-thinking-1/\">MAI-Thinking-1</a></strong> (reasoning, 35B parameters, available to \"select early partners\") and <strong><a href=\"https://microsoft.ai/news/introducingmai-code-1-flash/\">MAI-Code-1-Flash</a></strong> (5B parameters, \"purpose-built for GitHub Copilot and VS Code to deliver high performance and lower cost [...] rolling out to GitHub Copilot individual users in Visual Studio Code\"). I've not been able to try either of them just yet.</p> <p>It's very interesting to see Microsoft releasing models with such low parameter counts, especially given how expensive larger models are to access right now. They claim MAI-Thinking-1 \"is preferred to Sonnet 4.6 in our blind human side-by-side evaluations\", which is impressive for a 35B model seeing as I frequently run models larger than that on my own laptop.</p> <p>Also <a href=\"https://microsoft.ai/news/introducing-mai-thinking-1/\">of note</a>:</p> <blockquote> <p>We trained [MAI-Thinking-1] from the ground up on enterprise grade, clean and commercially licensed data, without distillation from third-party models.</p> </blockquote> <p>And for <a href=\"https://microsoft.ai/news/introducingmai-code-1-flash/\">MAI-Code-1-Flash</a> as well:</p> <blockquote> <p>It is built end-to-end by Microsoft using clean and appropriately licensed data.</p> </blockquote> <p>I would <em>very much</em> like to learn more about this \"appropriately licensed\" data! Could these be the first generally useful code-specialist models that didn't train on an unlicensed dump of the web?</p> <p>Tags: <a href=\"https://simonwillison.net/tags/llm-release\">llm-release</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/microsoft\">microsoft</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Jun/2/datasette-agent-micropython",
-      "anchor": "c0cf3fedc2",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "datasette-agent-micropython 0.1a0",
-      "headline": "datasette-agent-micropython 0.1a0",
-      "url": "https://simonwillison.net/2026/Jun/2/datasette-agent-micropython",
-      "published_at": "2026-06-02T19:28:36Z",
-      "discovered_at": "2026-06-03T00:14:39Z",
-      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/datasette/datasette-agent-micropython/releases/tag/0.1a0\">datasette-agent-micropython 0.1a0</a></p> <p>I want <a href=\"https://agent.datasette.io\">Datasette Agent</a> to be able to generate and execute Python code safely. This alpha is looking very promising so far. GPT-5.5 has so far failed to break out of the sandbox!</p> <p>Tags: <a href=\"https://simonwillison.net/tags/python\">python</a>, <a href=\"https://simonwillison.net/tags/sandboxing\">sandboxing</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a>, <a href=\"https://simonwillison.net/tags/webassembly\">webassembly</a>, <a href=\"https://simonwillison.net/tags/datasette-agent\">datasette-agent</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
