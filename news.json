@@ -1,6 +1,48 @@
 {
-  "generated_at": "2026-06-30T16:55:17Z",
+  "generated_at": "2026-06-30T17:10:34Z",
   "items": [
+    {
+      "id": "anthropic|https://www.anthropic.com/news/claude-science-ai-workbench",
+      "anchor": "f981f83812",
+      "source_id": "anthropic",
+      "source_name": "Anthropic",
+      "category": "lab",
+      "category_emoji": "🧠",
+      "hashtags": [
+        "lab",
+        "anthropic"
+      ],
+      "title": "Claude Science, an AI workbench for scientists",
+      "headline": "Claude Science, an AI workbench for scientists",
+      "url": "https://www.anthropic.com/news/claude-science-ai-workbench",
+      "published_at": "2026-06-30T17:00:01Z",
+      "discovered_at": "2026-06-30T17:08:45Z",
+      "description": "Claude Science is a customizable app that integrates the tools and packages researchers most often use, produces auditable artifacts, and provides flexible access to computing resources.",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "simonw|https://simonwillison.net/2026/Jun/30/shot-scraper-video",
+      "anchor": "bb5b794b65",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "Have your agent record video demos of its work with shot-scraper video",
+      "headline": "Have your agent record video demos of its work with shot-scraper video",
+      "url": "https://simonwillison.net/2026/Jun/30/shot-scraper-video",
+      "published_at": "2026-06-30T16:54:26Z",
+      "discovered_at": "2026-06-30T17:08:56Z",
+      "description": "<p><a href=\"https://shot-scraper.datasette.io/en/stable/video.html\">shot-scraper video</a> is a new command introduced in today's <a href=\"https://github.com/simonw/shot-scraper/releases/tag/1.10\">shot-scraper 1.10</a> release which accepts a <code>storyboard.yml</code> file defining a routine to run against a web application and uses Playwright to record a video of that routine. I've written before about the importance of <a href=\"https://simonwillison.net/2026/Feb/10/showboat-and-rodney/#proving-code-actually-works\">having coding agents produce demos</a> of their work; this is my latest attempt at enabling them to do that.</p> <p>Here's an example video created using <code>shot-scraper video</code>, exercising a <a href=\"https://github.com/simonw/datasette/pull/2813\">still in development</a> feature adding the ability to create new tables in Datasette from pasted CSV, TSV or JSON data:</p> <div style=\"max-width: 100%; margin-bottom: 0.4em\"> <video controls=\"controls\" preload=\"none\" aria-label=\"Video demo of the new CSV import for Datasette\" poster=\"https://static.simonwillison.net/static/2026/datasette-bulk-insert-demo.jpg\" loop=\"loop\" style=\"width: 100%; height: auto;\" muted=\"muted\"> <source src=\"https://static.simonwillison.net/static/2026/datasette-bulk-insert-demo.mp4\" type=\"video/mp4\" /> </video> </div> <p>That video was created <a href=\"\">by running this command</a>:</p> <div class=\"highlight highlight-source-shell\"><pre>shot-scraper video datasette-bulk-insert-storyboard.yml \\ --auth datasette-demo-auth.json --mp4</pre></div> <p>(That <code>--auth</code> JSON file <a href=\"https://gist.github.com/simonw/287b26aff53fcb72942b19f5b69d7e5c\">contains a cookie</a>, as <a href=\"https://shot-scraper.datasette.io/en/stable/authentication.html\">described here</a> in the documentation.)</p> <p>Here's the <code>datasette-bulk-insert-storyboard.yml</code> file:</p> <div class=\"highlight highlight-source-yaml\"><pre><span class=\"pl-ent\">output</span>: <span class=\"pl-s\">/tmp/datasette-bulk-insert-demo.webm</span> <span class=\"pl-ent\">server</span>: - <span class=\"pl-s\">uv</span> - <span class=\"pl-s\">--directory</span> - <span class=\"pl-s\">/Users/simon/Dropbox/dev/datasette</span> - <span class=\"pl-s\">run</span> - <span class=\"pl-s\">datasette</span> - <span class=\"pl-s\">-p</span> - <span class=\"pl-c1\">6419</span> - <span class=\"pl-s\">--root</span> - <span class=\"pl-s\">--secret</span> - <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>1<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-s\">/tmp/demo.db</span> <span class=\"pl-ent\">url</span>: <span class=\"pl-s\">http://127.0.0.1:6419/demo/tasks</span> <span class=\"pl-ent\">viewport</span>: <span class=\"pl-ent\">width</span>: <span class=\"pl-c1\">1280</span> <span class=\"pl-ent\">height</span>: <span class=\"pl-c1\">720</span> <span class=\"pl-ent\">cursor</span>: <span class=\"pl-c1\">true</span> <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">'</span>button[data-table-action=\"insert-row\"]<span class=\"pl-pds\">'</span></span> <span class=\"pl-ent\">javascript</span>: <span class=\"pl-s\">|</span> <span class=\"pl-s\"> (() =&gt; {</span> <span class=\"pl-s\"> let clipboardText = \"\";</span> <span class=\"pl-s\"> Object.defineProperty(navigator, \"clipboard\", {</span> <span class=\"pl-s\"> configurable: true,</span> <span class=\"pl-s\"> get: () =&gt; ({</span> <span class=\"pl-s\"> writeText: async (text) =&gt; {</span> <span class=\"pl-s\"> clipboardText = String(text);</span> <span class=\"pl-s\"> },</span> <span class=\"pl-s\"> readText: async () =&gt; clipboardText,</span> <span class=\"pl-s\"> }),</span> <span class=\"pl-s\"> });</span> <span class=\"pl-s\"> })();</span> <span class=\"pl-s\"></span><span class=\"pl-ent\">scenes</span>: - <span class=\"pl-ent\">name</span>: <span class=\"pl-s\">Bulk insert existing table rows</span> <span class=\"pl-ent\">do</span>: - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.8</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">'</span>button[data-table-action=\"insert-row\"]<span class=\"pl-pds\">'</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>#row-edit-dialog[open]<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.5</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.row-edit-bulk-insert<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.row-edit-bulk-textarea<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.5</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.row-edit-copy-template<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>text=Copied<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.8</span> - <span class=\"pl-ent\">fill</span>: <span class=\"pl-ent\">into</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.row-edit-bulk-textarea<span class=\"pl-pds\">\"</span></span> <span class=\"pl-ent\">text</span>: <span class=\"pl-s\">|</span> <span class=\"pl-s\"> title,owner,status,priority,notes</span> <span class=\"pl-s\"> Prepare release video,Ana,doing,1,Recorded with shot-scraper</span> <span class=\"pl-s\"> Check pasted CSV import,Ben,review,3,Previewed before inserting</span> <span class=\"pl-s\"> Share the branch demo,Chen,queued,2,Bulk insert creates three rows</span> <span class=\"pl-s\"></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.8</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.row-edit-save<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>text=Previewing 3 rows.<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">1.2</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.row-edit-save<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>text=3 rows inserted.<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">1.0</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.row-edit-cancel<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>text=Prepare release video<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">1.0</span> - <span class=\"pl-ent\">name</span>: <span class=\"pl-s\">Create a table from pasted CSV</span> <span class=\"pl-ent\">open</span>: <span class=\"pl-s\">http://127.0.0.1:6419/demo</span> <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">'</span>details.actions-menu-links summary<span class=\"pl-pds\">'</span></span> <span class=\"pl-ent\">do</span>: - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.8</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">'</span>details.actions-menu-links summary<span class=\"pl-pds\">'</span></span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">'</span>button[data-database-action=\"create-table\"]<span class=\"pl-pds\">'</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>#table-create-dialog[open]<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.5</span> - <span class=\"pl-ent\">fill</span>: <span class=\"pl-ent\">into</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.table-create-table-name<span class=\"pl-pds\">\"</span></span> <span class=\"pl-ent\">text</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>launch_metrics<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.table-create-from-data<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.table-create-data-textarea<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.5</span> - <span class=\"pl-ent\">fill</span>: <span class=\"pl-ent\">into</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.table-create-data-textarea<span class=\"pl-pds\">\"</span></span> <span class=\"pl-ent\">text</span>: <span class=\"pl-s\">|</span> <span class=\"pl-s\"> metric_id,name,score,recorded_on</span> <span class=\"pl-s\"> m001,Activation rate,87.5,2026-06-29</span> <span class=\"pl-s\"> m002,Retention check,72.25,2026-06-30</span> <span class=\"pl-s\"> m003,CSV import health,95,2026-07-01</span> <span class=\"pl-s\"></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">0.8</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.table-create-save<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>text=Previewing 3 rows.<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">1.2</span> - <span class=\"pl-ent\">click</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>.table-create-save<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for_url</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>**/demo/launch_metrics<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">wait_for</span>: <span class=\"pl-s\"><span class=\"pl-pds\">\"</span>text=Activation rate<span class=\"pl-pds\">\"</span></span> - <span class=\"pl-ent\">pause</span>: <span class=\"pl-c1\">1.2</span></pre></div> <p>The <a href=\"https://shot-scraper.datasette.io/en/stable/video.html\">video command documentation</a> includes simpler examples, but for the purpose of this post I thought I'd go with something more comprehensive.</p> <p>That demo YAML storyboard was constructed entirely by GPT-5.5 xhigh running in Codex Desktop, using the following prompt run inside my <code>~/dev/datasette</code> checkout of <a href=\"https://github.com/simonw/datasette/commits/b759ea548606bc9bf9a4bf0e33e2d57ead7e0ab8/\">this branch</a>:</p> <blockquote> <p><code>Review the changes on this branch.</code></p> <p><code>cd to ~/dev/shot-scraper and run the command \"uv run shot-scraper video --help\"</code></p> <p><code>Now use that new video command to record a video demo of the new features from this branch, including running a \"uv run datasette -p 6419 --root --secret 1 /tmp/demo.db\" development server so you can record the video against a demo DB that you first create.</code></p> </blockquote> <p>Now that I've released the feature the prompt could say \"<code>run uvx shot-scraper video --help</code>\" instead and it should achieve the same result.</p> <p>I really like this pattern where the <code>--help</code> output for a command provides enough detail that a coding agent can use it - it works kind of like bundling a <code>SKILL.md</code> file directly inside the tool. I used the same pattern for <a href=\"https://simonwillison.net/2026/Feb/10/showboat-and-rodney/\">showboat and rodney</a>.</p> <h4 id=\"how-i-built-this\">How I built this</h4> <p><code>shot-scraper video</code> started as an experimental prototype. <code>shot-scraper</code> is built on top of <a href=\"https://playwright.dev/\">Playwright</a>, and the key feature it needed was for Playwright to be able to record video of browser sessions with enough control to create the desired demo.</p> <p>I first tried this a few years ago and found that the Playwright-produced videos included additional chrome that was useful for debugging a test failure but unwanted for a product demo.</p> <p>They fixed that a while ago, but there were still some minor blockers. In particular I was getting <a href=\"https://github.com/simonw/shot-scraper/pull/194/changes/c2f3b3a52ba84f2adcf3ad6da4d39c2570328584#issuecomment-4724459369\">a few white frames at the start of the videos</a>, since the recording mechanism kicked in before the first URL was loaded by the browser.</p> <p>Playwright 1.59 added a new <a href=\"https://playwright.dev/python/docs/api/class-screencast\">screencast mechanism</a> providing much more finely grained control over video recording. This was very nearly what I needed, but the resulting videos were fixed at 800px wide.</p> <p>I found a <a href=\"https://github.com/microsoft/playwright/pull/41183\">landed PR fixing that</a> but it wasn't yet in a release. Then yesterday they shipped it in <a href=\"https://github.com/microsoft/playwright-python/releases/tag/v1.61.0\">playwright-python 1.61.0</a> and I was finally unblocked to finish implementing the feature!</p> <p>The code itself was all written by GPT-5.5 xhigh in Codex Desktop. I had it write the documentation as well which gave me a very useful frame for reviewing the design - much of the iteration on the feature came from reviewing that documentation, spotting things that were redundant, inconsistent or confusing, and requesting (or dictating) a better design.</p> <p>The YAML format itself was mostly defined by the coding agent. I had it <a href=\"https://github.com/simonw/shot-scraper/blob/1.10/shot_scraper/video.py#L24\">use Pydantic</a> to both define and validate the format, partly to make the design easier to review.</p> <p>This is a great example of the kind of feature that I almost certainly wouldn't have taken on without coding agent support. I filed the <a href=\"https://github.com/simonw/shot-scraper/issues/142\">original issue</a> in February 2024, and had difficulty finding the necessary time to solve this in amongst all of my other projects.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/projects\">projects</a>, <a href=\"https://simonwillison.net/tags/python\">python</a>, <a href=\"https://simonwillison.net/tags/yaml\">yaml</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a>, <a href=\"https://simonwillison.net/tags/playwright\">playwright</a>, <a href=\"https://simonwillison.net/tags/shot-scraper\">shot-scraper</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/pydantic\">pydantic</a>, <a href=\"https://simonwillison.net/tags/coding-agents\">coding-agents</a>, <a href=\"https://simonwillison.net/tags/agentic-engineering\">agentic-engineering</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
     {
       "id": "deepmind|https://deepmind.google/blog/start-building-with-nano-banana-2-lite-and-gemini-omni-flash",
       "anchor": "9bb99b6b73",
@@ -1488,6 +1530,48 @@
       "published_at": "2026-06-30T00:00:00Z",
       "discovered_at": "2026-06-30T16:08:19Z",
       "description": "OpenAI engineers used large-scale core dump analysis to debug rare infrastructure crashes, uncovering both a hardware fault and a long-standing software bug.",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "openai|https://openai.com/index/introducing-genebench-pro",
+      "anchor": "aa14916a61",
+      "source_id": "openai",
+      "source_name": "OpenAI",
+      "category": "lab",
+      "category_emoji": "🧠",
+      "hashtags": [
+        "lab",
+        "openai"
+      ],
+      "title": "Introducing GeneBench-Pro",
+      "headline": "Introducing GeneBench-Pro",
+      "url": "https://openai.com/index/introducing-genebench-pro",
+      "published_at": "2026-06-30T00:00:00Z",
+      "discovered_at": "2026-06-30T17:08:46Z",
+      "description": "Introducing GeneBench-Pro, a new benchmark testing AI performance in genomics, biology, and scientific research using complex, real-world datasets.",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "openai|https://openai.com/index/genebench-pro/case-studies",
+      "anchor": "15c6e059ae",
+      "source_id": "openai",
+      "source_name": "OpenAI",
+      "category": "lab",
+      "category_emoji": "🧠",
+      "hashtags": [
+        "lab",
+        "openai"
+      ],
+      "title": "Inside Genebench-Pro",
+      "headline": "Inside Genebench-Pro",
+      "url": "https://openai.com/index/genebench-pro/case-studies",
+      "published_at": "2026-06-30T00:00:00Z",
+      "discovered_at": "2026-06-30T17:08:46Z",
+      "description": "",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -4475,27 +4559,6 @@
       "summarized_at": null
     },
     {
-      "id": "anthropic|https://www.anthropic.com/research/claude-4-cyber",
-      "anchor": "5db11a8d77",
-      "source_id": "anthropic",
-      "source_name": "Anthropic",
-      "category": "lab",
-      "category_emoji": "🧠",
-      "hashtags": [
-        "lab",
-        "anthropic"
-      ],
-      "title": "Cyber evaluations of Claude 4",
-      "headline": "Cyber evaluations of Claude 4",
-      "url": "https://www.anthropic.com/research/claude-4-cyber",
-      "published_at": "2026-06-17T16:47:45Z",
-      "discovered_at": "2026-06-17T16:54:37Z",
-      "description": "We partnered with Pattern Labs on a range of cybersecurity evaluations of Claude Opus 4 and Claude Sonnet 4, with Opus demonstrating especially notable improvement over previous models.",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
       "id": "interconnects|https://www.interconnects.ai/p/state-of-the-blog-mid-2026",
       "anchor": "3614a54769",
       "source_id": "interconnects",
@@ -5567,27 +5630,6 @@
       "summarized_at": "2026-06-13T04:07:00Z"
     },
     {
-      "id": "openai|https://openai.com/index/prc-linked-influence-operations-ai-debates",
-      "anchor": "840cb82093",
-      "source_id": "openai",
-      "source_name": "OpenAI",
-      "category": "lab",
-      "category_emoji": "🧠",
-      "hashtags": [
-        "lab",
-        "openai"
-      ],
-      "title": "PRC-linked influence operations are targeting AI debates in the US",
-      "headline": "PRC-linked influence operations are targeting AI debates in the US",
-      "url": "https://openai.com/index/prc-linked-influence-operations-ai-debates",
-      "published_at": "2026-06-10T12:00:00Z",
-      "discovered_at": "2026-06-10T20:04:28Z",
-      "description": "A new report from OpenAI details PRC-linked influence operations using AI to target U.S. tech debates, data center narratives, tariffs, and false claims about ChatGPT.",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
       "id": "deepmind|https://deepmind.google/blog/investing-in-multi-agent-ai-safety-research",
       "anchor": "6db3992af2",
       "source_id": "deepmind",
@@ -5667,27 +5709,6 @@
       "published_at": "2026-06-10T00:37:25Z",
       "discovered_at": "2026-06-10T00:45:15Z",
       "description": "<p><strong><a href=\"https://jonready.com/blog/posts/claude-fable5-is-allowed-to-sabotage-your-app-if-youre-a-competitor.html\">If Claude Fable stops helping you, you&#x27;ll never know</a></strong></p> Jonathon Ready highlights one of the more eyebrow-raising details from the <a href=\"https://www-cdn.anthropic.com/d00db56fa754a1b115b6dd7cb2e3c342ee809620.pdf\">319 page system card</a> for Fable 5 and Mythos 5. Here's a longer excerpt, highlights mine:</p> <blockquote> <p>In light of the ability of recent models to <a href=\"https://www.anthropic.com/institute/recursive-self-improvement\">accelerate their own development</a>, we’ve <strong>implemented new interventions</strong> that limit Claude’s effectiveness for requests targeting frontier LLM development (for example, on <strong>building pretraining pipelines, distributed training infrastructure, or ML accelerator design</strong>). Using Claude to develop competing models already violates our <a href=\"https://www.anthropic.com/legal/consumer-terms\">Terms of Service</a>, but enforcing this restriction through our safeguards avoids accelerating the actors most willing to violate these terms.</p> <p>Unlike our interventions for cybersecurity, biology and chemistry, and distillation attempts, <strong>these safeguards will not be visible to the user</strong>. Fable 5 will not fall back to a different model. Instead, the safeguards will limit effectiveness through methods such as prompt modification, steering vectors, or parameter-efficient fine-tuning (PEFT). These interventions will not affect the vast majority of coding work. We estimate they will impact ~0.03% of traffic, concentrated in fewer than 0.1% of organizations.</p> </blockquote> <p>I believe this is the first time Anthropic have announced these kinds of silent interventions. The justification still feels pretty science-fiction to me - the linked article talks about \"recursive self-improvement\". I'm not at all keen on a model that silently corrupts its replies to questions about \"ML accelerator design\" purely to slow down research that might conflict with Anthropic's own goals! <p><small></small>Via <a href=\"https://news.ycombinator.com/item?id=48467896\">Hacker News</a></small></p> <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/anthropic\">anthropic</a>, <a href=\"https://simonwillison.net/tags/claude\">claude</a>, <a href=\"https://simonwillison.net/tags/ai-ethics\">ai-ethics</a>, <a href=\"https://simonwillison.net/tags/claude-mythos\">claude-mythos</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "openai|https://openai.com/index/lseg",
-      "anchor": "898c25acb1",
-      "source_id": "openai",
-      "source_name": "OpenAI",
-      "category": "lab",
-      "category_emoji": "🧠",
-      "hashtags": [
-        "lab",
-        "openai"
-      ],
-      "title": "From data to decisions: how LSEG is scaling trusted AI",
-      "headline": "From data to decisions: how LSEG is scaling trusted AI",
-      "url": "https://openai.com/index/lseg",
-      "published_at": "2026-06-10T00:00:00Z",
-      "discovered_at": "2026-06-10T09:01:39Z",
-      "description": "See how LSEG uses OpenAI to scale trusted AI across its global business, accelerating insights, shrinking release cycles, and empowering 4,000 employees.",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -6255,27 +6276,6 @@
       "published_at": "2026-06-03T17:13:57Z",
       "discovered_at": "2026-06-03T17:20:51Z",
       "description": "The legendary Microsoft CEO makes his first Latent Space appearance!",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Jun/3/uber-caps-usage",
-      "anchor": "3855d339e1",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "Uber Caps Usage of AI Tools Like Claude Code to Manage Costs",
-      "headline": "Uber Caps Usage of AI Tools Like Claude Code to Manage Costs",
-      "url": "https://simonwillison.net/2026/Jun/3/uber-caps-usage",
-      "published_at": "2026-06-03T12:01:27Z",
-      "discovered_at": "2026-06-03T12:19:01Z",
-      "description": "<p><strong><a href=\"https://www.bloomberg.com/news/articles/2026-06-02/uber-caps-usage-of-ai-tools-like-claude-code-to-cut-costs\">Uber Caps Usage of AI Tools Like Claude Code to Manage Costs</a></strong></p> I wrote <a href=\"https://simonwillison.net/2026/May/27/product-market-fit/#the-ai-failure-stories-around-this-are-pretty-thin\">the other day</a> about Uber blowing its 2026 AI budget in four months, and how that wasn't particularly surprising given they would have set that budget in 2025, before anyone could have predicted how popular token-burning coding agents were about to become.</p> <p>Natalie Lung for Bloomberg:</p> <blockquote> <p>The rideshare giant is limiting all employees to $1,500 in monthly token spending per AI coding tool, an Uber spokesperson said in response to a Bloomberg News inquiry. That means spending on one tool doesn’t have a bearing on the budget for another. The limits, which have been instituted in recent months, only apply to agentic coding software such as Cursor or Anthropic PBC’s Claude Code.</p> </blockquote> <p>A $1,500 monthly limit per tool strikes me as <em>much</em> more sensible than those <a href=\"https://en.wikipedia.org/wiki/Token_maxxing\">tokenmaxxing</a> leaderboards encouraging employees to compete for as much AI usage as possible, and as a rational policy response to over-spending.</p> <p>It's also interesting in that it hints at a real dollar value for what Uber is getting out of these tools. If we assume two actively used tools per engineer that's $3,000 * 12 = $36,000 cap per engineer per year. Levels.fyi lists <a href=\"https://www.levels.fyi/companies/uber/salaries/software-engineer?country=254\">the median yearly compensation package for Uber software engineers in the USA</a> at $330,000.</p> <p>That means each employee's AI spending cap is ~11% of that median compensation package.</p> <p>I <a href=\"https://simonwillison.net/2026/May/27/product-market-fit/#enterprise-customers-are-now-paying-api-prices\">noted</a> that my own token usage comes to about $1,000/month against each of Anthropic and OpenAI - which currently costs me just $100 per provider thanks to their generous subsidized plans for individual subscribers - plans that are no longer available to larger companies like Uber.</p> <p>That means if I were working at Uber I'd still have ~$500/month of tokens to spare for each of those tools, given my current usage patterns. <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/llm-pricing\">llm-pricing</a>, <a href=\"https://simonwillison.net/tags/coding-agents\">coding-agents</a>, <a href=\"https://simonwillison.net/tags/uber\">uber</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
