@@ -1,6 +1,27 @@
 {
-  "generated_at": "2026-07-02T18:37:33Z",
+  "generated_at": "2026-07-02T18:52:34Z",
   "items": [
+    {
+      "id": "simonw|https://simonwillison.net/2026/Jul/2/dspy-datasette-agent-prompts",
+      "anchor": "3639f02ed7",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "Using DSPy to evaluate and improve Datasette Agent's SQL system prompts",
+      "headline": "Using DSPy to evaluate and improve Datasette Agent's SQL system prompts",
+      "url": "https://simonwillison.net/2026/Jul/2/dspy-datasette-agent-prompts",
+      "published_at": "2026-07-02T18:25:00Z",
+      "discovered_at": "2026-07-02T18:50:40Z",
+      "description": "<p><strong>Research:</strong> <a href=\"https://github.com/simonw/research/tree/main/dspy-datasette-agent-prompts#readme\">Using DSPy to evaluate and improve Datasette Agent&#x27;s SQL system prompts</a></p> <p>One of this morning's AIE keynotes covered <a href=\"https://github.com/stanfordnlp/dspy\">dspy</a>, which reminded me I've been meaning to see if it could help me improve the system prompt used by <a href=\"https://agent.datasette.io\">Datasette Agent</a> - so I fired off an asynchronous research task in Claude Code for web using Claude Fable 5:</p> <blockquote> <p><code>Pip install the latest Datasette alpha and datasette-agent and dspy - then figure out how to use dspy to evaluate and improve the main system prompts used by Datasette Agent for the feature where it can execute read only SQL queries to answer user questions about data.</code></p> </blockquote> <p>Fable chose to test using GPT 4.1 mini and nano, and identified several promising looking directions for improvements. I particularly like this one:</p> <blockquote> <p>The schema listing gives only table names; the \"don't call describe_table if you already have the information\" advice caused column-name guessing (page_count, o.order_id, first_name) and error-retry loops in baseline traces. Either include column names in the prompt's schema listing or soften that advice.</p> </blockquote> <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/evals\">evals</a>, <a href=\"https://simonwillison.net/tags/dspy\">dspy</a>, <a href=\"https://simonwillison.net/tags/datasette-agent\">datasette-agent</a>, <a href=\"https://simonwillison.net/tags/claude-mythos\">claude-mythos</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
     {
       "id": "hn|https://clashreport.com/world/articles/spain-orders-blacklist-of-us-tech-giant-palantir-from-public-and-private-companies-fsnc2z17gjv",
       "anchor": "32f9eee3a5",
@@ -6297,27 +6318,6 @@
       "published_at": "2026-06-07T23:56:38Z",
       "discovered_at": "2026-06-08T00:12:13Z",
       "description": "<p><strong>Release:</strong> <a href=\"https://github.com/datasette/datasette-agent-edit/releases/tag/0.1a0\">datasette-agent-edit 0.1a0</a></p> <p>I'm planning several plugins for Datasette Agent which can make edits to existing pieces of text - things like collaborative Markdown editing, updating large SQL queries, and editing SVG files.</p> <p>Agentic editing of text is a little tricky to get right. My favorite published design for this is for the <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool#use-the-text-editor-tool\">Claude text editor</a>, which implements the following tools:</p> <ul> <li><code>view</code> - view sections of a file, with line numbers added to every line.</li> <li><code>str_replace</code> - find an exact <code>old_str</code> and replace it with <code>new_str</code> - fail if the original string is not unique</li> <li><code>insert</code> - insert the specified text after the specified line number</li> </ul> <p>Rather than recreate these patterns for every plugin that needs them I decided to create this base plugin, <code>datasette-agent-edit</code>, which implements the core tools in a way that allows them to be adapted for other plugins.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/llm-tool-use\">llm-tool-use</a>, <a href=\"https://simonwillison.net/tags/datasette-agent\">datasette-agent</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Jun/6/openai-help-lockdown-mode",
-      "anchor": "b70d5fd9d3",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "OpenAI Help: Lockdown Mode",
-      "headline": "OpenAI Help: Lockdown Mode",
-      "url": "https://simonwillison.net/2026/Jun/6/openai-help-lockdown-mode",
-      "published_at": "2026-06-06T23:56:40Z",
-      "discovered_at": "2026-06-06T00:40:56Z",
-      "description": "<p><strong><a href=\"https://help.openai.com/en/articles/20001061-lockdown-mode\">OpenAI Help: Lockdown Mode</a></strong></p> OpenAI first teased this <a href=\"https://openai.com/index/introducing-lockdown-mode-and-elevated-risk-labels-in-chatgpt/\">in February</a>, but now it's live and \"rolling out to eligible personal accounts, including Free, Go, Plus, and Pro, and self-serve ChatGPT Business accounts\":</p> <blockquote> <p>Lockdown Mode is designed to help prevent the final stage of data exfiltration from a prompt injection attack by limiting outbound network requests that could transfer sensitive data to an attacker. Lockdown Mode does not prevent prompt injections from appearing in the content ChatGPT processes. For example, a prompt injection could appear in cached web content or in an uploaded file, and could still affect the behavior or accuracy of a response.</p> </blockquote> <p>This looks really good to me.</p> <p>The <a href=\"https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/\">Lethal Trifecta</a> occurs when an LLM system has access to all three of access to private data, exposure to untrusted content and a way to steal data and transmit it back to the attacker.</p> <p>The only way to solve the trifecta is to cut off one of the three legs, and by far the easiest leg to restrict without making your LLM systems far less useful is the exfiltration vectors to steal data.</p> <p>It looks to me like lockdown mode directly attacks that leg, using mechanisms that are deterministic and, crucially, are not evaluated by AI systems that themselves can be subverted by sufficiently devious attacks. <p>Tags: <a href=\"https://simonwillison.net/tags/security\">security</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/openai\">openai</a>, <a href=\"https://simonwillison.net/tags/prompt-injection\">prompt-injection</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/lethal-trifecta\">lethal-trifecta</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
