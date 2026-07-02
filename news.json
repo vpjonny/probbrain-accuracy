@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T22:08:52Z",
+  "generated_at": "2026-07-02T22:23:16Z",
   "items": [
     {
       "id": "latentspace|https://www.latent.space/p/the-website-of-the-future",
@@ -18,6 +18,27 @@
       "published_at": "2026-07-02T21:25:14Z",
       "discovered_at": "2026-07-02T21:36:13Z",
       "description": "Adobe is experimenting with “agentic sites” that generate pages around an individual user’s intent. At AIEWF, we talked to Carlos Sanchez about the Web's future.",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "simonw|https://simonwillison.net/2026/Jul/2/llm-coding-agent",
+      "anchor": "9e33098402",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "llm-coding-agent 0.1a0",
+      "headline": "llm-coding-agent 0.1a0",
+      "url": "https://simonwillison.net/2026/Jul/2/llm-coding-agent",
+      "published_at": "2026-07-02T19:33:12Z",
+      "discovered_at": "2026-07-02T22:21:32Z",
+      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/simonw/llm-coding-agent/releases/tag/0.1a0\">llm-coding-agent 0.1a0</a></p> <p>Another Fable 5 experiment. Now that my <a href=\"https://llm.datasette.io/\">LLM library</a> has evolved into more of an agent framework it's time to see what a simple coding agent would look like built on it.</p> <p>I started a <a href=\"https://github.com/simonw/llm-coding-agent/tree/2466fa03ba8e5122c3bfa93d52167d33bce40ac6\">new Python library</a> using my <a href=\"https://github.com/simonw/python-lib-template-repository\">python-lib-template-repository</a> GitHub template repository, then ran these two prompts (here's the <a href=\"https://claude.ai/code/session_01TEUBvBbMipbFSoqjMiJ7ha\">Claude Code for web transcript</a>):</p> <blockquote> <p><code>Write a spec.md for this project - it will depend on the latest “llm” alpha from PyPI and implement a Claude code style coding agent complete with tools for reading and editing files and executing commands</code></p> </blockquote> <p>Then:</p> <blockquote> <p><code>Commit the spec, then build it using red/green TDD in a series of sensible commits (each with passing tests and updated docs) - occasionally manually test it using the OpenAI API key in your environment</code></p> </blockquote> <p>Here's the <a href=\"https://github.com/simonw/llm-coding-agent/blob/0.1a0/README.md\">resulting README file</a> and the <a href=\"https://github.com/simonw/llm-coding-agent/commits/0.1a0\">sequence of commits</a>.</p> <p>I've shipped a slop-alpha to PyPI, so you can run the new agent like this:</p> <pre><code>uvx --prerelease=allow --with llm-coding-agent llm code </code></pre> <p>It's pretty good for a first attempt! Here's the (Fable-authored) <a href=\"https://github.com/simonw/llm-coding-agent/blob/0.1a0/README.md\">README</a>, which lists recipes like <code>llm code --yolo</code> and <code>llm code --allow \"pytest*\" --allow \"git diff*\"</code>.</p> <p>It also presents <a href=\"https://github.com/simonw/llm-coding-agent/blob/0.1a0/README.md#codingagent\">a Python API</a> based around a <code>CodingAgent(model=\"gpt-5.5\", root=\"/path\", approve=True).run(\"Fix the failing test in tests/test_parser.py\")</code> class which I didn't ask for but I'm delighted to see implemented.</p> <p>Here's the suite of tools <a href=\"https://github.com/simonw/llm-coding-agent/blob/0.1a0/llm_coding_agent/tools.py#L22\">it implemented</a>, listed using <code>uvx ... llm tools</code>:</p> <blockquote> <p><code>CodingTools_edit_file(path: str, old_string: str, new_string: str, replace_all: bool = False) -&gt; str</code></p> <p>Replace an exact string in a file.</p> <p>old_string must match the file contents exactly (including whitespace) and must identify a unique location unless replace_all is true. Returns a diff of the change so it can be verified.</p> <p><code>CodingTools_execute_command(command: str, timeout: int = 120) -&gt; str</code></p> <p>Run a shell command in the session root directory.</p> <p>Returns combined stdout and stderr followed by an Exit code line. timeout is in seconds (maximum 600); on timeout the whole process tree is killed.</p> <p><code>CodingTools_list_files(pattern: str = '**/*', path: str = '.') -&gt; str</code></p> <p>List files matching a glob pattern, newest first.</p> <p>Skips hidden directories, node_modules, __pycache__ and (in a git repository) anything covered by .gitignore. Returns at most 200 paths relative to the searched directory.</p> <p><code>CodingTools_read_file(path: str, offset: int = 0, limit: int = 2000) -&gt; str</code></p> <p>Read a text file, returning numbered lines like cat -n.</p> <p>Paths are relative to the session root. Use offset (0-based first line) and limit (max lines) to page through files too large to read in one call.</p> <p><code>CodingTools_search_files(pattern: str, path: str = '.', glob: str = None, max_results: int = 100) -&gt; str</code></p> <p>Search file contents for a regular expression.</p> <p>Returns matches as path:line_number:line, capped at max_results. Use glob (e.g. \"*.py\") to restrict which files are searched.</p> <p><code>CodingTools_write_file(path: str, content: str) -&gt; str</code></p> <p>Create or overwrite a file with the given content.</p> <p>Parent directories are created as needed. Prefer edit_file for modifying existing files.</p> </blockquote> <p>Tags: <a href=\"https://simonwillison.net/tags/projects\">projects</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llm\">llm</a>, <a href=\"https://simonwillison.net/tags/llm-tool-use\">llm-tool-use</a>, <a href=\"https://simonwillison.net/tags/coding-agents\">coding-agents</a>, <a href=\"https://simonwillison.net/tags/claude-code\">claude-code</a>, <a href=\"https://simonwillison.net/tags/claude-mythos\">claude-mythos</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -2816,6 +2837,27 @@
       "summarized_at": null
     },
     {
+      "id": "hn|https://www.mixedbread.com/blog/asymmetric-quant",
+      "anchor": "969f042f9f",
+      "source_id": "hn",
+      "source_name": "Hacker News",
+      "category": "community",
+      "category_emoji": "🔥",
+      "hashtags": [
+        "community",
+        "hn"
+      ],
+      "title": "Asymmetric Quantization: Near-Lossless Retrieval with 97% Storage Reduction",
+      "headline": "Asymmetric Quantization: Near-Lossless Retrieval with 97% Storage Reduction",
+      "url": "https://www.mixedbread.com/blog/asymmetric-quant",
+      "published_at": "2026-06-29T19:42:15Z",
+      "discovered_at": "2026-07-02T22:21:32Z",
+      "description": "HN score 100 · 39 comments",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
       "id": "hn|https://github.com/deepreinforce-ai/Ornith-1",
       "anchor": "9e123d43fc",
       "source_id": "hn",
@@ -3063,27 +3105,6 @@
       "published_at": "2026-06-29T07:00:00Z",
       "discovered_at": "2026-06-29T10:33:03Z",
       "description": "A new OpenAI report maps how AI could reshape jobs across the EU, highlighting which occupations may face automation, growth, or workflow changes.",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "hn|https://github.com/ogulcancelik/herdr",
-      "anchor": "4f86c29458",
-      "source_id": "hn",
-      "source_name": "Hacker News",
-      "category": "community",
-      "category_emoji": "🔥",
-      "hashtags": [
-        "community",
-        "hn"
-      ],
-      "title": "Herdr: Agent multiplexer that lives in your terminal",
-      "headline": "Herdr: Agent multiplexer that lives in your terminal",
-      "url": "https://github.com/ogulcancelik/herdr",
-      "published_at": "2026-06-29T04:27:46Z",
-      "discovered_at": "2026-06-29T14:03:16Z",
-      "description": "HN score 102 · 68 comments",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -6297,27 +6318,6 @@
       "published_at": "2026-06-08T13:04:59Z",
       "discovered_at": "2026-06-09T13:10:48Z",
       "description": "Results from a randomized controlled trial show the potential of Gemini’s Guided Learning feature to boost engagement and accelerate learning.",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Jun/7/datasette-agent-edit",
-      "anchor": "c02c4c7273",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "datasette-agent-edit 0.1a0",
-      "headline": "datasette-agent-edit 0.1a0",
-      "url": "https://simonwillison.net/2026/Jun/7/datasette-agent-edit",
-      "published_at": "2026-06-07T23:56:38Z",
-      "discovered_at": "2026-06-08T00:12:13Z",
-      "description": "<p><strong>Release:</strong> <a href=\"https://github.com/datasette/datasette-agent-edit/releases/tag/0.1a0\">datasette-agent-edit 0.1a0</a></p> <p>I'm planning several plugins for Datasette Agent which can make edits to existing pieces of text - things like collaborative Markdown editing, updating large SQL queries, and editing SVG files.</p> <p>Agentic editing of text is a little tricky to get right. My favorite published design for this is for the <a href=\"https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool#use-the-text-editor-tool\">Claude text editor</a>, which implements the following tools:</p> <ul> <li><code>view</code> - view sections of a file, with line numbers added to every line.</li> <li><code>str_replace</code> - find an exact <code>old_str</code> and replace it with <code>new_str</code> - fail if the original string is not unique</li> <li><code>insert</code> - insert the specified text after the specified line number</li> </ul> <p>Rather than recreate these patterns for every plugin that needs them I decided to create this base plugin, <code>datasette-agent-edit</code>, which implements the core tools in a way that allows them to be adapted for other plugins.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/llm-tool-use\">llm-tool-use</a>, <a href=\"https://simonwillison.net/tags/datasette-agent\">datasette-agent</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
