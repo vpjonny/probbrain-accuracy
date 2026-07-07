@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07T04:25:19Z",
+  "generated_at": "2026-07-07T04:40:08Z",
   "items": [
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.02668",
@@ -181,14 +181,14 @@
         "arxiv"
       ],
       "title": "Where do LLMs Fall Short in CBT-Guided Affective Reasoning?",
-      "headline": "Where do LLMs Fall Short in CBT-Guided Affective Reasoning?",
+      "headline": "LLMs achieve high CBT theory scores but fail in application; a multiple chain-of-thought framework improves strategy selection in CBT-guided affective reasoning.",
       "url": "https://arxiv.org/abs/2607.02885",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.02885v1 Announce Type: new Abstract: Cognitive Behavioral Therapy (CBT) provides a structured framework for understanding a user's mental state by examining the interaction between cognitive and behavioral factors. However, out-of-the-box LLMs respond fluently and empathetically, yet collapse into validation & reflection, regardless of what the user actually needs. They know theoretical CBT (scoring up to 96% accuracy on licensing exam questions) but fail to apply it effectively. We explore this gap with a knowledge-guided framework that treats CBT dialogue as controlled affective reasoning: user narratives are decomposed into Beck's Cognitive Conceptualization structure, grounded in clinical SNOMED CT concepts validated via Natural Language Inference, and a Multiple Chain-of-Thought (MCoT) strategy selection between Validation & Reflection, Socratic Questioning, or Alternative Perspectives. To measure whether such guidance actually changes behavior, we introduce the Protocol Leverage Force (F), a behavior-level metric that captures how far an intervention shifts a model away from its default response. Across three open-weight LLMs and 14 RealCBT-derived case studies, evaluated with human experts, valence-arousal trajectories, and linguistic entrainment, F shows that simply introducing protocol definitions via single chain-of-thought prompting fails to change LLM behavior, while MCoT on these definitions guides strategy selection better. Still, the effect stays within 1% (approx. 1.2-1.3%), and all models remain biased toward Validation & Reflection. These results show CBT knowledge alone does not ensure effective application, giving the affective-computing community instrumentation to measure where LLMs fall short.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:38:50Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.02966",
@@ -202,14 +202,14 @@
         "arxiv"
       ],
       "title": "Distill Where the Student Goes: Teacher-Regularized RL for English-Evidence Cross-Lingual RAG",
-      "headline": "Distill Where the Student Goes: Teacher-Regularized RL for English-Evidence Cross-Lingual RAG",
+      "headline": "TR-RAG combines teacher-regularized reinforcement learning with distillation to reduce language drift in cross-lingual RAG systems using English evidence.",
       "url": "https://arxiv.org/abs/2607.02966",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.02966v1 Announce Type: new Abstract: Cross-lingual retrieval-augmented generation (RAG) is often deployed in an English-evidence regime, where users query in diverse languages but retrieved passages remain English. In this setting, generation can fail despite strong base models: English evidence induces language drift (English or code-switching outputs) and models use evidence unreliably when producing non-English answers. We attribute these failures to two post-training challenges: (i) errors are prefix-dependent, so fixed-trajectory supervision suffers from prefix mismatch; and (ii) sequence-level (partly discrete / judge-based) rewards yield noisy credit assignment and high-variance updates. We propose TR-RAG, a teacher-regularized RL recipe that couples reward optimization with on-policy distillation on student-visited prefixes. A compact student samples on-policy answers, while a stronger frozen teacher is queried only on those prefixes and provides a prefix-wise student-to-teacher reverse-KL anchor. We further introduce a reward decomposition for English-evidence multilingual generation, combining language consistency, character 3-gram recall, and an LLM-judge score for evidence-grounded correctness. Across three benchmarks -- BioASQ-ENKB5, Hotpot-ENKB5, and naturally multilingual MKQA -- and two backbones, TR-RAG improves the composite of language adherence and evidence-grounded correctness over strong baselines. Crucially, the teacher anchor acts as a safety net: on in-domain languages it prevents the large language-consistency collapses (up to ~27 percentage points) that reward-only RL can suffer by drifting below even the base model, while on distant out-of-distribution languages -- where reward-only RL stalls at the base model's ceiling -- it still improves evidence grounding; and on character 3-gram recall the compact student sometimes surpasses its 70B teacher.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:39:01Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.02980",
@@ -223,14 +223,14 @@
         "arxiv"
       ],
       "title": "Hierarchical Sparse Attention Done Right: Toward Infinite Context Modeling",
-      "headline": "Hierarchical Sparse Attention Done Right: Toward Infinite Context Modeling",
+      "headline": "HiLS Attention mechanism achieves full-attention performance while enabling 64x context length extrapolation beyond training sequences.",
       "url": "https://arxiv.org/abs/2607.02980",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.02980v1 Announce Type: new Abstract: Scaling modern large language models (LLMs) to long contexts is limited by the quadratic computation cost, and poor length extrapolation of dense attention. Chunk-wise sparse attention offers a promising alternative, but all existing methods fall short of full attention because of their inaccurate chunk selection. We propose Hierarchical Landmark Sparse (HiLS) Attention, a chunk-wise sparse attention mechanism that learns chunk selection end-to-end under the language-modeling (LM) loss. HiLS factorizes attention hierarchically: each query performs attention independently with each retrieved chunk to extract chunk-specific information, and the resulting outputs are fused according to chunk retrieval scores. By incorporating retrieval scores into the forward attention computation, HiLS optimizes them directly with the LM loss, enabling end-to-end retrieval learning and native sparse training. Experimental results show that HiLS-Attention achieves performance comparable to, and in some cases better than, full attention at in-domain context lengths. Meanwhile, HiLS-Attention extrapolates more than $64\\times$ the training context length with 90% retrieval accuracy, far beyond full attention. Moreover, existing full-attention models can be converted to HiLS-Attention with lightweight continued pretraining, preserving in-domain performance while acquiring ultra-long-context extrapolation. Together with its sparse KV access and computation, HiLS-Attention breaks the usual efficiency-performance trade-off, enabling long-context LLMs that are both more efficient and more effective on general long-context tasks than their full-attention counterparts.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:39:17Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.03003",
@@ -244,14 +244,14 @@
         "arxiv"
       ],
       "title": "psytechlab at CLPsych 2026: Utilising Natural Language Processing methods and Large Language Models for Social Media Text Analysis",
-      "headline": "psytechlab at CLPsych 2026: Utilising Natural Language Processing methods and Large Language Models for Social Media Text Analysis",
+      "headline": "Researchers used NLP and LLM methods to analyze mental health states from social media, achieving top summarization scores in the CLPsych 2026 shared task.",
       "url": "https://arxiv.org/abs/2607.03003",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.03003v1 Announce Type: new Abstract: Social media posts are a rich and valuable source of data for analyzing mental health states and users' well-being using automated analysis tools. In this work, we demonstrate how we used a range of Natural Language Processing (NLP) methods, including Long Short-Term Memory (LSTM), BERT-based models, and Large Language Models (LLMs), for self-state and well-being analysis and summarization during the CLPsych Shared Task 2026. Our approach achieved one of the top Consistency and Contradiction scores for the summarization task and also middle-level results for the other tasks. By testing and developing such mental health-state estimation systems, we contributed to improving mental health support systems. We make our code available https://github.com/psytechlab/CLPsych2026/.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:39:25Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.03049",
@@ -265,14 +265,14 @@
         "arxiv"
       ],
       "title": "Alignment-Guided Largest Table Overlap Size Estimation",
-      "headline": "Alignment-Guided Largest Table Overlap Size Estimation",
+      "headline": "ALORE estimates table overlaps using alignment-guided row-column structure encoding instead of independent table embeddings.",
       "url": "https://arxiv.org/abs/2607.03049",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.03049v1 Announce Type: new Abstract: Fast estimation of the size of the largest overlap between tables enables blocking and query-by-table retrieval in large table repositories. The first and the state-of-the-art estimator Armadillo improves efficiency by embedding each table independently and approximating overlap ratio via embedding similarity. However, accurate estimation in heterogeneous repositories remains limited by three challenges: (C1) overlap depends on row-column structure, i.e., each matched cell must preserve both its row and column membership under a joint alignment of the two tables, but existing encodings leave this structure to be inferred indirectly; (C2) independent encoding provides no explicit channel for inter-table alignment signals, biasing prediction toward global similarity; (C3) naive value encodings overfit to corpus-specific distributions, causing cross-domain degradation. Hence, we propose ALORE, a scalable and domain-robust overlap ratio estimator built on three principles: (P1) explicitly represent row-column structure; (P2) expose inter-table alignment signals during training without expensive alignment search; (P3) reduce sensitivity to corpus-specific value distributions. ALORE instantiates these principles with a Two-View Row-Column Hypergraph encoder, alignment-guided objectives with inexpensive interaction signals, and a domain-robust value mapping. Experiments on multiple datasets spanning diverse domains and scales, including a large real-world corpus beyond prior benchmarks, show that ALORE outperforms the state of the art. ALORE reduces MAE by up to 55% overall and 69% in zero-shot transfer, while achieving up to 89x speedup. We further validate its effectiveness for query-by-table retrieval.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:39:41Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.03093",
@@ -286,14 +286,14 @@
         "arxiv"
       ],
       "title": "Don't Wait to Reply: Towards Responsive yet Thoughtful Dialogue through Proactive Thinking",
-      "headline": "Don't Wait to Reply: Towards Responsive yet Thoughtful Dialogue through Proactive Thinking",
+      "headline": "Researchers propose Proactive Thinking, allowing LLMs to pre-compute response elements during pauses to reduce latency in conversational AI.",
       "url": "https://arxiv.org/abs/2607.03093",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.03093v1 Announce Type: new Abstract: Thinking has emerged as a critical capability for Large Language Models (LLMs) tackling complex tasks. However, its reactive nature, where reasoning is passively triggered only upon receiving a user response, inevitably introduces latency that compromises conversational fluidity. This stands in sharp contrast to human dialogue, where speakers proactively anticipate and plan future content during natural pauses to ensure seamless interaction. To bridge this gap, we propose Proactive Thinking, a framework that empowers models to pre-compute potential response elements during conversational downtime instead of waiting idly for the next input. We then introduce a training-free baseline that can think ahead by anticipating future states, balancing efficiency and quality through speculative continual thinking. To evaluate this approach in practice, we adapt three benchmarks of varying complexity into time-aware environments that simulate real-time conversational flow. We demonstrate that proactive thinking effectively improves interaction efficiency without compromising performance. Ultimately, this work advocates for a fundamental shift toward more intelligent, anticipatory, and real-time conversational AI.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:39:49Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.03154",
@@ -307,14 +307,14 @@
         "arxiv"
       ],
       "title": "Conditional Diffusion Guided Knowledge Transfer for Multi-Domain Knowledge Graph Completion",
-      "headline": "Conditional Diffusion Guided Knowledge Transfer for Multi-Domain Knowledge Graph Completion",
+      "headline": "Researchers propose DMKGC, a diffusion-based method for multi-domain knowledge graph completion that generates domain-general embeddings while preserving domain-specific information.",
       "url": "https://arxiv.org/abs/2607.03154",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.03154v1 Announce Type: new Abstract: Multi-domain knowledge graph completion (MKGC) aims to improve missing triple prediction in a target KG by transferring knowledge from other support KGs. Existing methods typically enforce consistency constraints on equivalent entities across KGs to transfer knowledge, which risks suppressing domain-specific contextual information of entities. This design can also compromise entity representation information from all KG domains, impeding performance improvements, especially in low-resource data scenarios. To address this, we pioneer a generation-based paradigm for MKGC and propose DMKGC, a conditional diffusion-guided knowledge transfer framework. Our key insight is to treat each KG as a partial view of the entity entire information, and generate informative domain-general entity embeddings through diffusion models conditioned on support KGs. Particularly, we first initialize domain-agnostic entity embeddings as prior entity embeddings, and then encode them within individual KGs. Afterward, we fuse equivalent entities from support KGs as the conditional diffusion generation guidance. We leverage the prior entity embeddings as the proxy generation objective, which ensures this conditional generation to be unbiased towards any conditioned KGs. Simultaneously, we also train the generated embeddings to be predictive across KGs, thus preserving domain-specific information. Extensive experiments on 14 KGs in 3 benchmarks demonstrate a 4.3\\% average MRR improvement in tail entity prediction over state-of-the-art methods, with sustained gains in low-resource data settings.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:39:58Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.03160",
@@ -328,14 +328,14 @@
         "arxiv"
       ],
       "title": "The Role of Prompt Language and Translation-Theory-Driven Prompts in Large Language Models: A Case Study on Spanish-Chinese Journalistic Translation",
-      "headline": "The Role of Prompt Language and Translation-Theory-Driven Prompts in Large Language Models: A Case Study on Spanish-Chinese Journalistic Translation",
+      "headline": "Translation theory-driven prompts improve Spanish-Chinese journalistic translation quality in human evaluation, despite automated metrics favoring simpler baseline approaches.",
       "url": "https://arxiv.org/abs/2607.03160",
       "published_at": "2026-07-07T04:00:00Z",
       "discovered_at": "2026-07-07T04:08:24Z",
       "description": "arXiv:2607.03160v1 Announce Type: new Abstract: This study examines how prompt language and translation theory-driven prompt design influence the quality of Spanish-Chinese journalistic translations generated by GPT-5.2. A parallel corpus of four editorials from El Pais was translated under 48 experimental conditions (4 prompt types, 3 prompt languages, and 4 articles). Translation quality was assessed using BLEU and BERTScore-F1 for automated evaluation, alongside human evaluation based on the Multidimensional Quality Metrics (MQM) framework. Automated metrics identified the baseline prompt (BASE) as the best-performing condition, whereas human evaluation ranked the brief-oriented prompt (BRIEF) highest (MQM: 8.66 vs. 7.84), a reversal likely attributable to the single-reference constraint inherent in automated measures. Sub-error type analysis revealed that translation theory-driven prompts selectively reduced Awkward style errors, while Unidiomatic style errors persisted across conditions. Prompt language had a negligible impact under both evaluation paradigms. These results indicate that translation theory-driven prompts can yield measurable quality gains under expert evaluation of journalistic translations, although their pedagogical implications for language learners remain suggestive and require validation through user-based studies.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-07T04:40:08Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.03166",
