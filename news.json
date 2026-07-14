@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T05:29:53Z",
+  "generated_at": "2026-07-14T05:44:28Z",
   "items": [
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.09880",
@@ -916,14 +916,14 @@
         "arxiv"
       ],
       "title": "Safe responses matter: Output-aware safety guardrail mitigate over-refusal in MLLMs",
-      "headline": "Safe responses matter: Output-aware safety guardrail mitigate over-refusal in MLLMs",
+      "headline": "Output-aware safety guardrails predict unsafe MLLM responses in hidden states, reducing over-refusal compared to input-side safety mechanisms.",
       "url": "https://arxiv.org/abs/2607.09697",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09697v1 Announce Type: new Abstract: Existing safety mechanisms for multimodal large language models (MLLMs) face a fundamental trade-off between safety and utility. Model fine-tuning achieves robust safety but compromises general utility. Input-side safety guardrails offer a lightweight alternative, yet they suffer from severe over-refusal, indiscriminately blocking benign queries or those the model could have safely answered through refusal or advisory responses. We identify that the root cause of over-refusal lies in the input-aware paradigm: safety guardrails make safety decisions without considering whether the model itself is capable of generating safe responses. Usually, MLLMs already possess intrinsic safety mechanisms that can transform harmful inputs into harmless outputs, but input-side safety guardrails override this capability, degrading user experience. Motivated by this insight, we propose a paradigm shift toward output-aware safety guardrails. Our method operates within the model's hidden state space to predict whether the forthcoming generation will be unsafe before it is fully produced. By training a lightweight classifier via multi-instance contrastive learning on hidden state representations, our approach distinguishes between inputs that will lead to unsafe outputs and those that will not, even when the inputs themselves contain risky elements. This enables precise intervention only when the model's actual response would be harmful. Extensive experiments demonstrate that our output-aware safety guardrail matches the safety performance of existing methods while drastically reducing over-refusal, preserving the model's utility and built-in safety capabilities. Code is available at: https://github.com/kunzhan/OutGuard",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:42:38Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09704",
@@ -1021,14 +1021,14 @@
         "arxiv"
       ],
       "title": "Gauge dependence and structured-output corruption in sign-branched repetition penalties: measurements across models, inference stacks, and alternative repetition controls",
-      "headline": "Gauge dependence and structured-output corruption in sign-branched repetition penalties: measurements across models, inference stacks, and alternative repetition controls",
+      "headline": "Multiplicative repetition penalties in LLM inference engines depend on arbitrary logit values, causing inconsistent behavior and degrading structured output validity across models.",
       "url": "https://arxiv.org/abs/2607.09791",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09791v1 Announce Type: new Abstract: The multiplicative repetition penalty shipped across the LLM inference ecosystem (HuggingFace, vLLM, llama.cpp, and a dozen further engines) branches on the sign of each raw logit (divide positives by theta, multiply negatives). But the softmax is unchanged by adding a constant to every logit, so a model's logit zero-point is arbitrary, and the sign-branch reads that arbitrary point. The sign-branch is itself the accepted fix for an earlier bug, so the accepted fix branches on a quantity the training objective leaves unconstrained. Two measurable consequences follow. (1) The penalty is not well-defined: re-centring a model's logits by a constant is a provable no-op at theta=1, yet at a routine theta=1.3 it changes 58-96% of greedy tokens, where subtractive and normalized penalties change none; real checkpoints sit at widely different zero-points, so a fixed repetition_penalty is a different operation on every model. (2) It corrupts structured output: on 200 real-world JSON schemas, theta=1.3 drops the rate of valid, schema-conformant output from 97% to 23%. In our measurements, applying the penalty to normalized log-probabilities instead of raw logits removes both effects. HuggingFace already ships that operator (LogitNormalization); today it is off by default and applied after the penalty. This note gives the mechanism, the measurements (five models up to 7B, base and RLHF, on WikiText-103 prefixes; two code models on HumanEval and JSONSchemaBench; both effects replicated inside vLLM and llama.cpp through their own samplers on the same inputs), and the normalized variant.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:42:51Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09796",
@@ -1042,14 +1042,14 @@
         "arxiv"
       ],
       "title": "Metadata-Free Meta-Reweighted Direct Preference Optimization under Noisy Preference Labels",
-      "headline": "Metadata-Free Meta-Reweighted Direct Preference Optimization under Noisy Preference Labels",
+      "headline": "Researchers develop a bilevel optimization framework for Direct Preference Optimization that mitigates performance degradation from noisy preference labels without metadata.",
       "url": "https://arxiv.org/abs/2607.09796",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09796v1 Announce Type: new Abstract: Direct Preference Optimization (DPO) has become an important method for aligning large language models (LLMs) with human preferences because it removes the need for explicit reward modeling and reinforcement learning optimization. However, its performance depends heavily on the quality of preference data, and noisy preference data in real-world settings can weaken alignment performance. To address this issue, we propose a bilevel optimization framework and prove, under certain assumptions, that this framework can recover the DPO optimum under clean data. We further derive a prior form for the learnable weighting function under asymmetric label-flipping noise. Considering that high-quality metadata may be difficult to obtain, we propose a task-agnostic meta-knowledge-driven method that enables meta-learning even when metadata is completely unavailable. To reduce the high cost of higher-order gradients in LLM meta-learning, we combine central-difference approximation with LoRA fine-tuning and develop a scalable training scheme. Experiments on TL;DR summarization and Anthropic HH single-turn dialogue show that the proposed method improves training performance over multiple DPO baselines under different noise rates.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:43:03Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09798",
@@ -1063,14 +1063,14 @@
         "arxiv"
       ],
       "title": "JEPA for AI-Native 6G: Predictive Representations and Open Challenges",
-      "headline": "JEPA for AI-Native 6G: Predictive Representations and Open Challenges",
+      "headline": "JEPA, a self-supervised learning approach, enables AI-native 6G networks by predicting latent representations from partial wireless observations with improved label efficiency.",
       "url": "https://arxiv.org/abs/2607.09798",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09798v1 Announce Type: new Abstract: Sixth-generation (6G) networks are moving toward AI-native operation, where learning modules are embedded across the radio access network (RAN), edge, and core. This transition requires learning from limited labels, heterogeneous wireless and network data, partial observations, non-stationary propagation, and latency-constrained control loops. Joint-embedding predictive architecture (JEPA) is a promising self-supervised paradigm for this setting because it predicts missing or future representations in latent space instead of reconstructing raw measurements or using contrastive negative samples. This article presents a wireless-oriented tutorial on JEPA for 6G intelligence. We define the JEPA training mechanism, describe how CSI, beam measurements, KPIs, topology graphs, and sensing observations can be tokenized and masked, and position the learned encoder as a predictive representation layer for RAN, O-RAN, edge, and core functions, with task-specific heads or controllers producing final decisions. Then we present an illustrative, beam-management case study suggesting that a wireless-aware target, specifically an auxiliary future beam-energy target during self-supervised pretraining, can improve label efficiency and robustness across shifted deployment conditions relative to a supervised source domain. Finally, we outline open challenges in multi-timescale prediction, action-conditioned modeling, distributed training, trustworthiness, efficient deployment, benchmarking, and standardization.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:43:23Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09800",
@@ -1084,14 +1084,14 @@
         "arxiv"
       ],
       "title": "The Silent Freeze: Predicting When Low-Precision Training Stops Learning",
-      "headline": "The Silent Freeze: Predicting When Low-Precision Training Stops Learning",
+      "headline": "Low-precision training deterministically freezes weight updates when gradients become too small for the floating-point format, predictable from high-precision reference runs.",
       "url": "https://arxiv.org/abs/2607.09800",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09800v1 Announce Type: new Abstract: Training in reduced floating-point precision can silently halt learning: when a gradient-descent weight update falls below half the unit in the last place (ULP) of the weight, it rounds away and that coordinate freezes while its gradient is still nonzero. The freeze is deterministic, governed by a per-coordinate half-ULP condition, and predictable from a high-precision trajectory and the target mantissa length alone, without low-precision data. In a small GPT trained under the standard AdamW-plus-cosine recipe with bf16-equivalent stored weights, training proceeds normally and then permanently freezes just past mid-run, within four steps of the a-priori prediction. In a $124$-million-parameter GPT-2 transformer whose weights are constrained to the $8$-bit floating-point grid after every optimizer step, with no master weights, the dense weights freeze at initialization in both fp8 formats -- predicted \\emph{a priori} from an fp32 reference -- and validation loss plateaus while full precision keeps improving. Stochastic rounding removes the persistent freeze, and the same reference predicts that too. The condition transfers across frozen-feature regression, a mantissa-truncation emulator spanning $128\\times$ in precision, small networks, and a CNN on MNIST: a computable axis of low-precision training, not diffuse noise.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:43:38Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09801",
@@ -1105,14 +1105,14 @@
         "arxiv"
       ],
       "title": "Discovering Latent Response Laws in Forced Physical Systems",
-      "headline": "Discovering Latent Response Laws in Forced Physical Systems",
+      "headline": "FLARE learns compact latent dynamics for forced physical systems, enabling equation discovery and long-horizon response prediction from high-dimensional observations.",
       "url": "https://arxiv.org/abs/2607.09801",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09801v1 Announce Type: new Abstract: Governing equations provide compact descriptions of physical systems, yet the variables in which they are simple are often hidden in high-dimensional measurements. This challenge is sharper for forced systems, whose responses depend on both intrinsic dynamics and time-dependent inputs. Here we introduce FLARE, a forced latent autoencoder for response equations that learns compact response coordinates, identifies sparse input-dependent latent dynamics and decodes equation rollouts to full responses. By estimating latent dimension from data and separating state estimation from external forcing, FLARE enables forecasts to be initialized from past responses and driven by prescribed future inputs. Across known dynamical systems, application-scale forced responses and visual observations, FLARE recovers compact forced dynamics and predicts long-horizon high-dimensional responses under inputs not used for training. By turning learned coordinates into a dynamical interface, FLARE extends equation discovery to systems whose effective states are hidden within complex observations, providing a route for interpretable modelling and prediction of high-dimensional responses in forced dynamical systems.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:43:49Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09802",
@@ -1126,14 +1126,14 @@
         "arxiv"
       ],
       "title": "Quota Marketplace: Dynamic Pricing for Efficient Allocation of ML Training Resources",
-      "headline": "Quota Marketplace: Dynamic Pricing for Efficient Allocation of ML Training Resources",
+      "headline": "Quota Marketplace dynamically prices ML training resources to efficiently allocate scarce chips while maintaining fairness across heterogeneous workload values.",
       "url": "https://arxiv.org/abs/2607.09802",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09802v1 Announce Type: new Abstract: The escalating demand for Machine Learning (ML) training resources in recent years has resulted in a substantial gap between the high demand and the available supply. Efficient allocation of these scarce and expensive resources is crucial for organizations to maximize their return on investment. Existing resource allocation mechanisms, like Karma [OSDI'23], are designed to guarantee Pareto efficiency and max-min fairness in settings with dynamic (time-varying) user demands, but fail to preserve these key properties in the presence of demands with heterogeneous values. Given the ubiquity and inevitability of heterogeneity in organizational values of different workloads, effective resource allocation policies must accommodate these variations. In this paper, we describe the design, implementation, deployment, and theoretical analysis of Quota Marketplace, a market-based mechanism to efficiently allocate ML training chips (like GPUs), explicitly addressing scenarios with demands of heterogeneous value. We detail the implementation of this mechanism within Google and present metrics that demonstrate its impact. We also discuss many business-critical requirements that the Quota Marketplace handles quite effectively, and document the gains and opportunities it has unlocked. We establish theoretically how this market-based approach achieves the essential properties of Pareto efficiency and max-min fairness by allowing the users to express the value of their workloads and enabling dynamic resource pricing based on supply and demand fluctuations. Ultimately, the market facilitates resource allocation that aligns with organizational priorities.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:44:04Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09803",
@@ -1147,14 +1147,14 @@
         "arxiv"
       ],
       "title": "Spectral Origins of the Self-Correction Blind Spot in Autoregressive Generation",
-      "headline": "Spectral Origins of the Self-Correction Blind Spot in Autoregressive Generation",
+      "headline": "SPARC theory explains LLMs' self-correction blind spot through spectral analysis and proposes correction marker interventions.",
       "url": "https://arxiv.org/abs/2607.09803",
       "published_at": "2026-07-14T04:00:00Z",
       "discovered_at": "2026-07-14T04:12:08Z",
       "description": "arXiv:2607.09803v1 Announce Type: new Abstract: Large autoregressive language models exhibit a self-correction blind spot: they reliably fix identical errors when attributed to an external source yet fail to fix the same errors in their own outputs. Prior work has documented this phenomenon empirically, through controlled error injection, error-depth decompositions, RL-based verifier-corrector training, and intrinsic self-verification, but offers no formal model of why generating a token suppresses the ability to detect its error, no quantitative activation condition for correction markers, and no convergence guarantee for reinforcement-learning-based self-correction. We close these gaps with SPARC, a spectral-algebraic theory of self-correction in autoregressive generation. We define the error-propagation operator as the product of per-step attention Jacobians on the residual stream and prove that the blind spot arises if and only if the spectral radius of this operator is at least one. We derive a sharp activation threshold, given as a function of the spectral radius, that a correction marker must exceed, recovering the 89.3\\% blind-spot reduction observed with a simple ``Wait'' marker. We further prove that RL-based verifier-corrector training converges at a rate proportional to the squared coupling strength over the square root of the number of samples if and only if the verifier-corrector coupling matrix has spectral norm below one, and that this criterion is invariant across residual-stream autoregressive modalities, unifying text LLMs and autoregressive image and video generation. Experiments across four backbones and a visual autoregressive probe validate every theorem, with spectral predictions matching measured blind-spot rates within 3.2\\% RMSE.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-14T05:44:28Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.09816",
