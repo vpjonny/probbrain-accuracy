@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-16T23:48:11Z",
+  "generated_at": "2026-07-17T00:03:09Z",
   "items": [
     {
       "id": "hn|https://lmstudio.ai/blog/introducing-lm-studio-bionic",
@@ -123,6 +123,27 @@
       "published_at": "2026-07-16T16:00:00Z",
       "discovered_at": "2026-07-16T16:15:22Z",
       "description": "Learn how OpenAI is making ChatGPT safer for teens with age-appropriate protections, learning tools, parental controls, and expert partnerships.",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "simonw|https://simonwillison.net/2026/Jul/16/mermaid-ascii",
+      "anchor": "8eb0737ef5",
+      "source_id": "simonw",
+      "source_name": "Simon Willison",
+      "category": "writing",
+      "category_emoji": "✍️",
+      "hashtags": [
+        "writing",
+        "simonw"
+      ],
+      "title": "Mermaid to ASCII art (mermaid-ascii)",
+      "headline": "Mermaid to ASCII art (mermaid-ascii)",
+      "url": "https://simonwillison.net/2026/Jul/16/mermaid-ascii",
+      "published_at": "2026-07-16T14:57:39Z",
+      "discovered_at": "2026-07-17T00:01:23Z",
+      "description": "<p><strong>Tool:</strong> <a href=\"https://tools.simonwillison.net/mermaid-ascii\">Mermaid to ASCII art (mermaid-ascii)</a></p> <p>After building the <a href=\"https://simonwillison.net/2026/Jul/16/grok-mermaid/\">Mermaid to ASCII tool based on Grok Build's Rust code</a> I learned that there's an older, more fully-featured Go library called <a href=\"https://github.com/AlexanderGrooff/mermaid-ascii\">AlexanderGrooff/mermaid-ascii</a> that implements a similar pattern, so I had Claude Fable 5 compile that one to WebAssembly as well so I could compare the two.</p> <p>This one includes support for colors!</p> <p><img alt=\"Screenshot of a Mermaid diagram editor web app. A row of tab buttons reads: Flowchart, Multiple links, Subgraphs, Multi-line labels, Colors (selected, highlighted blue), Sequence, Alt fragment, Loop + note, Parallel. Below is a text input area containing: &quot;graph LR / Build:::good --&gt; Test:::good / Test --&gt; Deploy:::warn / Deploy --&gt; Rollback:::bad / classDef good color:#3fb950 / classDef warn color:#e3b341 / classDef bad color:#ff7b72&quot;. A control row shows an unchecked &quot;ASCII only&quot; checkbox, &quot;Padding X: 5&quot;, &quot;Padding Y: 5&quot;, &quot;Box padding: 1&quot;, and buttons &quot;Copy as text&quot; and &quot;Copy link to this diagram&quot;. At the bottom on a black background is the rendered left-to-right flowchart with four connected boxes: &quot;Build&quot; (green text), &quot;Test&quot; (green text), &quot;Deploy&quot; (yellow text), &quot;Rollback&quot; (red text), each linked by arrows.\" src=\"https://static.simonwillison.net/static/2026/mermaid-ascii.webp\" /></p> <p>Tags: <a href=\"https://simonwillison.net/tags/go\">go</a>, <a href=\"https://simonwillison.net/tags/tools\">tools</a>, <a href=\"https://simonwillison.net/tags/webassembly\">webassembly</a>, <a href=\"https://simonwillison.net/tags/mermaid\">mermaid</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -6213,27 +6234,6 @@
       "published_at": "2026-06-15T17:19:27Z",
       "discovered_at": "2026-06-15T23:44:59Z",
       "description": "<p><strong>Release:</strong> <a href=\"https://github.com/datasette/datasette-agent/releases/tag/0.3a0\">datasette-agent 0.3a0</a></p> <blockquote> <ul> <li>New tool, <code>execute_write_sql</code>, which requests user approval and then writes to a database - taking user permissions into account. <a href=\"https://github.com/datasette/datasette-agent/issues/27\">#27</a></li> </ul> </blockquote> <p>I added a mechanism for asking user approval in <a href=\"https://simonwillison.net/2026/Jun/10/datasette-agent/\">datasette agent 0.2a0</a>. The new <code>execute_write_sql</code> tool can now prompt the user for all kinds of useful operations. Here's an example where I add some pelican sightings to my <code>pelican_sightings</code> table:</p> <p><img alt=\"Screenshot of a chat interface showing a write SQL confirmation dialog. User message (blue bubble): &quot;I saw 4 pelicans flying over the harbor&quot;. Collapsed tool section: &quot;► Tool: execute_write_sql&quot;. A yellow-bordered confirmation card reads: &quot;Confirm write SQL batch / Database: pelicans / Statements execute in order. If one statement fails, later statements will not be executed. / Statement 1 / INSERT INTO pelican_sightings (number_of_pelicans, notes) VALUES (:number_of_pelicans, :notes); / number_of_pelicans 4 / notes Flying over the harbor&quot;. A table with columns &quot;Operation, Database, Table, Required permissions&quot; shows row: &quot;insert, pelicans, pelican_sightings&quot; with permission buttons &quot;insert-row&quot;, &quot;update-row&quot;, &quot;delete-row&quot;. Below: &quot;Execute 1 write SQL statement against database 'pelicans'? / Asked by tool: execute_write_sql&quot; with &quot;Yes&quot; (blue) and &quot;No&quot; (gray) buttons.\" src=\"https://static.simonwillison.net/static/2026/i-saw-pelicans-agent.jpg\" /></p> <p>The new version also enhances the <code>datasette agent chat</code> terminal mode to support approvals, and adds several new options including <code>--unsafe</code> mode for auto-approving them:</p> <blockquote> <ul> <li><code>datasette agent chat</code> can execute tools that require user approval. <a href=\"https://github.com/datasette/datasette-agent/issues/30\">#30</a></li> <li>Three new options for <code>datasette agent chat</code> - <code>--root</code> to run as root, <code>--yes</code> to approve all ask user questions, and <code>--unsafe</code> for both.</li> <li>Tools can now provide plain text alternatives to HTML, for display in the <code>datasette agent chat</code> CLI. <a href=\"https://github.com/datasette/datasette-agent/issues/31\">#31</a></li> </ul> </blockquote> <p>The <code>datasette agent chat content.db -m gpt-5.5 --unsafe</code> command can now be used to chat directly with a specific database <em>and</em> directly modify it through prompts like \"create a notes table\", \"add a note about X\" etc.</p> <p>Tags: <a href=\"https://simonwillison.net/tags/projects\">projects</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/datasette\">datasette</a>, <a href=\"https://simonwillison.net/tags/annotated-release-notes\">annotated-release-notes</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/llm-tool-use\">llm-tool-use</a>, <a href=\"https://simonwillison.net/tags/datasette-agent\">datasette-agent</a></p>",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "simonw|https://simonwillison.net/2026/Jun/15/axios-clashes-anthropics",
-      "anchor": "a6722fab93",
-      "source_id": "simonw",
-      "source_name": "Simon Willison",
-      "category": "writing",
-      "category_emoji": "✍️",
-      "hashtags": [
-        "writing",
-        "simonw"
-      ],
-      "title": "\"They screwed us\": Personality clashes sent Anthropic's models offline",
-      "headline": "\"They screwed us\": Personality clashes sent Anthropic's models offline",
-      "url": "https://simonwillison.net/2026/Jun/15/axios-clashes-anthropics",
-      "published_at": "2026-06-15T14:57:33Z",
-      "discovered_at": "2026-06-15T15:12:19Z",
-      "description": "<p><strong><a href=\"https://www.axios.com/2026/06/15/anthropic-white-house-fable-mythos\">&quot;They screwed us&quot;: Personality clashes sent Anthropic&#x27;s models offline</a></strong></p> Lots of \"source familiar with the administration's thinking\" and \"source close to Anthropic\" in this Axios piece, which is the best collection of behind-the-scenes gossip I've seen about the US government <a href=\"https://simonwillison.net/2026/Jun/13/us-government-directive-to-suspend-access/\">export control Mythos/Fable story</a> so far.</p> <p>Logan Graham, Dave Orr and blog favorite <a href=\"https://simonwillison.net/tags/nicholas-carlini/\">Nicholas Carlini</a> are supposedly meeting with the Commerce Department today in D.C. Good luck to them!</p> <p>This closing notes doesn't give me much optimism that we'll be getting Fable back any time soon:</p> <blockquote> <p><strong>The bottom line</strong>: One option is to make sure Anthropic's models can't be jailbroken — though perfect jailbreak resistance <a href=\"https://www.anthropic.com/news/fable-mythos-access\">may be</a> impossible.</p> <p>Absent that, a source familiar with the administration's thinking said it may simply come down to an attitude fix where, instead of feeling dismissed, \"everyone feels safe, secure and happy.\"</p> </blockquote> <p>I wonder if Anthropic ever successfully addressed the class of attacks describe in the <a href=\"https://llm-attacks.org/\">Universal and Transferable Adversarial Attacks on Aligned Language Models</a> paper from 2023. <p>Tags: <a href=\"https://simonwillison.net/tags/jailbreaking\">jailbreaking</a>, <a href=\"https://simonwillison.net/tags/ai\">ai</a>, <a href=\"https://simonwillison.net/tags/generative-ai\">generative-ai</a>, <a href=\"https://simonwillison.net/tags/llms\">llms</a>, <a href=\"https://simonwillison.net/tags/anthropic\">anthropic</a>, <a href=\"https://simonwillison.net/tags/claude\">claude</a>, <a href=\"https://simonwillison.net/tags/nicholas-carlini\">nicholas-carlini</a>, <a href=\"https://simonwillison.net/tags/ai-ethics\">ai-ethics</a>, <a href=\"https://simonwillison.net/tags/claude-mythos\">claude-mythos</a></p>",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
