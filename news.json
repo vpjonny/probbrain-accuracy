@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19T04:49:53Z",
+  "generated_at": "2026-07-19T05:04:48Z",
   "items": [
     {
       "id": "simonw|https://simonwillison.net/2026/Jul/19/claude-code-in-bun-in-rust",
@@ -18,6 +18,27 @@
       "published_at": "2026-07-19T03:54:09Z",
       "discovered_at": "2026-07-19T04:18:32Z",
       "description": "<p>In <a href=\"https://bun.com/blog/bun-in-rust\">Rewriting Bun in Rust</a> Jarred Sumner made the following claim:</p> <blockquote> <p>Claude Code v2.1.181 (released June 17th) and later use the Rust port of Bun. Startup got 10% faster on Linux but otherwise, barely anyone noticed. Boring is good.</p> </blockquote> <p>I decided to have a poke at my own Claude Code installation to see if I could find evidence that it was using Bun written in Rust.</p> <p>I found these two commands convincing:</p> <pre><code>strings ~/.local/bin/claude | grep -m1 'Bun v1' </code></pre> <p>For me this outputs <code>Bun v1.4.0 (macOS arm64)</code>. The most recent release of <a href=\"https://github.com/oven-sh/bun/releases\">Bun on GitHub</a> is currently <a href=\"https://github.com/oven-sh/bun/releases/tag/bun-v1.3.14\">v1.3.14</a> from May 12th, so that v1.4.0 version number in Claude supports them shipping a preview of a not-yet-released Bun version.</p> <pre><code>strings ~/.local/bin/claude | grep -Eo 'src/[[:alnum:]_./-]+\\.rs' </code></pre> <p>This outputs a list of <a href=\"https://gist.github.com/simonw/c92fb0f67b114ac26e3b95a09ddccfdc\">563 filenames</a>, starting with these:</p> <pre><code>src/runtime/bake/dev_server/mod.rs src/runtime/bake/production.rs src/bundler/bundle_v2.rs </code></pre> <p>It looks like Bun in Rust is indeed being run in production across millions of different devices. Like Jarred said, \"Boring is good\".</p> <p>Tags: <a href=\"https://simonwillison.net/tags/bun\">bun</a>, <a href=\"https://simonwillison.net/tags/rust\">rust</a>, <a href=\"https://simonwillison.net/tags/anthropic\">anthropic</a>, <a href=\"https://simonwillison.net/tags/claude-code\">claude-code</a>, <a href=\"https://simonwillison.net/tags/jarred-sumner\">jarred-sumner</a></p>",
+      "summarize": false,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "hn|https://ludic.mataroa.blog/blog/ai-mania-is-eviscerating-global-decision-making",
+      "anchor": "9bc337a455",
+      "source_id": "hn",
+      "source_name": "Hacker News",
+      "category": "community",
+      "category_emoji": "🔥",
+      "hashtags": [
+        "community",
+        "hn"
+      ],
+      "title": "AI Mania Is Eviscerating Global Decision-Making",
+      "headline": "AI Mania Is Eviscerating Global Decision-Making",
+      "url": "https://ludic.mataroa.blog/blog/ai-mania-is-eviscerating-global-decision-making/#fnref:3",
+      "published_at": "2026-07-19T01:29:19Z",
+      "discovered_at": "2026-07-19T05:03:38Z",
+      "description": "HN score 103 · 37 comments",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
@@ -2475,27 +2496,6 @@
       "published_at": "2026-07-15T19:42:53Z",
       "discovered_at": "2026-07-16T02:59:40Z",
       "description": "HN score 102 · 20 comments",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "hn|https://turntrout.com/why-i-left-google-deepmind",
-      "anchor": "9fbef99d58",
-      "source_id": "hn",
-      "source_name": "Hacker News",
-      "category": "community",
-      "category_emoji": "🔥",
-      "hashtags": [
-        "community",
-        "hn"
-      ],
-      "title": "Why I Left Google DeepMind",
-      "headline": "Why I Left Google DeepMind",
-      "url": "https://turntrout.com/why-i-left-google-deepmind",
-      "published_at": "2026-07-15T18:40:34Z",
-      "discovered_at": "2026-07-15T19:29:21Z",
-      "description": "HN score 118 · 46 comments",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
