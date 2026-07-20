@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T04:21:57Z",
+  "generated_at": "2026-07-20T04:36:56Z",
   "items": [
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15380",
@@ -181,14 +181,14 @@
         "arxiv"
       ],
       "title": "Better Starts, Better Ends: Bootstrapped Iterative Self-Reasoning Distillation for Compressed Reasoning",
-      "headline": "Better Starts, Better Ends: Bootstrapped Iterative Self-Reasoning Distillation for Compressed Reasoning",
+      "headline": "BIRD reduces reasoning model compute via two-stage self-distillation: filtering concise solutions before on-policy reverse-KL training.",
       "url": "https://arxiv.org/abs/2607.15736",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15736v1 Announce Type: new Abstract: Large reasoning models often solve problems through long chain-of-thought (CoT) traces, yet much of this computation is spent on redundant derivations, repeated self-verification, and detours that do not improve the final answer. Existing on-policy self-distillation methods reduce this cost by matching a student model to a concise copy of itself on prefixes sampled from the student's own rollouts. We show that this objective has an initialization bottleneck. Since supervision is applied only to visited prefixes, training from a verbose base model places the KL loss on contexts that are often noisy, redundant, or already off track. In such regions, a concise teacher can provide only local corrections, while the student continues to explore trajectories that an efficient reasoner should avoid. In this paper, we propose BIRD(Bootstrapped Iterative Self-Reasoning Distillation), a two-stage self-reasoning distillation method that improves the rollout distribution before on-policy training. BIRD first samples concise solutions from the base model under a brevity instruction, keeps only answer-correct traces, and performs a lightweight prompt-switch SFT step. The traces are generated with the brevity instruction but learned under the original task prompt, turning instruction-induced conciseness into a default reasoning behavior. Starting from this warm model, BIRD then applies on-policy reverse-KL distillation with a concise self-teacher, now on cleaner and more informative prefixes. Across Qwen3 series models, BIRD achieves a stronger accuracy-efficiency trade-off than prompting and cold-start on-policy distillation on MATH-500 and AIME benchmarks. On Qwen3-8B, it improves MATH-500 accuracy from 86.2% to 92.0% while reducing the average response length from 3,099 to 1,115 tokens. These results highlight prefix support as a central factor in efficient reasoning distillation.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:35:26Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15766",
@@ -202,14 +202,14 @@
         "arxiv"
       ],
       "title": "Before the Action: Benchmarking LLMs on Prospective Hypothesis Discovery",
-      "headline": "Before the Action: Benchmarking LLMs on Prospective Hypothesis Discovery",
+      "headline": "Researchers introduce HypoArena benchmark to evaluate LLMs' ability to generate hypotheses from inconclusive evidence across six scientific domains.",
       "url": "https://arxiv.org/abs/2607.15766",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15766v1 Announce Type: new Abstract: Large language models (LLMs) excel at answering pre-specified questions, yet their ability to navigate the open-ended, pre-conclusion stage of discovery remains largely unmeasured. We introduce Prospective Hypothesis Discovery (PHD), which asks models to autonomously construct grounded, discriminative, and testable hypothesis spaces from inconclusive evidence, including anomalous observations and fragmented records, to guide subsequent investigation. To evaluate this capability, we introduce HypoArena, comprising HypoData, a benchmark of 988 cases across six scientific and analytical domains, and HypoEval, an evaluation framework for open-ended hypothesis sets. To construct HypoData at scale, we propose Retrospective Context Regression, a Forge--Audit pipeline that reconstructs pre-conclusion contexts from completed expert documents by removing explicit conclusions, target hypotheses, and retrospective causal attributions while preserving the factual substrate. Because PHD admits multiple valid outputs, HypoEval combines bidirectional pairwise judgments with Bradley--Terry--Davidson aggregation for ranking and six-dimensional rubric scoring for diagnosis. Experiments on 15 frontier LLMs reveal clear capability stratification and model-dependent effects of structured analytical skills, with gains for several lower-performing models on HypoArena but regressions for other systems, including a top-performing model. Compared with absolute rubric scoring, arena evaluation resolves finer-grained differences among models, with aggregated rankings showing strong agreement with human experts and an independent judge. Together, these results support treating PHD as a distinct target for evaluating how LLMs formulate investigative directions when final conclusions are withheld. Our code and data are publicly available at github.com/SKYLENAGE-AI/HypoArena and github.com/SKYLENAGE-AI/HypoArena.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:35:36Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15829",
@@ -223,14 +223,14 @@
         "arxiv"
       ],
       "title": "Cost-efficient generative AI summarization for scalable automated essay scoring in educational assessment",
-      "headline": "Cost-efficient generative AI summarization for scalable automated essay scoring in educational assessment",
+      "headline": "Study shows GPT-5 variants can summarize long essays for automated scoring, with trade-offs between model size, summarization quality, and computational cost.",
       "url": "https://arxiv.org/abs/2607.15829",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15829v1 Announce Type: new Abstract: Automated essay scoring (AES) enables scalable assessment and timely feedback but remains challenged by transformer input-length limitations, which can cause information loss when processing long essays. This study proposes a generative AI-assisted summarization framework to improve long-form essay representation while maintaining scoring reliability. Using the ASAP 2.0 dataset, we generate controlled-length summaries with three GPT-5 variants (GPT-5, GPT-5 mini, and GPT-5 nano) and use them as inputs for downstream AES models. To preserve original writing signals, handcrafted linguistic features extracted from full essays are integrated with summary representations to form a hybrid framework. The approach is evaluated in terms of scoring performance, summarization quality, and computational cost. Scoring reliability is measured using quadratic weighted kappa (QWK), while summary quality is assessed through lexical overlap, semantic similarity, information retention, and redundancy metrics. Results show that GPT-5 mini achieves the highest agreement with human ratings, whereas GPT-5 produces the strongest summarization quality. Summary quality decreases for higher-scoring essays, indicating that more complex writing is more difficult to compress without information loss. These findings reveal trade-offs among model capacity, summary fidelity, cost efficiency, and preservation of educational constructs. This study provides an initial controlled evaluation of GPT-based summarization for AES and identifies important baselines and ablation studies required for future generalization. Overall, generative AI summarization offers a promising approach for scalable writing assessment while requiring careful validation of information preservation and fairness.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:35:46Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15847",
@@ -244,14 +244,14 @@
         "arxiv"
       ],
       "title": "CAMMAR: Culture-Aware Matryoshka for Metaphorical Arabic Representations",
-      "headline": "CAMMAR: Culture-Aware Matryoshka for Metaphorical Arabic Representations",
+      "headline": "CAMMAR representation learning framework separates lexical, cultural, and metaphorical information in Arabic embeddings through nested subspaces.",
       "url": "https://arxiv.org/abs/2607.15847",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15847v1 Announce Type: new Abstract: Metaphor in Arabic is a culturally grounded mechanism for constructing meaning, encoding cultural knowledge that shapes interpretation. Yet current Arabic language models typically collapse lexical, cultural, and metaphorical information into a single representational space, a phenomenon we term \"semantic smearing\". We introduce CAMMAR (Culture-Aware Matryoshka for Metaphorical Arabic Representations), a representation learning framework that organizes meaning into nested lexical, cultural, and metaphorical embedding subspaces through a staged semantic curriculum. The design implements compositional principles of Al-Jurjani's theory of nazum, modeling figurative meaning as compositionally grounded in prior semantic relations, and yields a training-free geometric measure of metaphoricity based on the distance between lexical and metaphorical representations. Evaluated on a new span-annotated Arabic metaphor set as word-matched figurative/literal pairs, the geometric readout detects metaphor well above chance when the inter-layer geometry is shaped by paired supervision (AUC up to 0.84; figurative outscores its literal counterpart for the same word in 82.6\\% of pairs), but sits at chance under an unsupervised domain contrast alone, a clean separation between a legible-under-supervision regime and a non-emergent one. A controlled ablation shows that grounding the lexical layer in morphological roots gives a small but consistent gain, an effect absent from direct probing that reflects the layer's quality as a measurement anchor. We will release the datasets, cultural concept inventory, and code upon acceptance.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:36:05Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15856",
@@ -265,14 +265,14 @@
         "arxiv"
       ],
       "title": "Contextual Semantic Relevance Tracks fMRI BOLD Responses During Naturalistic Speech Comprehension",
-      "headline": "Contextual Semantic Relevance Tracks fMRI BOLD Responses During Naturalistic Speech Comprehension",
+      "headline": "Contextual semantic relevance, not word surprisal, better predicts brain fMRI responses during naturalistic speech comprehension.",
       "url": "https://arxiv.org/abs/2607.15856",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15856v1 Announce Type: new Abstract: Naturalistic language comprehension requires listeners to process both local probabilistic expectations and contextual semantic relations. Surprisal has been widely used to quantify local word unexpectedness, but evidence that it robustly predicts fMRI BOLD responses during continuous comprehension has been mixed. This study investigates whether contextual semantic relevance, defined as how strongly an incoming word relates to its recent semantic context, predicts BOLD responses during naturalistic speech comprehension. We analyzed two public fMRI datasets, the Alice dataset and the Moth dataset, treating them as complementary rather than identical replications. Transformed BOLD responses were modeled with generalized additive mixed models (GAMMs) and original continuous BOLD time series were tested with FIR/deconvolution analyses. In Alice, semantic relevance was significant across all 12 ROIs (region of interest), whereas surprisal was not significant after FDR correction. In Moth, semantic relevance showed consistent negative effects across all 30 ROIs, while surprisal showed no comparable pattern. These findings suggest that semantic relevance is a promising BOLD-sensitive metric of contextual semantic fit. More broadly, our findings support the view that slow hemodynamic responses during naturalistic speech comprehension may be especially sensitive to contextual semantic integration, whereas local probabilistic prediction error may be more difficult to detect reliably with fMRI. In this sense, semantic relevance extends computational models of language comprehension from prediction alone toward context-sensitive semantic integration.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:36:18Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15861",
@@ -286,14 +286,14 @@
         "arxiv"
       ],
       "title": "Conditional Reliability of Toxicity Signals for Multilingual and Code-Mixed Abuse Detection",
-      "headline": "Conditional Reliability of Toxicity Signals for Multilingual and Code-Mixed Abuse Detection",
+      "headline": "ToxGate conditions external toxicity signals on context to improve abuse detection in multilingual and code-mixed text.",
       "url": "https://arxiv.org/abs/2607.15861",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15861v1 Announce Type: new Abstract: Moderation systems increasingly rely on external toxicity tools, but those tools are unreliable under code-mixing, transliteration, slang, and language mismatch. We study the \\emph{conditional reliability} of toxicity priors in Indian multilingual and code-mixed short text: English toxicity, Indic abuse, and rule-based severity cues can be useful evidence, but only in some linguistic and abuse-severity contexts. We propose ToxGate, a trust-fusion head that conditions each auxiliary signal on the encoder representation before adding it to the prediction state. Across three short-text abuse datasets, four transformer encoders, and five seeds per setting, ToxGate improves over matched plain encoders in 10 of 12 in-domain settings and 7 of 8 transfer settings. The largest and most interpretable gains occur in high-risk moderation slices, including explicit slurs, violent threats, and cross-dataset transfer. The broader lesson is that moderation systems should treat external toxicity tools and priors as conditional evidence rather than fixed features or ground truth, in focused ablations, source-specific gating gives the strongest results in transfer, severe-abuse slices, and high-risk triage.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:36:30Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15865",
@@ -307,14 +307,14 @@
         "arxiv"
       ],
       "title": "An MLIR-Based Compilation Method for Large Language Models",
-      "headline": "An MLIR-Based Compilation Method for Large Language Models",
+      "headline": "Researchers present an MLIR-based compilation method for deploying large language models on specialized hardware using framework-independent and hardware-specific operator dialects.",
       "url": "https://arxiv.org/abs/2607.15865",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15865v1 Announce Type: new Abstract: Large Language Models (LLMs) have become the dominant workload on modern AI accelerators, yet deploying them on specialized hardware still faces two core challenges: how to import a trained model into a compiler-friendly intermediate representation, and how to efficiently schedule the autoregressive inference loop under limited on-chip memory. This paper presents an MLIR (Multi-Level Intermediate Representation) based compilation method for large language models, illustrated using two dialects of operators, TopOp and TpuOp. TopOp serves as a high-level graph dialect that is independent of both the source framework and the target chip, and is responsible for expressing model semantics; TpuOp serves as the target hardware dialect, carrying chip-related decisions such as quantization, layer groups, and memory layout. A model is first represented as TopOp, then lowered layer by layer to TpuOp, and finally a deployable binary is generated. In addition, each Transformer layer is split into three stages for static compilation: prefill, prefill_kv (prefill with historical key-value cache), and decode, so as to accommodate the different computational characteristics of prompt-parallel processing and per-token generation. The method has been implemented in the TPU-MLIR compiler{https://github.com/sophgo/tpu-mlir} and the LLM-TPU deployment project\\footnote{https://github.com/sophgo/LLM-TPU}, supporting a variety of generative models including the Qwen, Llama, InternVL, and MiniCPM-V series, as well as multiple quantization and deployment forms such as GPTQ, AWQ, and AutoRound.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:36:40Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15870",
@@ -328,14 +328,14 @@
         "arxiv"
       ],
       "title": "How Much Human Label Variation Does Formal Semantic Structure Explain?: Group-Level Effects and Item-Level Ceilings in NLI",
-      "headline": "How Much Human Label Variation Does Formal Semantic Structure Explain?: Group-Level Effects and Item-Level Ceilings in NLI",
+      "headline": "Formal semantic structure explains only 3-3.6 percent of human label variation in natural language inference.",
       "url": "https://arxiv.org/abs/2607.15870",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:48Z",
       "description": "arXiv:2607.15870v1 Announce Type: new Abstract: Human label variation in natural language inference is increasingly treated as signal rather than noise, but how much of it formal semantic structure explains has not been measured directly. We measure it on the 3,113 SNLI and MNLI items of ChaosNLI, using a rule-based operator and monotonicity tagger validated against MED (0.883 agreement at the edit site, 0.807 on the sentence-level summary our analyses consume), three preregistered analysis blocks, and full reporting of negative results. Three bounds emerge. First, a group-level boundary: hypotheses that are not purely upward monotone show reliably higher label entropy (Cliff's delta = -0.284), and rank-based tests defend the effect against operator-presence and length reductions, though a bounded-outcome sensitivity check weakens the regression form of the length defense. Second, an item-level ceiling: the same formal profiles explain only 3.3 to 3.6 percent of entropy variance and reach a median-split AUC of 0.606, too weak to identify high-disagreement items. Third, composition invariance: across the boundary, three high-powered preregistered contrasts on validated error shares and explanation-type shares (VariErr, LiTEx) all return null results. In this sample, formal semantic structure shifts how much annotators disagree by a small amount and does not detectably change what they disagree about. ChaosNLI-S/M consists of items selected for low original agreement, and every claim is conditioned on that scope. All analyses were preregistered in a version-controlled research log, whose audit trail, including one corrected interpretation rule, the paper discloses.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T04:36:56Z"
     },
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15879",
@@ -1258,6 +1258,27 @@
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15682v1 Announce Type: new Abstract: Sampling from an unnormalized Boltzmann density requires proposals that move probability mass globally while retaining enough path-probability information for statistical correction. We introduce Neural Non-Equilibrium Hamiltonian Monte Carlo (NHMC), a train-then-correct learned Hamiltonian sampler. Starting from a tractable base distribution, NHMC learns stochastic Hamiltonian-style paths toward the target. Once training is complete, the learned proposal parameters are fixed; the proposal then generates complete paths and endpoint configurations, which are statistically corrected using the recorded non-equilibrium work. This dimensionless generalized work is determined by the probability ratio between the forward proposal path and a reverse reference path. During training, minimizing its mean reduces a path-space KL divergence and controls an upper bound on endpoint mismatch. During evaluation, the same quantity defines weights for self-normalized importance sampling on paths (path-SNIS), estimates normalizing constants or free-energy differences, and gives the acceptance ratio for path-space independent Metropolis-Hastings (path-IMH). The same forward-reverse laws also define a shared-bridge round-trip Metropolis kernel that acts directly on configurations and preserves the Boltzmann target. On double-well and finite-volume lattice $\\phi^4$ targets, the NHMC construction gives corrected estimates when path overlap is sufficient; when overlap is poor, weight degeneracy, low acceptance, and long autocorrelation expose proposal failure. We additionally report a molecular internal-coordinate feasibility study using an MD prior and learned-force path proposal.",
       "summarize": true,
+      "summarized": false,
+      "summarized_at": null
+    },
+    {
+      "id": "hn|https://xcancel.com/__alpoge__/status/2079028340955197566",
+      "anchor": "e7cb9c58b6",
+      "source_id": "hn",
+      "source_name": "Hacker News",
+      "category": "community",
+      "category_emoji": "🔥",
+      "hashtags": [
+        "community",
+        "hn"
+      ],
+      "title": "Claude Fable produced a counterexample to the Jacobian Conjecture",
+      "headline": "Claude Fable produced a counterexample to the Jacobian Conjecture",
+      "url": "https://xcancel.com/__alpoge__/status/2079028340955197566",
+      "published_at": "2026-07-20T02:51:16Z",
+      "discovered_at": "2026-07-20T04:34:53Z",
+      "description": "HN score 117 · 42 comments",
+      "summarize": false,
       "summarized": false,
       "summarized_at": null
     },
@@ -2349,27 +2370,6 @@
       "published_at": "2026-07-16T16:00:00Z",
       "discovered_at": "2026-07-16T16:15:22Z",
       "description": "Learn how OpenAI is making ChatGPT safer for teens with age-appropriate protections, learning tools, parental controls, and expert partnerships.",
-      "summarize": false,
-      "summarized": false,
-      "summarized_at": null
-    },
-    {
-      "id": "hn|https://www.zhinit.dev/blog/training-a-kick-drum-diffusion-model",
-      "anchor": "d7c5d2827e",
-      "source_id": "hn",
-      "source_name": "Hacker News",
-      "category": "community",
-      "category_emoji": "🔥",
-      "hashtags": [
-        "community",
-        "hn"
-      ],
-      "title": "How to Train a Gen AI Kick Drum Model on Your Old Linux Desktop with 6GB VRAM",
-      "headline": "How to Train a Gen AI Kick Drum Model on Your Old Linux Desktop with 6GB VRAM",
-      "url": "https://www.zhinit.dev/blog/training-a-kick-drum-diffusion-model",
-      "published_at": "2026-07-16T15:13:00Z",
-      "discovered_at": "2026-07-17T02:16:33Z",
-      "description": "HN score 100 · 54 comments",
       "summarize": false,
       "summarized": false,
       "summarized_at": null
