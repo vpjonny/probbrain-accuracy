@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T05:21:53Z",
+  "generated_at": "2026-07-20T05:36:51Z",
   "items": [
     {
       "id": "arxiv-cs.CL|https://arxiv.org/abs/2607.15380",
@@ -1021,14 +1021,14 @@
         "arxiv"
       ],
       "title": "Cache-Aware Prompt Compression:A Two-Tier Cost Model for LLM API Caching",
-      "headline": "Cache-Aware Prompt Compression:A Two-Tier Cost Model for LLM API Caching",
+      "headline": "Research proposes Cache-Aware Prompt Compression combining query-agnostic compression with cache control, achieving 49-64% cost reduction over existing LLM caching strategies.",
       "url": "https://arxiv.org/abs/2607.15516",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15516v1 Announce Type: new Abstract: Production LLM deployments combine two cost-reduction primitives: prompt caching (a discounted rate for re-used token prefixes) and prompt compression (fewer tokens sent). The compression literature has standardized on query-aware methods that produce a different compressed prefix per query, mechanically invalidating the prefix-strict cache on every call. We characterize this cost empirically on Anthropic's Sonnet 4.6 API and find caching is far from the rho=1.0 ideal the literature assumes: Sonnet's cache has a two-tier architecture with a sharp threshold near 3,500 tokens, below which the hit rate plateaus at rho~0.83 across 30-call sessions. Our cost model predicts, and experiments confirm, that under realistic rho, query-aware compression beats naive caching at high compression ratios (r>=6). We propose Cache-Aware Prompt Compression (CAPC), pairing query-agnostic compression with explicit cache_control plus a tier-preserving ratio bound that prevents over-compression from pushing the cached prefix into the hot tier. CAPC is the cheapest strategy in 16/16 configurations on LongBench-v2, with mean savings of 49% over cache-only, 64% over query-aware compression, and 90% over vanilla, at quality within 0.05 of the uncompressed baseline. We validate CAPC on three production workloads: an enterprise tool-using assistant with a 94k-token schema prefix (51.7% cost reduction at r=3); a graphify knowledge-graph RAG pipeline across two codebases (9.3x vs cache-all on FastAPI, 2.4x on httpx); and the public tau-bench retail benchmark (50 tasks), where CAPC is the cheapest of four strategies with reward exactly equal to vanilla (both 36/50, p=1.00) while query-aware compression is the most expensive at +40.1% over vanilla -- the first production confirmation of the crossover model's negative-ROI prediction on a public benchmark.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:35:12Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15524",
@@ -1042,14 +1042,14 @@
         "arxiv"
       ],
       "title": "Recursive Harness Self-Improvement",
-      "headline": "Recursive Harness Self-Improvement",
+      "headline": "RHI iteratively refines task-specific agent harnesses using feedback, improving low-reasoning-effort agent performance while reducing inference costs by up to 60%.",
       "url": "https://arxiv.org/abs/2607.15524",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15524v1 Announce Type: new Abstract: Under model--harness co-evolution, harnesses are not merely inference-time scaffolds but data-generating components whose execution traces can shape future foundation models. This motivates harness-in-the-loop learning: optimizing harnesses for both immediate agent performance and the quality of traces used for future model training. However, continually updating provider-built scaffolds is costly and labor-intensive. We therefore investigate whether optimizing user-constructed harnesses in a task-specific manner can improve execution-trace quality while remaining computationally lightweight and requiring only a few update iterations. To this end, we introduce Recursive Harness Self-Improvement (RHI), which represents the harness as a prompt-level specification of the agent loop and iteratively refines it using pairwise feedback over its own revision history. Across 30 synthetic machine-learning research tasks spanning quantitative finance, robotics, and pharmacy, a few RHI iterations suffice to substantially raise the performance ceiling of low-reasoning-effort agents, exceeding the corresponding maximum-reasoning-effort setting while reducing inference cost by up to 60%. We show that these gains arise primarily from improved task-specific context management through more effective inter-agent information flow rather than longer reasoning traces. Finally, we formalize this behavior as an information-theoretic hypothesis for RHI's implicit optimization objective, suggesting RHI as a practical algorithm for continual learning within the paradigm of model--harness co-evolution.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:35:21Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15525",
@@ -1063,14 +1063,14 @@
         "arxiv"
       ],
       "title": "Kolmogorov--Arnold Networks for Small Language Models",
-      "headline": "Kolmogorov--Arnold Networks for Small Language Models",
+      "headline": "Kolmogorov-Arnold Networks enable interpretable auditing of feed-forward functions but don't reliably replace MLPs in small language models.",
       "url": "https://arxiv.org/abs/2607.15525",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15525v1 Announce Type: new Abstract: Kolmogorov--Arnold Networks (KANs) replace fixed node activations with learned one-dimensional edge functions, offering an explicit interface for interpretation and a possible alternative to transformer feed-forward networks. We test these claims separately. In a six-layer, 10M-parameter B-spline KAN, we reconstruct all 884,736 feed-forward edges: 87.8\\% exceed (NLS>0.1) and 0.4\\% are inactive. Pruning the lowest-activity 20--25\\% causes negligible loss increase, although structured MLP neuron pruning tolerates comparable sparsity. The audit replicates on BabyLM, but grid-size sweeps show that near-total fPCA compression and high closed-form-fit coverage are properties of the low-capacity grid-2 basis, not universal KAN behavior. For replacement, we evaluate MLP, SwiGLU, grouped Chebyshev, and rational GR-KAN networks on BabyLM. The KAN-family and gated variants improve validation loss over the GELU MLP, but this ordering does not transfer to standardized benchmarks: across ten seeds and 59,875 BLiMP pairs, accuracies span 62.4--63.1\\%, EWoK remains at chance, and a (+0.7)-point GR-KAN effect on BLiMP reverses on the supplement. Larger tests are also cautionary: parameter-matched MLPEdge underperforms the MLP on Wikitext-103, and 286M-parameter GR-KAN remains below a SwiGLU ClimbMix baseline after stabilization. Thus, small-basis KANs provide a practical, corpus-transferable interface for auditing learned scalar transformations, but the tested replacements show no consistent benchmark, quality, or latency advantage over strong MLP baselines.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:35:38Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15528",
@@ -1084,14 +1084,14 @@
         "arxiv"
       ],
       "title": "Publicly-Verifiable Certificates for Statistical Algorithms",
-      "headline": "Publicly-Verifiable Certificates for Statistical Algorithms",
+      "headline": "Non-interactive proofs enable public verification that learning algorithms produce valid results with sample complexity logarithmic in adaptive queries.",
       "url": "https://arxiv.org/abs/2607.15528",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15528v1 Announce Type: new Abstract: Following Goldwasser, Rothblum, Shafer, and Yehudayoff, who defined a framework for interactive proofs of learning [ITCS'21], we initiate the study of non-interactive proofs of learning. We define and study a new notion: Publicly-Verifiable Certificates of Statistical Validity (pvCSVs), which allow for public, distributionally-robust certification that the result of a learning algorithm is valid. In a pvCSV, a learner publishes a hypothesis $h$ and corresponding certificate $\\pi$; then, any user, who holds a user-specific distribution, can read the pair $(h,\\pi)$ and determine efficiently whether the hypothesis is valid according to the user-specific distribution. We construct pvCSVs in the context of Adaptive Statistical Query (SQ) Algorithms. To certify SQ algorithms that makes $k$ adaptive queries, we construct pvCSVs where the sample complexity scales with $O(\\log k)$, whereas the sample complexity of the best learning algorithms scale with $\\tilde{O}(\\sqrt{k})$. More generally, we study proof systems for learning in the SQ model, demonstrating the model's strengths as well as its limitations.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:35:51Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15552",
@@ -1105,14 +1105,14 @@
         "arxiv"
       ],
       "title": "From Feasibility to Desirability: Plan, Learn, Adapt (PLA) Framework for Personalized On-Device Itinerary Generation",
-      "headline": "From Feasibility to Desirability: Plan, Learn, Adapt (PLA) Framework for Personalized On-Device Itinerary Generation",
+      "headline": "PLA framework balances feasibility and preferences for on-device itinerary generation using planning, learning, and adaptation; achieves 100% feasibility versus 0% for frontier LLMs.",
       "url": "https://arxiv.org/abs/2607.15552",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15552v1 Announce Type: new Abstract: Generating personalized trip itineraries is a complex planning task and involves a tension between hard combinatorial feasibility and soft latent desirability. Classical optimization enforces constraints but fails to capture subjective traveler preferences. While learning-based approaches model preferences, they cannot guarantee feasibility. Mobile deployment imposes additional resource constraints on both. To address this, we propose Plan, Learn, Adapt (PLA), a three-stage framework for personalized on-device itinerary generation. The Plan stage builds a heterogeneous ensemble of lightweight planners that produces structurally diverse feasible candidates. From pairwise itinerary comparisons, Learn fits a compact Bradley-Terry reward model that captures emergent schedule properties such as pacing, geographic coherence, and day balance, which per-POI signals miss. Finally, Adapt applies feasibility-preserving local refinement within a device-aware compute budget; every intermediate state is feasible by construction. On 2,519 pairwise human comparisons across more than 100 U.S. cities, the reward-guided ensemble achieves a 67.8% win rate, 11.2 percentage points above the best single planner, with 100% feasibility. Three frontier LLMs, GPT-5, Claude Opus 4.5, and Gemini 3 Pro, achieve 0% feasibility under the same constraints. The reward model generalizes across held-out cities, with a 67.6% mean leave-one-city-out accuracy. In production deployment within FlyEnJoy, PLA increased itinerary completion rates by 91%, with 109.9 ms average on-device latency.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:36:05Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15562",
@@ -1126,14 +1126,14 @@
         "arxiv"
       ],
       "title": "Hard Rules, Soft Preferences: Bridging Reasoning, Learning, and Optimization for Personalized Packing Checklist Generation",
-      "headline": "Hard Rules, Soft Preferences: Bridging Reasoning, Learning, and Optimization for Personalized Packing Checklist Generation",
+      "headline": "Three-stage framework integrating symbolic reasoning, preference learning, and constraint optimization creates personalized packing checklists that comply with safety requirements and user preferences.",
       "url": "https://arxiv.org/abs/2607.15562",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15562v1 Announce Type: new Abstract: Packing for air travel is recurring and error-prone: the checklist must be personal and context-aware, yet feasible under safety rules, item dependencies, and luggage limits. Existing packing assistants are template-driven and generic, or recommendation-driven but unconstrained, leaving users to manually patch regulatory and capacity violations. We propose a reasoning-guided learning framework with three stages: (1) a symbolic engine that generates a regulation-aware seed checklist with explicit dependency structure, (2) a two-stage preference learner that estimates inclusion and priority utilities from user add and remove actions while mitigating survivorship bias, and (3) a CP-SAT optimizer that selects a compact, compliant subset. The architecture instantiates a general pattern for constrained personalization, applicable wherever hard feasibility coexists with sparse preference signals. On 604 labeled trip scenarios, comprising 29K inclusion labels and 343K pairwise comparisons, the symbolic engine attains 99.7% recall and 0.96 rubric validity, compared with 0.78 to 0.81 for frontier LLMs. Gradient-boosted trees and LambdaMART reach an AUC-ROC of 0.943 and an NDCG@5 of 0.923. CP-SAT attains 100% constraint satisfaction, compared with 28% for greedy selection and 10% for random selection. Deployment in FlyEnJoy, a production iOS travel app, doubled checklist completions and reduced editing and completion time.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:36:21Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15577",
@@ -1147,14 +1147,14 @@
         "arxiv"
       ],
       "title": "Information-Directed Sampling for Causal Bandits",
-      "headline": "Information-Directed Sampling for Causal Bandits",
+      "headline": "New causal bandits methods handle non-manipulable variables using Thompson Sampling and Information-Directed Sampling with entropy-dependent regret bounds.",
       "url": "https://arxiv.org/abs/2607.15577",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15577v1 Announce Type: new Abstract: Causal bandits exploit structural relationships among variables to share information across interventions and accelerate the identification of high-reward decisions. In many applications, however, some variables cannot be directly manipulated, even though they influence the reward and provide useful information about the underlying causal system. We study contextual causal bandits with non-manipulable variables, where context variables are observed before action selection and additional variables are observed after each intervention. Assuming a known causal graph without latent confounding, we adopt a Bayesian formulation in which the conditional probability tables of the observational distribution constitute the unknown parameter. This representation allows observations collected under one intervention to update reward estimates for other interventions through their shared causal mechanisms. We develop causal variants of Thompson Sampling and Information-Directed Sampling (IDS) for this setting. For Thompson Sampling, we establish an entropy-dependent sublinear Bayesian regret bound. For IDS, we derive an entropy-dependent regret bound that explicitly quantifies the additional error introduced by Monte Carlo approximation of the expected regret and information gain; when these quantities are available exactly, the bound recovers the standard sublinear IDS rate. We further provide high-probability confidence bounds for the Monte Carlo estimates used by the algorithm. Experiments on several synthetic causal bandit tasks show that the proposed methods outperform causal and non-causal baselines by more effectively exploiting information shared across interventions.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:36:36Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15587",
@@ -1168,14 +1168,14 @@
         "arxiv"
       ],
       "title": "Rethinking Transfer in Continual Learning: A Replay-Based Realisation",
-      "headline": "Rethinking Transfer in Continual Learning: A Replay-Based Realisation",
+      "headline": "Researchers propose Transfer-Selective Replay to improve forward transfer in continual learning by selectively replaying past data predicted to benefit new tasks.",
       "url": "https://arxiv.org/abs/2607.15587",
       "published_at": "2026-07-20T04:00:00Z",
       "discovered_at": "2026-07-20T04:04:45Z",
       "description": "arXiv:2607.15587v1 Announce Type: new Abstract: Continual learning studies how deployed language models can continually acquire new tasks without expensive retraining from scratch. Existing methods, whether rehearsal-based (replaying stored past data) or rehearsal-free (regularising or isolating parameters), overwhelmingly target one objective: preventing catastrophic forgetting. Forward transfer, the past helping the future, has meanwhile been pursued almost exclusively through parameter reuse, with no explicit account of when transfer should be expected at all. We begin one step earlier: before designing a transfer mechanism, we ask when transfer should exist at all. We answer with a framework of three measurable conditions: the target task must leave room for improvement beyond its own limited supervision, transferable information must survive continued optimisation, and replay must come from compatible previous tasks. We instantiate this view as Transfer-Selective Replay (TSR), which selects replay data predicted to benefit the incoming task rather than replaying past examples indiscriminately. Selection is guided by a zero-training task signature, while distillation preserves stability on previous tasks. Under the standard continual learning protocol in the low-budget regime, TSR consistently improves forward transfer while maintaining stability, outperforming existing replay baselines across heterogeneous and homogeneous task streams. More broadly, the results argue for treating transfer as a first-class objective of continual learning, to be understood before it is engineered.",
       "summarize": true,
-      "summarized": false,
-      "summarized_at": null
+      "summarized": true,
+      "summarized_at": "2026-07-20T05:36:51Z"
     },
     {
       "id": "arxiv-cs.LG|https://arxiv.org/abs/2607.15590",
